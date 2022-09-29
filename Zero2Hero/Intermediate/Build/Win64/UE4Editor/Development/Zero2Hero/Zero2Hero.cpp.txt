@@ -1,0 +1,2 @@
+C:\Users\Cameron Chester\Documents\Unreal Projects\Zero2Hero\Intermediate\Build\Win64\UE4Editor\Development\Zero2Hero\Definitions.Zero2Hero.h
+C:\Users\Cameron Chester\Documents\Unreal Projects\Zero2Hero\Source\Zero2Hero\Zero2Hero.h

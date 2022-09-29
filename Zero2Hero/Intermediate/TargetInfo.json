@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "Zero2Hero",
+			"Path": "C:\\Users\\Cameron Chester\\Documents\\Unreal Projects\\Zero2Hero\\Source\\Zero2Hero.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "Zero2HeroEditor",
+			"Path": "C:\\Users\\Cameron Chester\\Documents\\Unreal Projects\\Zero2Hero\\Source\\Zero2HeroEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
