@@ -1,7 +1,0 @@
-C:\Users\Cameron Chester\Documents\Unreal Projects\Zero2Hero\Intermediate\Build\Win64\UE4Editor\Development\Zero2Hero\Definitions.Zero2Hero.h
-C:\Users\Cameron Chester\Documents\Unreal Projects\Zero2Hero\Source\Zero2Hero\Zero2HeroGameModeBase.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
-C:\Users\Cameron Chester\Documents\Unreal Projects\Zero2Hero\Intermediate\Build\Win64\UE4Editor\Inc\Zero2Hero\Zero2HeroGameModeBase.generated.h
