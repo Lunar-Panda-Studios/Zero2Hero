@@ -7,7 +7,11 @@
 		{
 			"Name": "Zero2Hero",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"AIModule",
+				"Engine"
+			]
 		}
 	]
 }
