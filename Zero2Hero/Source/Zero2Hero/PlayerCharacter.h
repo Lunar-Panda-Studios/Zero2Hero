@@ -37,4 +37,7 @@ public:
 	void cameraVertical(float amount);
 	void cameraHorizontal(float amount);
 
+	void MoveLeftRight(float speed);
+	void MoveUpDown(float speed);
+
 };

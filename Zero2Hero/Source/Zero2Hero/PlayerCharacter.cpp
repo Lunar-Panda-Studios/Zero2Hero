@@ -38,6 +38,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	
 	PlayerInputComponent->BindAxis(TEXT("LookVertical"), this, &APlayerCharacter::cameraVertical);
 	PlayerInputComponent->BindAxis(TEXT("LookHorizontal"), this, &APlayerCharacter::cameraHorizontal);
+	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::MoveUpDown);
+	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::MoveLeftRight);
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayerCharacter::Jump);
 
 }
 
@@ -49,5 +52,15 @@ void APlayerCharacter::cameraVertical(float amount)
 void APlayerCharacter::cameraHorizontal(float amount)
 {
 	AddControllerYawInput(amount);
+}
+
+void APlayerCharacter::MoveLeftRight(float speed)
+{
+	this->AddMovementInput(this->GetActorRightVector() * speed);
+}
+
+void APlayerCharacter::MoveUpDown(float speed)
+{
+	this->AddMovementInput(this->GetActorForwardVector() * speed);
 }
 
