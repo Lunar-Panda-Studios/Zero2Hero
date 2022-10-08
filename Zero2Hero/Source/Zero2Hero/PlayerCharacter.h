@@ -8,7 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "RangedWeapon.h"
+//#include "RangedWeapon.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -26,10 +26,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera Settings")
 		UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, Category = "Ranged Weapons")
-		TArray<ARangedWeapon*> RangedWeapons;
-	UPROPERTY()
-		ARangedWeapon* CurrentRangedWeapon;
+	//UPROPERTY(EditAnywhere, Category = "Ranged Weapons")
+	//	TArray<ARangedWeapon*> RangedWeapons;
+	//UPROPERTY()
+	//	ARangedWeapon* CurrentRangedWeapon;
 
 	UPROPERTY(EditAnywhere, Category = "Melee Attack Settings")
 		USphereComponent* MeleeCollider;

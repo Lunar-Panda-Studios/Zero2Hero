@@ -4,23 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "PatrolPath.h"
-#include "EnemyPatrolController.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "PlayerCharacter.h"
-//#include "Enemy.h"
-#include "EnemyPatrol.generated.h"
+#include "Enemy.h"
+#include "Components/SphereComponent.h"
+#include "EnemyChaseMelee.generated.h"
 
 UCLASS()
-class ZERO2HERO_API AEnemyPatrol : public ACharacter
+class ZERO2HERO_API AEnemyChaseMelee : public AEnemy
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AEnemyPatrol();
+	AEnemyChaseMelee();
+
+	UPROPERTY()
+		USphereComponent* MeleeCollider;
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +31,4 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
-		APatrolPath* PathRef;
 };
