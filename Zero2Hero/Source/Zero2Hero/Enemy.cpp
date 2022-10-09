@@ -15,6 +15,8 @@ AEnemy::AEnemy()
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
 
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+
+
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +45,11 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (InRange)
+	//{
+	//	Attack();
+	//}
+
 }
 
 // Called to bind functionality to input
@@ -52,9 +59,24 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::Attack()
+{
+}
+
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
 	CanSee = stimulus.WasSuccessfullySensed();
+
+	//if (CanSee)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Can See"));
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No See"));
+	//}
+
+
 }
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -64,6 +86,7 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		if (OtherActor->ActorHasTag("Player"))
 		{
 			InRange = true;
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
 		}
 	}
 }
@@ -75,6 +98,7 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		if (OtherActor->ActorHasTag("Player"))
 		{
 			InRange = false;
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
 		}
 	}
 }
@@ -83,11 +107,12 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	if (OtherActor->ActorHasTag("Player"))
 	{
-		if (OtherComp->ComponentHasTag("MeleeZone"))
+		if (OtherComp->ComponentHasTag("MeleeZone") || OtherComp->ComponentHasTag("Projectile"))
 		{
 			//DAMAGE SELF;
 
-			Destroy();
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
+			//Destroy();
 		}
 	}
 }

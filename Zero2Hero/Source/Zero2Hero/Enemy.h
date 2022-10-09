@@ -10,6 +10,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "PlayerCharacter.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -77,6 +78,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void Attack();
+
+	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
 
 	UFUNCTION()

@@ -52,9 +52,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (IsAttacking)
 	{
 		MeleePressTimer += DeltaTime;
+
+		if (MeleePressTimer >= MeleePressMax)
+		{
+			MeleeAttackNum = 0;
+			MeleePressTimer = 0;
+			IsAttacking = false;
+			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
 
-	if (MeleeCollider->IsActive())
+	if (MeleeCollider->IsCollisionEnabled())
 	{
 		MeleeTimer += DeltaTime;
 
@@ -64,14 +72,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 			MeleePressTimer = 0;
 			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-	}
-
-	if (MeleePressTimer >= MeleePressMax)
-	{
-		MeleeAttackNum = 0;
-		MeleePressTimer = 0;
-		IsAttacking = false;
-		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	if (MeleeAttackNum >= 3)
@@ -108,14 +108,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != this)
-	{
-		if (OtherActor->ActorHasTag("MeleeZone"))
-		{
-			//DecreaseHealth();
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
-		}
-	}
+	//if (OtherActor != this)
+	//{
+	//	if (OverlappedComponent->ComponentHasTag("MeleeZone"))
+	//	{
+	//		//DecreaseHealth();
+	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
+	//	}
+	//}
 }
 
 void APlayerCharacter::cameraVertical(float amount)

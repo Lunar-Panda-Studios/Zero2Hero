@@ -13,7 +13,7 @@ EBTNodeResult::Type UBTTask_PerceptionCheck::ExecuteTask(UBehaviorTreeComponent&
 {
 	UBlackboardComponent* BBC = OwnerComp.GetBlackboardComponent();
 
-	AEnemy* enemy = Cast<AEnemy>(OwnerComp.GetOwner());
+	AEnemy* enemy = Cast<AEnemy>(BBC->GetValue<UBlackboardKeyType_Object>("SelfActor"));
 
 	if (enemy != nullptr)
 	{

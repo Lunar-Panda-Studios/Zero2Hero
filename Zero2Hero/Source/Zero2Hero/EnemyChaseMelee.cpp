@@ -29,20 +29,23 @@ void AEnemyChaseMelee::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (MeleeCollider->IsCollisionEnabled())
+	if (InRange && AttackSpeedTimer == 0)
+	{
+		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	else
+	{
+		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (InRange)
 	{
 		AttackSpeedTimer += DeltaTime;
 
 		if (AttackSpeedTimer >= AttackSpeed)
 		{
 			AttackSpeedTimer = 0;
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-	}
-
-	if (InRange)
-	{
-		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 
 }
@@ -54,11 +57,20 @@ void AEnemyChaseMelee::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void AEnemyChaseMelee::Attack()
+{
+}
+
 void AEnemyChaseMelee::OnOverlapMelee(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->ActorHasTag("Player"))
 	{
-		//DAMAGE PLAYER
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OverlappedComponent->GetReadableName());
+		if (OtherComp->ComponentHasTag("MainBody"))
+		{
+			//DAMAGE PLAYER
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Damaged"));
+		}
 	}
 }
 

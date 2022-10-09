@@ -25,5 +25,7 @@ public:
 		UBehaviorTree* BT;
 
 	void OnPossess(APawn* InPawn);
+
+	//UFUNCTION()
 	
 };
