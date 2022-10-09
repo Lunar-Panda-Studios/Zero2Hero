@@ -19,7 +19,7 @@ public:
 
 	UPROPERTY()
 		int Damage;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		UProjectileMovementComponent* ProjectMovementComp;
 	UPROPERTY()
 		UCapsuleComponent* MainBody;

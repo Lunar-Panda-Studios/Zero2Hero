@@ -33,6 +33,14 @@ void APlayerCharacter::BeginPlay()
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
 
 	MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
+
+	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	
 }
 
@@ -179,6 +187,11 @@ void APlayerCharacter::MeleeAttack()
 
 void APlayerCharacter::RangedAttack()
 {
-	//CurrentRangedWeapon->PrimaryAttack();
+	
+	if (CurrentRangedWeapon != nullptr)
+	{
+		CurrentRangedWeapon->PrimaryAttack();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+	}
 }
 

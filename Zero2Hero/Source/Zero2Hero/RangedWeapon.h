@@ -23,7 +23,7 @@ public:
 		float Charge;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
 		float MaxCharge;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
 		TSubclassOf<AProjectile> Projectile;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
 		USphereComponent* FireLocation;
