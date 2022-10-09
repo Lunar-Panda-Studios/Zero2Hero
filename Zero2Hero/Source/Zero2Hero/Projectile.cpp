@@ -10,7 +10,6 @@ AProjectile::AProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
-
 }
 
 // Called when the game starts or when spawned
@@ -19,7 +18,9 @@ void AProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	MainBody = FindComponentByClass<UCapsuleComponent>();
-	OnActorHit.AddDynamic(this, &AProjectile::OnHit);
+	OnActorBeginOverlap.AddDynamic(this, &AProjectile::OnHit);
+
+	SetLifeSpan(20);
 
 }
 
@@ -30,11 +31,15 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
-void AProjectile::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+void AProjectile::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (!OtherActor->ActorHasTag("Projectile"))
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
+	if (!OtherActor->ActorHasTag("Player"))
 	{
-		Destroy();
+		if (!OtherActor->ActorHasTag("Projectile"))
+		{
+			Destroy();
+		}
 	}
 }
 

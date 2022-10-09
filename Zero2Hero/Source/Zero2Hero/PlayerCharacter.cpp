@@ -187,7 +187,6 @@ void APlayerCharacter::MeleeAttack()
 
 void APlayerCharacter::RangedAttack()
 {
-	
 	if (CurrentRangedWeapon != nullptr)
 	{
 		CurrentRangedWeapon->PrimaryAttack();
