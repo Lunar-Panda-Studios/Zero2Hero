@@ -31,7 +31,7 @@ public:
 	//UPROPERTY()
 	//	ARangedWeapon* CurrentRangedWeapon;
 
-	UPROPERTY(EditAnywhere, Category = "Melee Attack Settings")
+	UPROPERTY(EditAnywhere)
 		USphereComponent* MeleeCollider;
 
 	UPROPERTY(EditAnywhere, Category = "Melee Attack Settings")

@@ -12,6 +12,10 @@ AEnemy::AEnemy()
 	PlayerRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Player Radius"));
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
+	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
+	AIPC = FindComponentByClass<UAIPerceptionComponent>();
+
+	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 }
 
 // Called when the game starts or when spawned
@@ -19,14 +23,17 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//AIPC->ConfigureSense(*SightConfig);
+
 	MainBody = FindComponentByClass<UCapsuleComponent>();
 
 	PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
 	PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
 
-	//MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
+	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
 
-	
+	//AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
+
 }
 
 // Called every frame
@@ -41,6 +48,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
+{
+	CanSee = stimulus.WasSuccessfullySensed();
 }
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -67,14 +79,11 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != this)
+	if (OtherActor->ActorHasTag("Player"))
 	{
-		if (OtherActor->ActorHasTag("Player"))
+		if (OtherComp->ComponentHasTag("MeleeZone"))
 		{
-			if (OtherComp->ComponentHasTag("MeleeZone"))
-			{
-				//DAMAGE SELF;
-			}
+			//DAMAGE SELF;
 		}
 	}
 }

@@ -5,13 +5,21 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "PlayerCharacter.h"
 #include "Enemy.generated.h"
 
 UCLASS()
 class ZERO2HERO_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	AEnemy();
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Health;
@@ -48,12 +56,15 @@ class ZERO2HERO_API AEnemy : public ACharacter
 
 	UPROPERTY()
 		UCapsuleComponent* MainBody;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		USphereComponent* PlayerRadius;
+	UPROPERTY()
+		bool CanSee = false;
 
-public:
-	// Sets default values for this character's properties
-	AEnemy();
+	UPROPERTY()
+		UAIPerceptionComponent* AIPC;
+	UPROPERTY(EditAnywhere)
+		UAISenseConfig* SightConfig;
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,8 +77,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
+
+	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION()
 	void OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };
