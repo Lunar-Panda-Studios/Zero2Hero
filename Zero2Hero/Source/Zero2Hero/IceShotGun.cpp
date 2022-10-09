@@ -38,15 +38,24 @@ void AIceShotGun::PrimaryAttack()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire Location Set"));
 		FRotator Rotation = GetActorRotation();
 		AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		Icicle->Damage = Damage;
+		if (Icicle != nullptr)
+		{
+			Icicle->Damage = Damage;
+		}
 		
 		Rotation = FRotator(Rotation.Pitch, Rotation.Yaw + DegreesFromCentre, Rotation.Roll);
 		Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		Icicle->Damage = Damage;
+		if (Icicle != nullptr)
+		{
+			Icicle->Damage = Damage;
+		}
 
 		Rotation = FRotator(Rotation.Pitch, Rotation.Yaw - (DegreesFromCentre*2), Rotation.Roll);
 		Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		Icicle->Damage = Damage;
+		if (Icicle != nullptr)
+		{
+			Icicle->Damage = Damage;
+		}
 	}
 }
 

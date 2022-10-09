@@ -13,7 +13,6 @@ AEnemy::AEnemy()
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
-	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 }
@@ -26,14 +25,17 @@ void AEnemy::BeginPlay()
 	//AIPC->ConfigureSense(*SightConfig);
 
 	MainBody = FindComponentByClass<UCapsuleComponent>();
+	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 
 	PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
 	PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
 
 	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
 
-	//AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
-
+	if (AIPC != nullptr)
+	{
+		AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
+	}
 }
 
 // Called every frame
@@ -84,6 +86,8 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		if (OtherComp->ComponentHasTag("MeleeZone"))
 		{
 			//DAMAGE SELF;
+
+			Destroy();
 		}
 	}
 }

@@ -19,10 +19,7 @@ void AEnemyChaseMelee::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MeleeCollider;
-
-	//MeleeCollider->OnComponentBeginOverlap.AddDynamic(this, &AEnemyChaseMelee::OnOverlapMelee);
-
+	MeleeCollider->OnComponentBeginOverlap.AddDynamic(this, &AEnemyChaseMelee::OnOverlapMelee);
 	MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 }
