@@ -204,12 +204,26 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 void APlayerCharacter::UpDownCheck(float amount)
 {
-	upDownPressed = !upDownPressed;
+	if (amount != 0)
+	{
+		upDownPressed = true;
+	}
+	else
+	{
+		upDownPressed = false;
+	}
 }
 
 void APlayerCharacter::LeftRightCheck(float amount)
 {
-	leftRightPressed = !leftRightPressed;
+	if (amount != 0)
+	{
+		leftRightPressed = true;
+	}
+	else
+	{
+		leftRightPressed = false;
+	}
 }
 
 void APlayerCharacter::Jump()
