@@ -96,7 +96,10 @@ protected:
 		int GroundPoundDamage = 1;
 	UPROPERTY()
 		bool hasGroundPounded = false;
-
+	UPROPERTY()
+		bool upDownPressed = false;
+	UPROPERTY()
+		bool leftRightPressed = false;
 
 
 
@@ -128,6 +131,9 @@ public:
 
 	void Dash();
 	void GroundPound();
+
+	void UpDownCheck(float amount);
+	void LeftRightCheck(float amount);
 
 	
 

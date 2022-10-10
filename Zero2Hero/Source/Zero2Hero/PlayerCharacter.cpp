@@ -104,7 +104,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis(TEXT("LookVertical"), this, &APlayerCharacter::cameraVertical);
 	PlayerInputComponent->BindAxis(TEXT("LookHorizontal"), this, &APlayerCharacter::cameraHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::MoveUpDown);
+	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::UpDownCheck);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::MoveLeftRight);
+	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::LeftRightCheck);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayerCharacter::DoubleJump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayerCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::MeleeAttack);
@@ -200,6 +202,16 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	}
 }
 
+void APlayerCharacter::UpDownCheck(float amount)
+{
+	upDownPressed = !upDownPressed;
+}
+
+void APlayerCharacter::LeftRightCheck(float amount)
+{
+	leftRightPressed = !leftRightPressed;
+}
+
 void APlayerCharacter::Jump()
 {
 	Super::Jump();
@@ -211,7 +223,11 @@ void APlayerCharacter::DoubleJump()
 	if (doubleJumpCount == 1 && canDoubleJump)
 	{
 		FVector forwardDir = GetActorRotation().Vector();
-		FVector dir = forwardDir * doubleJumpHeight + FVector(0, 0, doubleJumpHeight);
+		FVector dir = FVector(0, 0, doubleJumpHeight);
+		if (upDownPressed || leftRightPressed)
+		{
+			dir = forwardDir * doubleJumpHeight + FVector(0, 0, doubleJumpHeight);
+		}
 		LaunchCharacter(dir, true, true);
 		
 		doubleJumpCount++;
