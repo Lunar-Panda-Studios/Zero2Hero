@@ -3,6 +3,12 @@
 
 #include "EnemyChaseController.h"
 
+AEnemyChaseController::AEnemyChaseController()
+{
+
+
+}
+
 void AEnemyChaseController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
