@@ -2,6 +2,9 @@
 
 
 #include "PlayerCharacter.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet\KismetSystemLibrary.h"
+#include "Enemy.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -48,6 +51,8 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	currentDashCooldown += DeltaTime;
 
 	if (IsAttacking)
 	{
@@ -100,9 +105,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis(TEXT("LookHorizontal"), this, &APlayerCharacter::cameraHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBackward"), this, &APlayerCharacter::MoveUpDown);
 	PlayerInputComponent->BindAxis(TEXT("MoveLeftRight"), this, &APlayerCharacter::MoveLeftRight);
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayerCharacter::DoubleJump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayerCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::MeleeAttack);
+	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::GroundPound);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Pressed, this, &APlayerCharacter::RangedAttack);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &APlayerCharacter::BeginCrouch);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
+	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
+	
+
 
 }
 
@@ -150,8 +162,91 @@ void APlayerCharacter::MoveUpDown(float speed)
 	this->AddMovementInput(Direction * speed);
 }
 
-void APlayerCharacter::MeleeAttack()
+void APlayerCharacter::BeginCrouch() 
 {
+	Crouch(); 
+	//will probably have to override this built in crouch function to make one that plays our crouch anim. Or I could put that here
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Crouching"));
+}
+
+void APlayerCharacter::EndCrouch()
+{
+	UnCrouch();
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Uncrouching"));
+}
+
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	doubleJumpCount = 0;
+	if (hasGroundPounded)
+	{
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+		traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+		TArray<AActor*> ignoreActors;
+		ignoreActors.Init(this, 1);
+		TArray<AActor*> actors;
+		UClass* seekClass = ACharacter::StaticClass();
+		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), GroundPoundRadius, traceObjectTypes, seekClass, ignoreActors, actors);
+		hasGroundPounded = false;
+		DrawDebugSphere(GetWorld(), GetActorLocation(), GroundPoundRadius, 12, FColor::Red, false, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
+		for (AActor* overlappedActor : actors) 
+		{
+			//for now it just spits out the overlapped actors into the log. When we implement health, it will be simple
+			//to get the actors and call the function that removes health from them.
+			UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+		}
+	}
+}
+
+void APlayerCharacter::Jump()
+{
+	Super::Jump();
+	doubleJumpCount++;
+}
+
+void APlayerCharacter::DoubleJump()
+{
+	if (doubleJumpCount == 1 && canDoubleJump)
+	{
+		FVector forwardDir = GetActorRotation().Vector();
+		FVector dir = forwardDir * doubleJumpHeight + FVector(0, 0, doubleJumpHeight);
+		LaunchCharacter(dir, true, true);
+		
+		doubleJumpCount++;
+	}
+}
+void APlayerCharacter::Dash()
+{
+	if (currentDashCooldown >= dashCooldown)
+	{
+		FVector forwardDir = GetActorRotation().Vector();
+		FVector dir = forwardDir * dashDist * dashSpeed + FVector(0, 0, -doubleJumpHeight);
+		LaunchCharacter(dir, true, true);
+		currentDashCooldown = 0.0f;
+	}
+}
+
+void APlayerCharacter::GroundPound()
+{
+	FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - GroundPoundMinDist);
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
+	if(!Hit.IsValidBlockingHit())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("GroundPound"));
+		FVector downDir = FVector::DownVector;
+		LaunchCharacter(downDir * GroundPoundForce, true, true);
+		hasGroundPounded = true;
+	}
+}
+
+void APlayerCharacter::MeleeAttack()
+{ 
 	if (CanAttack)
 	{
 		MeleeTimer = 0;

@@ -67,6 +67,39 @@ protected:
 	UPROPERTY()
 		UCapsuleComponent* CapCollider;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool canDoubleJump = true;
+
+	UPROPERTY()
+		int doubleJumpCount = 0;
+
+	UPROPERTY()
+		float currentDashCooldown = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float doubleJumpHeight = 600.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float dashSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float dashDist = 50.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float dashCooldown = 0.5f;
+	UPROPERTY()
+		bool hasDashed = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float GroundPoundMinDist = 50.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float GroundPoundForce = 1000.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float GroundPoundRadius = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int GroundPoundDamage = 1;
+	UPROPERTY()
+		bool hasGroundPounded = false;
+
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -76,7 +109,6 @@ public:
 	UFUNCTION()
 		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-
 	void cameraVertical(float amount);
 	void cameraHorizontal(float amount);
 
@@ -85,5 +117,18 @@ public:
 
 	void MeleeAttack();
 	void RangedAttack();
+
+	void BeginCrouch();
+	void EndCrouch();
+
+	virtual void Landed(const FHitResult& Hit) override;
+	virtual void Jump() override;
+
+	void DoubleJump();
+
+	void Dash();
+	void GroundPound();
+
+	
 
 };
