@@ -240,7 +240,7 @@ void APlayerCharacter::DoubleJump()
 		FVector dir = FVector(0, 0, doubleJumpHeight);
 		if (upDownPressed || leftRightPressed)
 		{
-			dir = forwardDir * doubleJumpHeight + FVector(0, 0, doubleJumpHeight);
+			dir = forwardDir * doubleJumpThrust + FVector(0, 0, doubleJumpHeight);
 		}
 		LaunchCharacter(dir, true, true);
 		

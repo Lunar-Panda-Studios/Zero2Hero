@@ -78,6 +78,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float doubleJumpHeight = 600.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float doubleJumpThrust = 400.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float dashSpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float dashDist = 50.0f;
