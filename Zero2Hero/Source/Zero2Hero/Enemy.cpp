@@ -26,7 +26,7 @@ void AEnemy::BeginPlay()
 
 	//AIPC->ConfigureSense(*SightConfig);
 
-	MainBody = FindComponentByClass<UCapsuleComponent>();
+	MainBody = FindComponentByClass<UBoxComponent>();
 	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 
 	PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
@@ -112,7 +112,7 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 			//DAMAGE SELF;
 
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
-			//Destroy();
+			Destroy();
 		}
 	}
 }

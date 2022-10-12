@@ -252,7 +252,23 @@ void APlayerCharacter::Dash()
 	if (currentDashCooldown >= dashCooldown)
 	{
 		FVector forwardDir = GetActorRotation().Vector();
-		FVector dir = forwardDir * dashDist * dashSpeed + FVector(0, 0, -doubleJumpHeight);
+
+		FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - dashGroundedCheck);
+		FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+		FHitResult Hit;
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+		DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
+		FVector dir;
+		if (!Hit.IsValidBlockingHit())
+		{
+			dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
+		}
+		else
+		{
+			dir = forwardDir * dashVelocity;
+		}
 		LaunchCharacter(dir, true, true);
 		currentDashCooldown = 0.0f;
 	}
@@ -265,7 +281,7 @@ void APlayerCharacter::GroundPound()
 
 	FHitResult Hit;
 	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
-	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
+	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
 	if(!Hit.IsValidBlockingHit())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("GroundPound"));

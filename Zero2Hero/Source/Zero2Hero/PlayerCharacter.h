@@ -80,11 +80,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float doubleJumpThrust = 400.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float dashSpeed = 1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float dashDist = 50.0f;
+		float dashVelocity = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float dashCooldown = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float dashPushDown = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float dashGroundedCheck = 30.0f;
 	UPROPERTY()
 		bool hasDashed = false;
 

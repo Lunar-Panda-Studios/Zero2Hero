@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -47,16 +48,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DropChance;
 
-	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
+	/*UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AgroRadius;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float DeaggroRadius;
+		float DeaggroRadius;*/
 	UPROPERTY()
 		bool InRange = false;
 
-	UPROPERTY()
-		UCapsuleComponent* MainBody;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UBoxComponent* MainBody;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* PlayerRadius;
 	UPROPERTY()
