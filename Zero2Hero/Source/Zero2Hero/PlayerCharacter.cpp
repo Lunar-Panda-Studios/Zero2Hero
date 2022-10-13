@@ -134,14 +134,14 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 void APlayerCharacter::cameraVertical(float amount)
 {
-	AddControllerPitchInput(amount * TurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
 	//springArm->AddLocalRotation(FRotator(amount, 0, 0));
 }
 
 void APlayerCharacter::cameraHorizontal(float amount)
 {
-	AddControllerYawInput(amount * TurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerYawInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
 	//springArm->AddLocalRotation(FRotator(0, amount, 0));
 }
@@ -224,6 +224,36 @@ void APlayerCharacter::LeftRightCheck(float amount)
 	{
 		leftRightPressed = false;
 	}
+}
+
+int APlayerCharacter::GetHealth()
+{
+	return Health;
+}
+
+void APlayerCharacter::IncreaseHealth(int amount)
+{
+	Health += amount;
+}
+
+void APlayerCharacter::DecreaseHealth(int amount)
+{
+	Health -= amount;
+}
+
+int APlayerCharacter::GetAmmo()
+{
+	return Ammo;
+}
+
+void APlayerCharacter::IncreaseAmmo(int amount)
+{
+	Ammo += amount;
+}
+
+void APlayerCharacter::DecreaseAmmo(int amount)
+{
+	Ammo -= amount;
 }
 
 void APlayerCharacter::Jump()

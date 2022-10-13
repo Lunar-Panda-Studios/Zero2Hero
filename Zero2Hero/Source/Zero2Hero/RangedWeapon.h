@@ -17,20 +17,20 @@ public:
 	// Sets default values for this actor's properties
 	ARangedWeapon();
 
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		int Damage;
-	UPROPERTY()
-		float Charge;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		float MaxCharge;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		TSubclassOf<AProjectile> Projectile;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		USphereComponent* FireLocation;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
+		int Damage;
+	UPROPERTY()
+		int Charge;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float MaxCharge;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		TSubclassOf<AProjectile> Projectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		USphereComponent* FireLocation;
 
 public:	
 	// Called every frame
@@ -38,5 +38,12 @@ public:
 
 	virtual void PrimaryAttack();
 	virtual void SecondaryAttack();
+
+	UFUNCTION(BlueprintCallable)
+	int GetCharge();
+	UFUNCTION(BlueprintCallable)
+	void IncreaseCharge(int amount);
+	UFUNCTION(BlueprintCallable)
+	void DecreaseCharge(int amount);
 
 };

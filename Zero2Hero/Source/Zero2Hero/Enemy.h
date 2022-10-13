@@ -23,34 +23,33 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
+	UPROPERTY()
+		bool CanSee = false;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Health;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Damage;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float MovementSpeed;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float CombatMovementSpeed;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackCooldown;
 	UPROPERTY()
 		float AttackCooldownTimer;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackSpeed;
 	UPROPERTY()
 		float AttackSpeedTimer;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DropChance;
-
 	/*UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AgroRadius;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DeaggroRadius;*/
 	UPROPERTY()
@@ -60,17 +59,11 @@ public:
 		UBoxComponent* MainBody;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* PlayerRadius;
-	UPROPERTY()
-		bool CanSee = false;
 
 	UPROPERTY()
 		UAIPerceptionComponent* AIPC;
 	UPROPERTY(EditAnywhere)
 		UAISenseConfig* SightConfig;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 public:	
 	// Called every frame

@@ -39,3 +39,18 @@ void ARangedWeapon::SecondaryAttack()
 {
 }
 
+int ARangedWeapon::GetCharge()
+{
+	return Charge;
+}
+
+void ARangedWeapon::IncreaseCharge(int amount)
+{
+	Charge += amount;
+}
+
+void ARangedWeapon::DecreaseCharge(int amount)
+{
+	Charge += amount;
+}
+
