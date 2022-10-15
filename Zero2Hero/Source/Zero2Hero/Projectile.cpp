@@ -20,7 +20,7 @@ void AProjectile::BeginPlay()
 	MainBody = FindComponentByClass<UCapsuleComponent>();
 	OnActorBeginOverlap.AddDynamic(this, &AProjectile::OnHit);
 
-	SetLifeSpan(20);
+	SetLifeSpan(10);
 
 }
 

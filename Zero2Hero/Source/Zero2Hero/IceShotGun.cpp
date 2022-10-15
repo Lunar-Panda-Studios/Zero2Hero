@@ -36,25 +36,19 @@ void AIceShotGun::PrimaryAttack()
 	if (FireLocation != nullptr)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire Location Set"));
-		FRotator Rotation = GetActorRotation();
-		AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		if (Icicle != nullptr)
-		{
-			Icicle->Damage = Damage;
-		}
-		
-		Rotation = FRotator(Rotation.Pitch, Rotation.Yaw + DegreesFromCentre, Rotation.Roll);
-		Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		if (Icicle != nullptr)
-		{
-			Icicle->Damage = Damage;
-		}
+		FRotator Rotation;
 
-		Rotation = FRotator(Rotation.Pitch, Rotation.Yaw - (DegreesFromCentre*2), Rotation.Roll);
-		Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		if (Icicle != nullptr)
+		FRotator Max = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll + DegreesAroundCentre/2, GetActorRotation().Yaw);
+		FRotator Min = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll - DegreesAroundCentre/2, GetActorRotation().Yaw);
+
+		for (int i = 0; i < IcicleNumber; i++)
 		{
-			Icicle->Damage = Damage;
+			Rotation = FRotator(GetActorRotation().Pitch, (GetActorRotation().Yaw - DegreesAroundCentre/4) + FMath::FRandRange(Min.Yaw, Max.Yaw), (GetActorRotation().Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
+			AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+			if (Icicle != nullptr)
+			{
+				Icicle->Damage = Damage;
+			}
 		}
 	}
 }

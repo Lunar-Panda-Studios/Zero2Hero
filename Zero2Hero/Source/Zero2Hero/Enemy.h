@@ -12,6 +12,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "PlayerCharacter.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -32,7 +33,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Damage;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float MovementSpeed;
+		float MovementSpeed = 600.0f;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float CombatMovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
@@ -63,6 +64,9 @@ protected:
 		UAIPerceptionComponent* AIPC;
 	UPROPERTY(EditAnywhere)
 		UAISenseConfig* SightConfig;
+
+	UPROPERTY(EditAnywhere)
+		UCharacterMovementComponent* MovementComp;
 
 public:	
 	// Called every frame
