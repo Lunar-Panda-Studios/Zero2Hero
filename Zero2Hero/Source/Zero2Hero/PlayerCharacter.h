@@ -10,7 +10,8 @@
 #include "Components/CapsuleComponent.h"
 #include "RangedWeapon.h"
 #include "GrapplingHook.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "HookPoint.h"
+#include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -75,7 +76,9 @@ protected:
 	UPROPERTY()
 		FVector DirectionGrapple;
 	UPROPERTY()
-		UCharacterMovementComponent* CharacterMovementComp;
+		UStaticMeshComponent* ConeSight;
+	UPROPERTY(EditAnywhere, Category = "Grappling Hook")
+		TSubclassOf<AHookPoint> HookPoints;
 
 	UPROPERTY(EditAnywhere)
 		USphereComponent* MeleeCollider;

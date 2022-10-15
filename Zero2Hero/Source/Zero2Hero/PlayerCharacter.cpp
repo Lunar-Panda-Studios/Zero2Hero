@@ -32,6 +32,9 @@ void APlayerCharacter::BeginPlay()
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 
+	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
+	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
+
 	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
 
@@ -45,10 +48,17 @@ void APlayerCharacter::BeginPlay()
 	GrapplingHook->SetCamera(Camera);
 	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+	//Giving Hook Points Grappling Hook
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), HookPoints, FoundActors);
+
+	for (int i = 0; i < FoundActors.Num(); i++)
+	{
+		Cast<AHookPoint>(FoundActors[i])->SetGrapplingHook(GrapplingHook);
+	}
+
 	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
 	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
-	CharacterMovementComp = FindComponentByClass<UCharacterMovementComponent>();
 	
 }
 
@@ -377,14 +387,19 @@ void APlayerCharacter::HookShot()
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Pressed"));
 	if (HasHookShot)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Hook"));
-		if (GrapplingHook->Fire())
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hooked"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetGrapplePoint()->GetHumanReadableName());
+		if(GrapplingHook->GetGrapplePoint() != nullptr)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
-			DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
-			LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hook In Sight"));
+			if (GrapplingHook->Fire())
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
+				DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+				LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 
-			Hooked = true;
+				Hooked = true;
+			}
 		}
 	}
 }

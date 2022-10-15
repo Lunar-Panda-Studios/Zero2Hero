@@ -22,8 +22,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-		float Range;
+	//UPROPERTY(EditAnywhere)
+	//	float Range;
 
 	UPROPERTY(EditAnywhere)
 		USphereComponent* FireLocation;
@@ -31,6 +31,9 @@ protected:
 		UCameraComponent* CameraComponent;
 	UPROPERTY()
 		FHitResult HookHit;
+
+	UPROPERTY()
+		AActor* GrapplePoint = nullptr;
 
 
 public:	
@@ -45,5 +48,10 @@ public:
 		void SetCamera(UCameraComponent* Camera);
 	UFUNCTION()
 		bool HookReturned();
+
+	UFUNCTION()
+		void SetGrapplePoint(AActor* NewPoint);
+	UFUNCTION()
+		AActor* GetGrapplePoint();
 
 };

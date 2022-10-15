@@ -31,13 +31,13 @@ void AGrapplingHook::Tick(float DeltaTime)
 
 bool AGrapplingHook::Fire()
 {
-	FVector LineTraceEnd = (CameraComponent->GetForwardVector() * Range) + FireLocation->GetComponentLocation();
-	//FVector Start = FireLocation->GetComponentLocation();
+	//FVector LineTraceEnd = (CameraComponent->GetForwardVector() * Range) + FireLocation->GetComponentLocation();
+	FVector LineTraceEnd = GrapplePoint->GetActorLocation();
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(this->GetOwner());
 
 	GetWorld()->LineTraceSingleByChannel(OUT HookHit, FireLocation->GetComponentLocation(), LineTraceEnd, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
-	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Black, false, 1.0f, 0, 5);
+	//DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Black, false, 1.0f, 0, 5);
 	FVector dir;
 	if (HookHit.IsValidBlockingHit())
 	{
@@ -68,5 +68,25 @@ FHitResult AGrapplingHook::GetHit()
 void AGrapplingHook::SetCamera(UCameraComponent* Camera)
 {
 	CameraComponent = Camera;
+}
+
+void AGrapplingHook::SetGrapplePoint(AActor* NewPoint)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Set Grapple"));
+	GrapplePoint = NewPoint;
+
+	//if (GrapplePoint != nullptr)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not Null"));
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Null"));
+	//}
+}
+
+AActor* AGrapplingHook::GetGrapplePoint()
+{
+	return GrapplePoint;
 }
 
