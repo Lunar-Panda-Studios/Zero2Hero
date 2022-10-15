@@ -9,6 +9,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "RangedWeapon.h"
+#include "GrapplingHook.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -58,10 +60,25 @@ protected:
 		TArray<TSubclassOf<ARangedWeapon>> RangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		ARangedWeapon* CurrentRangedWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
+		TSubclassOf<AGrapplingHook> Grappling;
+	UPROPERTY()
+		bool HasHookShot = true;
+	UPROPERTY()
+		AGrapplingHook* GrapplingHook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
+		float GrapplingSpeed;
+	UPROPERTY()
+		float CurrentDistanceGrapple = 0.0f;
+	UPROPERTY()
+		bool Hooked;
+	UPROPERTY()
+		FVector DirectionGrapple;
+	UPROPERTY()
+		UCharacterMovementComponent* CharacterMovementComp;
 
 	UPROPERTY(EditAnywhere)
 		USphereComponent* MeleeCollider;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		int MeleeDamage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
@@ -106,8 +123,6 @@ protected:
 	UPROPERTY()
 		bool leftRightPressed = false;
 
-
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -125,6 +140,8 @@ public:
 
 	void MeleeAttack();
 	void RangedAttack();
+
+	void HookShot();
 
 	void BeginCrouch();
 	void EndCrouch();

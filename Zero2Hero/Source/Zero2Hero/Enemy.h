@@ -23,9 +23,6 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
-	UPROPERTY()
-		bool CanSee = false;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,6 +51,8 @@ protected:
 		float DeaggroRadius;*/
 	UPROPERTY()
 		bool InRange = false;
+	UPROPERTY()
+		bool CanSee = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -73,6 +72,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Attack();
+
+	UFUNCTION()
+		bool GetCanSee();
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);

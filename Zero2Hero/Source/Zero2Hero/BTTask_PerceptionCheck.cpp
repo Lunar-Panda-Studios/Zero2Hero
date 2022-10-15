@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_PerceptionCheck::ExecuteTask(UBehaviorTreeComponent&
 
 	if (enemy != nullptr)
 	{
-		BBC->SetValue<UBlackboardKeyType_Bool>("LineOfSight", enemy->CanSee);
+		BBC->SetValue<UBlackboardKeyType_Bool>("LineOfSight", enemy->GetCanSee());
 
 		return EBTNodeResult::Succeeded;
 	}

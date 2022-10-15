@@ -63,6 +63,11 @@ void AEnemy::Attack()
 {
 }
 
+bool AEnemy::GetCanSee()
+{
+	return CanSee;
+}
+
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
 	CanSee = stimulus.WasSuccessfullySensed();
