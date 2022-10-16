@@ -59,6 +59,9 @@ void APlayerCharacter::BeginPlay()
 
 	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
 	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	MaxHealth = Health;
+	MaxAmmo = Ammo;
 	
 }
 
@@ -377,8 +380,12 @@ void APlayerCharacter::RangedAttack()
 {
 	if (CurrentRangedWeapon != nullptr)
 	{
-		CurrentRangedWeapon->PrimaryAttack();
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		if (CurrentRangedWeapon->DecreaseCharge(CurrentRangedWeapon->GetUsage()))
+		{
+			CurrentRangedWeapon->PrimaryAttack();
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		}
+
 	}
 }
 

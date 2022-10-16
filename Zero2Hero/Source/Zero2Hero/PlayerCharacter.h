@@ -30,8 +30,10 @@ protected:
 		int Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 		int Ammo;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		int Charge;
+	UPROPERTY()
+		int MaxHealth;
+	UPROPERTY()
+		int MaxAmmo;
 
 	UPROPERTY()
 		float MeleePressTimer = 0;
@@ -161,16 +163,16 @@ public:
 	void LeftRightCheck(float amount);
 
 	UFUNCTION(BlueprintCallable)
-	int GetHealth();
+		int GetHealth();
 	UFUNCTION(BlueprintCallable)
-	void IncreaseHealth(int amount);
+		void IncreaseHealth(int amount);
 	UFUNCTION(BlueprintCallable)
-	void DecreaseHealth(int amount);
+		void DecreaseHealth(int amount);
 
 	UFUNCTION(BlueprintCallable)
-	int GetAmmo();
+		int GetAmmo();
 	UFUNCTION(BlueprintCallable)
-	void IncreaseAmmo(int amount);
+		void IncreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
-	void DecreaseAmmo(int amount);
+		void DecreaseAmmo(int amount);
 };

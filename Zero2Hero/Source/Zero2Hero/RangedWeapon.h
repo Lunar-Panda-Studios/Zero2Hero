@@ -23,6 +23,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
 		int Damage;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
+		int ChargeUsage = 10;
 	UPROPERTY()
 		int Charge;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
@@ -40,10 +42,12 @@ public:
 	virtual void SecondaryAttack();
 
 	UFUNCTION(BlueprintCallable)
-	int GetCharge();
+		int GetCharge();
 	UFUNCTION(BlueprintCallable)
-	void IncreaseCharge(int amount);
+		void IncreaseCharge(int amount);
 	UFUNCTION(BlueprintCallable)
-	void DecreaseCharge(int amount);
+		bool DecreaseCharge(int amount);
+	UFUNCTION(BlueprintCallable)
+		int GetUsage();
 
 };

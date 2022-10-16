@@ -30,10 +30,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void PrimaryAttack() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SecondaryAttack() override;
 
 };

@@ -49,8 +49,19 @@ void ARangedWeapon::IncreaseCharge(int amount)
 	Charge += amount;
 }
 
-void ARangedWeapon::DecreaseCharge(int amount)
+bool ARangedWeapon::DecreaseCharge(int amount)
 {
-	Charge += amount;
+	if (Charge - amount < 0)
+	{
+		return false;
+	}
+
+	Charge -= amount;
+	return true;
+}
+
+int ARangedWeapon::GetUsage()
+{
+	return ChargeUsage;
 }
 
