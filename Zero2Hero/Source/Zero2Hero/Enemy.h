@@ -12,6 +12,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "PlayerCharacter.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -23,54 +24,49 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Health;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Damage;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float MovementSpeed;
-
+		float MovementSpeed = 600.0f;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float CombatMovementSpeed;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackCooldown;
 	UPROPERTY()
 		float AttackCooldownTimer;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackSpeed;
 	UPROPERTY()
 		float AttackSpeedTimer;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DropChance;
-
 	/*UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AgroRadius;
-
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DeaggroRadius;*/
 	UPROPERTY()
 		bool InRange = false;
+	UPROPERTY()
+		bool CanSee = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* PlayerRadius;
-	UPROPERTY()
-		bool CanSee = false;
 
 	UPROPERTY()
 		UAIPerceptionComponent* AIPC;
 	UPROPERTY(EditAnywhere)
 		UAISenseConfig* SightConfig;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere)
+		UCharacterMovementComponent* MovementComp;
 
 public:	
 	// Called every frame
@@ -80,6 +76,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Attack();
+
+	UFUNCTION()
+		bool GetCanSee();
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
