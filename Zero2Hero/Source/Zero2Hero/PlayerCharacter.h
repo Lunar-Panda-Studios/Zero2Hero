@@ -145,6 +145,7 @@ public:
 
 	void MeleeAttack();
 	void RangedAttack();
+	void RangedAttackEnd();
 
 	void HookShot();
 

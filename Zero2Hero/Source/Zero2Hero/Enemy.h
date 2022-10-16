@@ -30,6 +30,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Health;
+	UPROPERTY()
+		int MaxHealth;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		int Damage;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
@@ -54,6 +56,14 @@ protected:
 		bool InRange = false;
 	UPROPERTY()
 		bool CanSee = false;
+	UPROPERTY()
+		float FlameThrowerDamageTimer = 0.0f;
+	UPROPERTY()
+		float FlameThrowerDamageTimerMax = 1.0f;
+	UPROPERTY()
+		bool OnFire = false;
+	UPROPERTY()
+		int FlameDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -79,6 +89,15 @@ public:
 
 	UFUNCTION()
 		bool GetCanSee();
+	UFUNCTION()
+		void SetOnFire(bool isOnFire);
+	UFUNCTION()
+		void SetFlameDamage(int amount);
+
+	UFUNCTION()
+		void DecreaseHealth(int amount);
+	UFUNCTION()
+		void IncreaseHealth(int amount);
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);

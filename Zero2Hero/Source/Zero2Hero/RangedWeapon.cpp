@@ -35,6 +35,10 @@ void ARangedWeapon::PrimaryAttack()
 
 }
 
+void ARangedWeapon::PrimaryAttackEnd()
+{
+}
+
 void ARangedWeapon::SecondaryAttack()
 {
 }
