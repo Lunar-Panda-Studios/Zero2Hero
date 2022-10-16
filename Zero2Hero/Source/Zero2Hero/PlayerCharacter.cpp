@@ -251,6 +251,11 @@ int APlayerCharacter::GetHealth()
 	return Health;
 }
 
+int APlayerCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
 void APlayerCharacter::IncreaseHealth(int amount)
 {
 	Health += amount;
@@ -264,6 +269,11 @@ void APlayerCharacter::DecreaseHealth(int amount)
 int APlayerCharacter::GetAmmo()
 {
 	return Ammo;
+}
+
+int APlayerCharacter::GetMaxAmmo()
+{
+	return MaxAmmo;
 }
 
 void APlayerCharacter::IncreaseAmmo(int amount)
