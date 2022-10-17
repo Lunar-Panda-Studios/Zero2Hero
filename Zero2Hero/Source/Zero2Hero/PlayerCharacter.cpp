@@ -35,15 +35,18 @@ void APlayerCharacter::BeginPlay()
 	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
 	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
 
+	//Adds Custom Collisions
 	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
-
+	CapCollider->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnComponentHit);
 	MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//Spawn Params
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
 
+	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
 	GrapplingHook->SetCamera(Camera);
 	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -57,9 +60,12 @@ void APlayerCharacter::BeginPlay()
 		Cast<AHookPoint>(FoundActors[i])->SetGrapplingHook(GrapplingHook);
 	}
 
+
+	//Gives Weapon
 	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
 	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+	//Sets health
 	MaxHealth = Health;
 	MaxAmmo = Ammo;
 	
@@ -113,6 +119,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if (Hooked)
+	{
+		if (!GrapplingHook->GetIsGrappling())
+		{
+			GrappleTo();
+			Hooked = false;
+		}
+	}
+
 }
 
 // Called to bind functionality to input
@@ -151,6 +166,17 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
 	//	}
 	//}
+}
+
+void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
+	{
+		GrapplingHook->GetCable()->SetVisibility(false);
+		GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
+		GrapplingHook->GetInUseHook()->Destroy();
+		
+	}
 }
 
 void APlayerCharacter::cameraVertical(float amount)
@@ -411,12 +437,20 @@ void APlayerCharacter::HookShot()
 			if (GrapplingHook->Fire())
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
-				DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
-				LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 
+				//GrappleTo();
 				Hooked = true;
+				GrapplingHook->GetCable()->SetAttachEndTo(GrapplingHook->GetInUseHook(), GrapplingHook->GetInUseHook()->GetMainBody()->GetFName());
+				GrapplingHook->GetCable()->SetVisibility(true);
+
 			}
 		}
 	}
+}
+
+void APlayerCharacter::GrappleTo()
+{
+	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 
