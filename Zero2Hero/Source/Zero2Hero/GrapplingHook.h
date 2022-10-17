@@ -7,6 +7,9 @@
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
+#include "CableComponent.h"
+#include "Hook.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GrapplingHook.generated.h"
 
 UCLASS()
@@ -31,9 +34,19 @@ protected:
 		UCameraComponent* CameraComponent;
 	UPROPERTY()
 		FHitResult HookHit;
+	UPROPERTY(EditAnywhere, Category = "Grappling")
+		float FiringRate = 5.0f;
+	UPROPERTY(EditAnywhere, Category = "Grappling")
+		TSubclassOf<AHook> Hook;
+	UPROPERTY()
+		bool isGrappling = false;
 
 	UPROPERTY()
 		AActor* GrapplePoint = nullptr;
+	UPROPERTY(EditAnywhere)
+		UCableComponent* CableComp;
+	UPROPERTY()
+		AHook* InUseHook;
 
 
 public:	
@@ -48,10 +61,24 @@ public:
 		void SetCamera(UCameraComponent* Camera);
 	UFUNCTION()
 		bool HookReturned();
+	UFUNCTION()
+		bool GetIsGrappling();
+	UFUNCTION()
+		UCableComponent* GetCable();
+	UFUNCTION()
+		USphereComponent* GetFireLocation();
 
 	UFUNCTION()
 		void SetGrapplePoint(AActor* NewPoint);
 	UFUNCTION()
 		AActor* GetGrapplePoint();
+	UFUNCTION()
+		AHook* GetInUseHook();
+
+	UFUNCTION()
+		void OnHit(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+		void CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };
