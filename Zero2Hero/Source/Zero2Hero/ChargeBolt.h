@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float chargeRadius = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int maxEnemiesHit = 3;
+		int maxEnemiesHit = 4;
 	UPROPERTY()
 		int currentEnemiesHit = 0;
 

@@ -10,6 +10,7 @@ AChargeBolt::AChargeBolt()
 	PrimaryActorTick.bCanEverTick = true;
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara Component"));
 	NiagaraComp->SetupAttachment(GetRootComponent());
+	GEngine->ClearOnScreenDebugMessages();
 }
 
 void AChargeBolt::BeginPlay()
@@ -29,9 +30,12 @@ void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 		{
 			NiagaraComp->ActivateSystem();
 		}
-		CheckArea(OtherActor->GetActorLocation());
-		
 		electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
+		++currentEnemiesHit;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
+		CheckArea(OtherActor->GetActorLocation());
+		Destroy();
+		
 	}
 }
 
@@ -40,24 +44,28 @@ void AChargeBolt::CheckArea(FVector pos)
 	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 	TArray<AActor*> ignoreActors;
+	ignoreActors.Add(electricutedEnemies[0]);
 	TArray<AActor*> actorsHit;
 	UClass* seekClass = ACharacter::StaticClass();
 	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), pos, chargeRadius, traceObjectTypes, seekClass, ignoreActors, actorsHit);
 	AEnemy* closest = nullptr;
+	
 	for (AActor* i : actorsHit)
-	{ //need to make sure that already electricuted enemies arent included in this
+	{
 		if (i->ActorHasTag("Enemy"))
 		{
-			if (closest != nullptr)
+			if (closest != nullptr) //unneeded now?
 			{
 				//this sucks ass
 				bool isSame = false;
 				
 				for (AEnemy* e : electricutedEnemies)
 				{
+					
 					if (e == Cast<AEnemy>(i))
 					{
 						isSame = true;
+						
 					}
 				}
 				if (FVector::Dist(pos, i->GetActorLocation()) > FVector::Dist(pos, closest->GetActorLocation()) && !isSame)
@@ -67,7 +75,18 @@ void AChargeBolt::CheckArea(FVector pos)
 			}
 			else
 			{
-				closest = Cast<AEnemy>(i);
+				bool isSame = false;
+				for (AEnemy* e : electricutedEnemies)
+				{
+					if (e == Cast<AEnemy>(i))
+					{
+						isSame = true;
+					}
+				}
+				if (!isSame)
+				{
+					closest = Cast<AEnemy>(i);
+				}
 			}
 		}
 	}
@@ -93,6 +112,7 @@ void AChargeBolt::ConnectCharge(AEnemy* Enemy)
 	
 	if (currentEnemiesHit >= maxEnemiesHit)
 	{
+		PrimaryActorTick.bCanEverTick = false; //just in case :p
 		Destroy();
 	}
 	else
