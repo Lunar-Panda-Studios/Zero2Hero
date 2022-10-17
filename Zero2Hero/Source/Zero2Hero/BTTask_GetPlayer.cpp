@@ -12,12 +12,13 @@ UBTTask_GetPlayer::UBTTask_GetPlayer()
 EBTNodeResult::Type UBTTask_GetPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	UBlackboardComponent* BBC = OwnerComp.GetBlackboardComponent();
-	//BBC->ClearValue(BBKS.SelectedKeyName);
 
 	UWorld* World = GEngine->GameViewport->GetWorld();
-	FVector PlayerLocation = World->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	//FVector PlayerLocation = World->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
-	BBC->SetValue<UBlackboardKeyType_Vector>("PlayerLocation", PlayerLocation);
+	AActor* Player = World->GetFirstPlayerController()->GetPawn();
+
+	BBC->SetValue<UBlackboardKeyType_Object>("PlayerActor", Player);
 
 	return EBTNodeResult::Succeeded;
 }
