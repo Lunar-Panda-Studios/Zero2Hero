@@ -48,4 +48,7 @@ public:
 		int maxEnemiesHit = 3;
 	UPROPERTY()
 		int currentEnemiesHit = 0;
+
+	UPROPERTY()
+		TArray<AEnemy*> electricutedEnemies;
 };

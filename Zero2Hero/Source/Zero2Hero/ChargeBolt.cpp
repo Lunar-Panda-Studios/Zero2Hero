@@ -14,9 +14,11 @@ AChargeBolt::AChargeBolt()
 
 void AChargeBolt::BeginPlay()
 {
+	//GEngine->ClearOnScreenDebugMessages();
 	Super::BeginPlay();
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(ElectricSystem);
+	
 }
 
 void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
@@ -28,6 +30,8 @@ void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 			NiagaraComp->ActivateSystem();
 		}
 		CheckArea(OtherActor->GetActorLocation());
+		
+		electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
 	}
 }
 
@@ -39,14 +43,38 @@ void AChargeBolt::CheckArea(FVector pos)
 	TArray<AActor*> actorsHit;
 	UClass* seekClass = ACharacter::StaticClass();
 	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), pos, chargeRadius, traceObjectTypes, seekClass, ignoreActors, actorsHit);
-
+	AEnemy* closest = nullptr;
 	for (AActor* i : actorsHit)
-	{
+	{ //need to make sure that already electricuted enemies arent included in this
 		if (i->ActorHasTag("Enemy"))
 		{
-			AEnemy* enemy = Cast<AEnemy>(i); //this is dangerous. If anything is given the enemy tag that isnt AEnemy the game will crash
-			ConnectCharge(enemy);
+			if (closest != nullptr)
+			{
+				//this sucks ass
+				bool isSame = false;
+				
+				for (AEnemy* e : electricutedEnemies)
+				{
+					if (e == Cast<AEnemy>(i))
+					{
+						isSame = true;
+					}
+				}
+				if (FVector::Dist(pos, i->GetActorLocation()) > FVector::Dist(pos, closest->GetActorLocation()) && !isSame)
+				{
+					closest = Cast<AEnemy>(i);//this is dangerous. If anything is given the enemy tag that isnt AEnemy the game will crash
+				}
+			}
+			else
+			{
+				closest = Cast<AEnemy>(i);
+			}
 		}
+	}
+	if (closest != nullptr)
+	{
+		electricutedEnemies.Add(closest);
+		ConnectCharge(closest);
 	}
 }
 
@@ -61,6 +89,8 @@ void AChargeBolt::ConnectCharge(AEnemy* Enemy)
 	FRotator rotation = GetActorRotation();
 	AActor* connectorActor = GetWorld()->SpawnActor<AActor>(ConnectionNiagaraSystem, Enemy->GetActorLocation(), rotation, spawnParams);
 	++currentEnemiesHit;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, Enemy->GetName());
+	
 	if (currentEnemiesHit >= maxEnemiesHit)
 	{
 		Destroy();
