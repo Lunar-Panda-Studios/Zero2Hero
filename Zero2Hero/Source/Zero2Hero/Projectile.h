@@ -33,7 +33,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void OnHit(AActor* OverlappedActor, AActor* OtherActor);
+	virtual void OnHit(AActor* OverlappedActor, AActor* OtherActor);
 
 	//void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
