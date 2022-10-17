@@ -35,7 +35,37 @@ void ARangedWeapon::PrimaryAttack()
 
 }
 
+void ARangedWeapon::PrimaryAttackEnd()
+{
+}
+
 void ARangedWeapon::SecondaryAttack()
 {
+}
+
+int ARangedWeapon::GetCharge()
+{
+	return Charge;
+}
+
+void ARangedWeapon::IncreaseCharge(int amount)
+{
+	Charge += amount;
+}
+
+bool ARangedWeapon::DecreaseCharge(int amount)
+{
+	if (Charge - amount < 0)
+	{
+		return false;
+	}
+
+	Charge -= amount;
+	return true;
+}
+
+int ARangedWeapon::GetUsage()
+{
+	return ChargeUsage;
 }
 

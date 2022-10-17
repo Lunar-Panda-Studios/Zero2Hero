@@ -10,11 +10,11 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "PlayerCharacter.h"
-//#include "Enemy.h"
+#include "Enemy.h"
 #include "EnemyPatrol.generated.h"
 
 UCLASS()
-class ZERO2HERO_API AEnemyPatrol : public ACharacter
+class ZERO2HERO_API AEnemyPatrol : public AEnemy
 {
 	GENERATED_BODY()
 

@@ -13,7 +13,6 @@ AEnemy::AEnemy()
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
-
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
 
@@ -38,6 +37,9 @@ void AEnemy::BeginPlay()
 	{
 		AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
 	}
+
+	MovementComp = FindComponentByClass<UCharacterMovementComponent>();
+	MovementComp->MaxWalkSpeed = MovementSpeed;
 }
 
 // Called every frame
@@ -45,10 +47,20 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (InRange)
-	//{
-	//	Attack();
-	//}
+	if (OnFire || FlameThrowerDamageTimer != 0)
+	{
+		OnFire = false;
+		if (FlameThrowerDamageTimer < FlameThrowerDamageTimerMax)
+		{
+			FlameThrowerDamageTimer += DeltaTime;
+		}
+
+		if (FlameThrowerDamageTimer >= FlameThrowerDamageTimerMax)
+		{
+			FlameThrowerDamageTimer = 0;
+			DecreaseHealth(Damage);
+		}
+	}
 
 }
 
@@ -61,6 +73,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::Attack()
 {
+}
+
+bool AEnemy::GetCanSee()
+{
+	return CanSee;
 }
 
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
@@ -101,6 +118,26 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
 		}
 	}
+}
+
+void AEnemy::SetOnFire(bool isOnFire)
+{
+	OnFire = isOnFire;
+}
+
+void AEnemy::SetFlameDamage(int amount)
+{
+	FlameDamage = amount;
+}
+
+void AEnemy::DecreaseHealth(int amount)
+{
+	Health -= amount;
+}
+
+void AEnemy::IncreaseHealth(int amount)
+{
+	Health += amount;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
