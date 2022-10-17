@@ -39,6 +39,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void PrimaryAttack();
+	virtual void PrimaryAttackEnd();
 	virtual void SecondaryAttack();
 
 	UFUNCTION(BlueprintCallable)

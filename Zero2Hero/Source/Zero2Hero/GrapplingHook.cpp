@@ -14,6 +14,8 @@ AGrapplingHook::AGrapplingHook()
 	FireLocation = CreateDefaultSubobject<USphereComponent>(TEXT("Fire Location"));
 	//FireLocation->SetupAttachment(RootComponent);
 
+	CableComp = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
+
 }
 
 // Called when the game starts or when spawned
@@ -21,17 +23,27 @@ void AGrapplingHook::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CableComp->SetVisibility(false);
+
+	CableComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 // Called every frame
 void AGrapplingHook::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (InUseHook != nullptr)
+	{
+		if (InUseHook->GetHookAttached())
+		{
+			isGrappling = false;
+		}
+	}
 }
 
 bool AGrapplingHook::Fire()
 {
-	//FVector LineTraceEnd = (CameraComponent->GetForwardVector() * Range) + FireLocation->GetComponentLocation();
 	FVector LineTraceEnd = GrapplePoint->GetActorLocation();
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(this->GetOwner());
@@ -43,6 +55,14 @@ bool AGrapplingHook::Fire()
 	{
 		if (HookHit.GetActor()->ActorHasTag("GrapplePoint"))
 		{
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;
+			spawnParams.Instigator = GetInstigator();
+
+			FRotator rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), HookHit.GetActor()->GetActorLocation());;
+
+			InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
+			isGrappling = true;
 			return true;
 		}
 	}
@@ -88,5 +108,38 @@ void AGrapplingHook::SetGrapplePoint(AActor* NewPoint)
 AActor* AGrapplingHook::GetGrapplePoint()
 {
 	return GrapplePoint;
+}
+
+USphereComponent* AGrapplingHook::GetFireLocation()
+{
+	return FireLocation;
+}
+
+void AGrapplingHook::CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->ActorHasTag("GrapplePoint"))
+	{
+		isGrappling = false;
+	}
+}
+
+bool AGrapplingHook::GetIsGrappling()
+{
+	return isGrappling;
+}
+
+UCableComponent* AGrapplingHook::GetCable()
+{
+	return CableComp;
+}
+
+void AGrapplingHook::OnHit(AActor* OverlappedActor, AActor* OtherActor)
+{
+
+}
+
+AHook* AGrapplingHook::GetInUseHook()
+{
+	return InUseHook;
 }
 

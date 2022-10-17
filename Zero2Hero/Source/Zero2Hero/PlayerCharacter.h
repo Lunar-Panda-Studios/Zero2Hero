@@ -136,6 +136,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION()
 		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void cameraVertical(float amount);
 	void cameraHorizontal(float amount);
@@ -145,8 +147,10 @@ public:
 
 	void MeleeAttack();
 	void RangedAttack();
+	void RangedAttackEnd();
 
 	void HookShot();
+	void GrappleTo();
 
 	void BeginCrouch();
 	void EndCrouch();
