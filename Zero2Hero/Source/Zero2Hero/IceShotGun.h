@@ -17,20 +17,23 @@ public:
 	AIceShotGun();
 
 	UPROPERTY(EditAnywhere, Category = "Ice Shotgun")
-		float DegreesFromCentre;
+		float DegreesAroundCentre;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, Category = "Ice Shotgun")
+		int IcicleNumber;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void PrimaryAttack() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SecondaryAttack() override;
 
 };

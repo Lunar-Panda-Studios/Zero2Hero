@@ -32,6 +32,9 @@ void APlayerCharacter::BeginPlay()
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 
+	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
+	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
+
 	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
 
@@ -41,9 +44,24 @@ void APlayerCharacter::BeginPlay()
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
 
-	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
+	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
+	GrapplingHook->SetCamera(Camera);
+	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+	//Giving Hook Points Grappling Hook
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), HookPoints, FoundActors);
+
+	for (int i = 0; i < FoundActors.Num(); i++)
+	{
+		Cast<AHookPoint>(FoundActors[i])->SetGrapplingHook(GrapplingHook);
+	}
+
+	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
 	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	MaxHealth = Health;
+	MaxAmmo = Ammo;
 	
 }
 
@@ -53,6 +71,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	currentDashCooldown += DeltaTime;
+
 
 	if (IsAttacking)
 	{
@@ -115,6 +134,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &APlayerCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
+	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
 	
 
 
@@ -134,14 +154,14 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 void APlayerCharacter::cameraVertical(float amount)
 {
-	AddControllerPitchInput(amount * TurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
 	//springArm->AddLocalRotation(FRotator(amount, 0, 0));
 }
 
 void APlayerCharacter::cameraHorizontal(float amount)
 {
-	AddControllerYawInput(amount * TurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerYawInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
 	//springArm->AddLocalRotation(FRotator(0, amount, 0));
 }
@@ -224,6 +244,46 @@ void APlayerCharacter::LeftRightCheck(float amount)
 	{
 		leftRightPressed = false;
 	}
+}
+
+int APlayerCharacter::GetHealth()
+{
+	return Health;
+}
+
+int APlayerCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
+void APlayerCharacter::IncreaseHealth(int amount)
+{
+	Health += amount;
+}
+
+void APlayerCharacter::DecreaseHealth(int amount)
+{
+	Health -= amount;
+}
+
+int APlayerCharacter::GetAmmo()
+{
+	return Ammo;
+}
+
+int APlayerCharacter::GetMaxAmmo()
+{
+	return MaxAmmo;
+}
+
+void APlayerCharacter::IncreaseAmmo(int amount)
+{
+	Ammo += amount;
+}
+
+void APlayerCharacter::DecreaseAmmo(int amount)
+{
+	Ammo -= amount;
 }
 
 void APlayerCharacter::Jump()
@@ -330,8 +390,34 @@ void APlayerCharacter::RangedAttack()
 {
 	if (CurrentRangedWeapon != nullptr)
 	{
-		CurrentRangedWeapon->PrimaryAttack();
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		if (CurrentRangedWeapon->DecreaseCharge(CurrentRangedWeapon->GetUsage()))
+		{
+			CurrentRangedWeapon->PrimaryAttack();
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		}
+
+	}
+}
+
+void APlayerCharacter::HookShot()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Pressed"));
+	if (HasHookShot)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hooked"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetGrapplePoint()->GetHumanReadableName());
+		if(GrapplingHook->GetGrapplePoint() != nullptr)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hook In Sight"));
+			if (GrapplingHook->Fire())
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
+				DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+				LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+
+				Hooked = true;
+			}
+		}
 	}
 }
 

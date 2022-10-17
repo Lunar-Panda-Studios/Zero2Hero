@@ -13,7 +13,6 @@ AEnemy::AEnemy()
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
-
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
 
@@ -38,6 +37,9 @@ void AEnemy::BeginPlay()
 	{
 		AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
 	}
+
+	MovementComp = FindComponentByClass<UCharacterMovementComponent>();
+	MovementComp->MaxWalkSpeed = MovementSpeed;
 }
 
 // Called every frame
@@ -61,6 +63,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::Attack()
 {
+}
+
+bool AEnemy::GetCanSee()
+{
+	return CanSee;
 }
 
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
