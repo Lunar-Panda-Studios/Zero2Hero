@@ -170,12 +170,15 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
+	if (OtherActor != nullptr)
 	{
-		GrapplingHook->GetCable()->SetVisibility(false);
-		GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
-		GrapplingHook->GetInUseHook()->Destroy();
-		
+		if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
+		{
+			GrapplingHook->GetCable()->SetVisibility(false);
+			GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
+			GrapplingHook->GetInUseHook()->Destroy();
+
+		}
 	}
 }
 
