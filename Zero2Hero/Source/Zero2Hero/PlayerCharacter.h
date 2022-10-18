@@ -63,6 +63,10 @@ protected:
 		TArray<TSubclassOf<ARangedWeapon>> RangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		ARangedWeapon* CurrentRangedWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
+		int currentWeapon = 0;
+	UPROPERTY()
+		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
 	UPROPERTY()
@@ -183,4 +187,6 @@ public:
 		void IncreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
 		void DecreaseAmmo(int amount);
+	UFUNCTION(BlueprintCallable)
+		void NextWeapon();
 };
