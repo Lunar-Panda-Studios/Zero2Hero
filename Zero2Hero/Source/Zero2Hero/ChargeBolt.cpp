@@ -10,7 +10,7 @@ AChargeBolt::AChargeBolt()
 	PrimaryActorTick.bCanEverTick = true;
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara Component"));
 	NiagaraComp->SetupAttachment(GetRootComponent());
-	GEngine->ClearOnScreenDebugMessages();
+	//GEngine->ClearOnScreenDebugMessages();
 }
 
 void AChargeBolt::BeginPlay()
