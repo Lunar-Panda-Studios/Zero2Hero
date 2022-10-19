@@ -11,9 +11,6 @@ ARangedWeapon::ARangedWeapon()
 
 	//FireLocation = FindComponentByClass<USphereComponent>();
 
-	//FireLocation = CreateDefaultSubobject<USphereComponent>(TEXT("Fire Location"));
-	//FireLocation->SetupAttachment(RootComponent);
-
 }
 
 // Called when the game starts or when spawned

@@ -34,11 +34,14 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
-	if (!OtherActor->ActorHasTag("Player"))
+	if (OtherActor != nullptr)
 	{
-		if (!OtherActor->ActorHasTag("Projectile"))
+		if (!OtherActor->ActorHasTag("Player"))
 		{
-			Destroy();
+			if (!OtherActor->ActorHasTag("Projectile"))
+			{
+				Destroy();
+			}
 		}
 	}
 }

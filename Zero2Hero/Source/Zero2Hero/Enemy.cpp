@@ -28,18 +28,44 @@ void AEnemy::BeginPlay()
 	MainBody = FindComponentByClass<UBoxComponent>();
 	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 
-	PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
-	PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
+	if (PlayerRadius != nullptr)
+	{
+		PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
+		PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Player Radius Collider - Enemy"));
+	}
 
-	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
+	if (MainBody != nullptr)
+	{
+		MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Main Body Collider (Box Collider) - Enemy"));
+	}
 
 	if (AIPC != nullptr)
 	{
 		AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No AI Perception Component - Enemy"));
+	}
 
 	MovementComp = FindComponentByClass<UCharacterMovementComponent>();
-	MovementComp->MaxWalkSpeed = MovementSpeed;
+
+	if (MovementComp)
+	{
+		MovementComp->MaxWalkSpeed = MovementSpeed;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Movement Component - Enemy"));
+	}
 }
 
 // Called every frame
@@ -98,24 +124,30 @@ void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != this)
+	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("Player"))
+		if (OtherActor != this)
 		{
-			InRange = true;
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+			if (OtherActor->ActorHasTag("Player"))
+			{
+				InRange = true;
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+			}
 		}
 	}
 }
 
 void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor != this)
+	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("Player"))
+		if (OtherActor != this)
 		{
-			InRange = false;
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
+			if (OtherActor->ActorHasTag("Player"))
+			{
+				InRange = false;
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
+			}
 		}
 	}
 }
@@ -142,14 +174,20 @@ void AEnemy::IncreaseHealth(int amount)
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->ActorHasTag("Player"))
+	if (OtherActor != nullptr)
 	{
-		if (OtherComp->ComponentHasTag("MeleeZone") || OtherComp->ComponentHasTag("Projectile"))
+		if (OtherActor->ActorHasTag("Player"))
 		{
-			//DAMAGE SELF;
+			if (OtherComp != nullptr)
+			{
+				if (OtherComp->ComponentHasTag("MeleeZone") || OtherComp->ComponentHasTag("Projectile"))
+				{
+					//DAMAGE SELF;
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
-			Destroy();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
+					Destroy();
+				}
+			}
 		}
 	}
 }

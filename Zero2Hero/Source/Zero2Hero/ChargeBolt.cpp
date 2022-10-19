@@ -24,18 +24,21 @@ void AChargeBolt::BeginPlay()
 
 void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (OtherActor->ActorHasTag("Enemy"))
+	if (OtherActor != nullptr)
 	{
-		if (NiagaraComp != nullptr)
+		if (OtherActor->ActorHasTag("Enemy"))
 		{
-			NiagaraComp->ActivateSystem();
+			if (NiagaraComp != nullptr)
+			{
+				NiagaraComp->ActivateSystem();
+			}
+			electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
+			++currentEnemiesHit;
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
+			CheckArea(OtherActor->GetActorLocation());
+			Destroy();
+
 		}
-		electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
-		++currentEnemiesHit;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
-		CheckArea(OtherActor->GetActorLocation());
-		Destroy();
-		
 	}
 }
 

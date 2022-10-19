@@ -54,9 +54,12 @@ void AFlameThrower::PrimaryAttack()
 
 void AFlameThrower::OnParticleHit(AEnemy* Enemy)
 {
-	Enemy->SetOnFire(true);
-	Enemy->SetFlameDamage(Damage);
-	Enemy->DecreaseHealth(Damage);
+	if (Enemy != nullptr)
+	{
+		Enemy->SetOnFire(true);
+		Enemy->SetFlameDamage(Damage);
+		Enemy->DecreaseHealth(Damage);
+	}
 }
 
 void AFlameThrower::PrimaryAttackEnd()

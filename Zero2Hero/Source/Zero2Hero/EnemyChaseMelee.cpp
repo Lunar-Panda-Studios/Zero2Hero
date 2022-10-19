@@ -19,9 +19,15 @@ void AEnemyChaseMelee::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MeleeCollider->OnComponentBeginOverlap.AddDynamic(this, &AEnemyChaseMelee::OnOverlapMelee);
-	MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+	if (MeleeCollider != nullptr)
+	{
+		MeleeCollider->OnComponentBeginOverlap.AddDynamic(this, &AEnemyChaseMelee::OnOverlapMelee);
+		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Melee Collider - Enemy Chase Melee"));
+	}
 }
 
 // Called every frame
@@ -63,13 +69,16 @@ void AEnemyChaseMelee::Attack()
 
 void AEnemyChaseMelee::OnOverlapMelee(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->ActorHasTag("Player"))
+	if (OtherActor != nullptr)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OverlappedComponent->GetReadableName());
-		if (OtherComp->ComponentHasTag("MainBody"))
+		if (OtherActor->ActorHasTag("Player"))
 		{
-			//DAMAGE PLAYER
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Damaged"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OverlappedComponent->GetReadableName());
+			if (OtherComp->ComponentHasTag("MainBody"))
+			{
+				//DAMAGE PLAYER
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Damaged"));
+			}
 		}
 	}
 }

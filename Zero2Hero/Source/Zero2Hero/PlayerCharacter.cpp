@@ -36,10 +36,25 @@ void APlayerCharacter::BeginPlay()
 	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
 
 	//Adds Custom Collisions
-	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
-	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
-	CapCollider->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnComponentHit);
-	MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (CapCollider != nullptr)
+	{
+		CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
+		//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
+		CapCollider->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnComponentHit);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Capule Collider"));
+	}
+
+	if (MeleeCollider != nullptr)
+	{
+		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Capsule Collider"));
+	}
 
 	//Spawn Params
 	FActorSpawnParameters spawnParams;
@@ -48,16 +63,22 @@ void APlayerCharacter::BeginPlay()
 
 	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->SetCamera(Camera);
 	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	//Giving Hook Points Grappling Hook
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), HookPoints, FoundActors);
-
-	for (int i = 0; i < FoundActors.Num(); i++)
+	if (HookPoints != nullptr)
 	{
-		Cast<AHookPoint>(FoundActors[i])->SetGrapplingHook(GrapplingHook);
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), HookPoints, FoundActors);
+
+		for (int i = 0; i < FoundActors.Num(); i++)
+		{
+			Cast<AHookPoint>(FoundActors[i])->SetGrapplingHook(GrapplingHook);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
 
 
@@ -181,10 +202,12 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 	{
 		if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
 		{
-			GrapplingHook->GetCable()->SetVisibility(false);
-			GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
-			GrapplingHook->GetInUseHook()->Destroy();
-
+			if (GrapplingHook->GetInUseHook() != nullptr)
+			{
+				GrapplingHook->GetCable()->SetVisibility(false);
+				GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
+				GrapplingHook->GetInUseHook()->Destroy();
+			}
 		}
 	}
 }
@@ -459,7 +482,6 @@ void APlayerCharacter::HookShot()
 	if (HasHookShot)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hooked"));
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetGrapplePoint()->GetHumanReadableName());
 		if(GrapplingHook->GetGrapplePoint() != nullptr)
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hook In Sight"));
@@ -467,7 +489,6 @@ void APlayerCharacter::HookShot()
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
 
-				//GrappleTo();
 				Hooked = true;
 				GrapplingHook->GetCable()->SetAttachEndTo(GrapplingHook->GetInUseHook(), GrapplingHook->GetInUseHook()->GetMainBody()->GetFName());
 				GrapplingHook->GetCable()->SetVisibility(true);
