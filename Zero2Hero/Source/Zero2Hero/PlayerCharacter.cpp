@@ -31,10 +31,13 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
-
+	this->GetCharacterMovement();
 	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
 	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
-
+	
+	characterMovementComp = this->GetCharacterMovement();
+	normalFriction = characterMovementComp->GroundFriction;
+	
 	//Adds Custom Collisions
 	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
@@ -82,8 +85,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (currentDashTime < dashTime && isDashing)
+	{
+		currentDashTime += DeltaTime;
+	}
+	else if (isDashing)
+	{
+		LaunchCharacter(GetActorForwardVector() * speedAfterDash, true, false);
+		currentDashTime = 0;
+		isDashing = false;
+		characterMovementComp->GroundFriction = normalFriction;
+	}
 	currentDashCooldown += DeltaTime;
-
+	
 
 	if (IsAttacking)
 	{
@@ -371,6 +385,8 @@ void APlayerCharacter::Dash()
 		}
 		LaunchCharacter(dir, true, true);
 		currentDashCooldown = 0.0f;
+		isDashing = true;
+		characterMovementComp->GroundFriction = dashFriction;
 	}
 }
 
