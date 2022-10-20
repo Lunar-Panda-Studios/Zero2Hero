@@ -180,13 +180,5 @@ public:
 		void DecreaseHealth(int amount);
 
 	UFUNCTION(BlueprintCallable)
-		int GetAmmo();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxAmmo();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
 		void NextWeapon();
 };

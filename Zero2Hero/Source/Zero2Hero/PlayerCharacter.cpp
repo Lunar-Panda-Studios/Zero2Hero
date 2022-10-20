@@ -326,26 +326,6 @@ void APlayerCharacter::DecreaseHealth(int amount)
 	Health -= amount;
 }
 
-int APlayerCharacter::GetAmmo()
-{
-	return Ammo;
-}
-
-int APlayerCharacter::GetMaxAmmo()
-{
-	return MaxAmmo;
-}
-
-void APlayerCharacter::IncreaseAmmo(int amount)
-{
-	Ammo += amount;
-}
-
-void APlayerCharacter::DecreaseAmmo(int amount)
-{
-	Ammo -= amount;
-}
-
 void APlayerCharacter::Jump()
 {
 	Super::Jump();
@@ -450,12 +430,8 @@ void APlayerCharacter::RangedAttack()
 {
 	if (CurrentRangedWeapon != nullptr)
 	{
-		if (CurrentRangedWeapon->DecreaseCharge(CurrentRangedWeapon->GetUsage()))
-		{
-			CurrentRangedWeapon->PrimaryAttack();
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
-		}
-
+		CurrentRangedWeapon->PrimaryAttack();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
 	}
 }
 
@@ -490,9 +466,11 @@ void APlayerCharacter::HookShot()
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, GrapplingHook->GetHit().ToString());
 
 				Hooked = true;
-				GrapplingHook->GetCable()->SetAttachEndTo(GrapplingHook->GetInUseHook(), GrapplingHook->GetInUseHook()->GetMainBody()->GetFName());
-				GrapplingHook->GetCable()->SetVisibility(true);
-
+				if (GrapplingHook->GetCable() != nullptr)
+				{
+					GrapplingHook->GetCable()->SetAttachEndTo(GrapplingHook->GetInUseHook(), GrapplingHook->GetInUseHook()->GetMainBody()->GetFName());
+					GrapplingHook->GetCable()->SetVisibility(true);
+				}
 			}
 		}
 	}
