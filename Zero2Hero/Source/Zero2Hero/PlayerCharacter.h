@@ -188,5 +188,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DecreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
-		void NextWeapon();
+		void ChangeToWeapon1();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon2();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon3();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon4();
 };

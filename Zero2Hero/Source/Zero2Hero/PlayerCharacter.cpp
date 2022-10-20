@@ -157,7 +157,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
 	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
-	PlayerInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
+	PlayerInputComponent->BindAction(TEXT("Weapon1"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon1);
+	PlayerInputComponent->BindAction(TEXT("Weapon2"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon2);
+	PlayerInputComponent->BindAction(TEXT("Weapon3"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon3);
+	PlayerInputComponent->BindAction(TEXT("Weapon4"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon4);
 	
 
 
@@ -444,13 +447,28 @@ void APlayerCharacter::RangedAttackEnd()
 	}
 }
 
-void APlayerCharacter::NextWeapon()
+void APlayerCharacter::ChangeToWeapon1()
 {
-	++currentWeapon;
-	if (currentWeapon >= RangedWeapons.Num())
-		currentWeapon = 0;
+	currentWeapon = 0;
 	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
-	
+}
+
+void APlayerCharacter::ChangeToWeapon2()
+{
+	currentWeapon = 1;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+}
+
+void APlayerCharacter::ChangeToWeapon3()
+{
+	currentWeapon = 2;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+}
+
+void APlayerCharacter::ChangeToWeapon4()
+{
+	currentWeapon = 3;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 }
 
 void APlayerCharacter::HookShot()
