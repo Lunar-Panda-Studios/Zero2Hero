@@ -76,8 +76,10 @@ void AEnemyChaseMelee::OnOverlapMelee(UPrimitiveComponent* OverlappedComponent, 
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OverlappedComponent->GetReadableName());
 			if (OtherComp->ComponentHasTag("MainBody"))
 			{
-				//DAMAGE PLAYER
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Damaged"));
+
+				ADamageable* otherDamageable = Cast<ADamageable>(OtherActor);
+				otherDamageable->DecreaseHealth(GetDamage());
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Damage Player Melee"));
 			}
 		}
 	}

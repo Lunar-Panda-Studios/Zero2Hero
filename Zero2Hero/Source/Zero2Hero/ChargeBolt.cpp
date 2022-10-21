@@ -36,6 +36,11 @@ void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 			++currentEnemiesHit;
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
 			CheckArea(OtherActor->GetActorLocation());
+
+			ADamageable* Damageable = Cast<ADamageable>(OtherActor);
+			Damageable->DecreaseHealth(Damage);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage Projectile"));
+
 			Destroy();
 
 		}

@@ -12,10 +12,12 @@
 #include "GrapplingHook.h"
 #include "HookPoint.h"
 #include "Kismet/GameplayStatics.h"
+#include "Damageable.h"
+#include "Projectile.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class ZERO2HERO_API APlayerCharacter : public ACharacter
+class ZERO2HERO_API APlayerCharacter : public ADamageable
 {
 	GENERATED_BODY()
 
@@ -26,15 +28,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		int Health;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		int Ammo;
-	UPROPERTY()
-		int MaxHealth;
-	UPROPERTY()
-		int MaxAmmo;
-
 	UPROPERTY()
 		float MeleePressTimer = 0;
 	UPROPERTY()
@@ -94,6 +87,10 @@ protected:
 		float MeleeAttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		float MeleeAttackCooldown;
+	UPROPERTY()
+		float AttackAnimTimer = 0.0f;
+	UPROPERTY()
+		TArray<ADamageable*> EnemiesInRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Settings")
 		bool canDoubleJump = true;
@@ -150,6 +147,8 @@ public:
 	void MoveUpDown(float speed);
 
 	void MeleeAttack();
+	void AddEnemyInRange(ADamageable* newEnemy);
+	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
 	void RangedAttackEnd();
 
@@ -166,19 +165,14 @@ public:
 
 	void Dash();
 	void GroundPound();
+	bool isGrounded();
 
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
 
 	UFUNCTION(BlueprintCallable)
-		int GetHealth();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxHealth();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseHealth(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseHealth(int amount);
-
-	UFUNCTION(BlueprintCallable)
 		void NextWeapon();
+
+	UFUNCTION()
+		void ComboDamage();
 };

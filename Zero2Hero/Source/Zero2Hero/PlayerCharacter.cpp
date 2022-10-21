@@ -91,10 +91,6 @@ void APlayerCharacter::BeginPlay()
 		allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
 		allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
-
-	//Sets health
-	MaxHealth = Health;
-	MaxAmmo = Ammo;
 	
 }
 
@@ -108,6 +104,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (IsAttacking)
 	{
+
+		//Pressing Timer for combo
 		MeleePressTimer += DeltaTime;
 
 		if (MeleePressTimer >= MeleePressMax)
@@ -115,12 +113,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 			MeleeAttackNum = 0;
 			MeleePressTimer = 0;
 			IsAttacking = false;
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 
 	if (MeleeCollider->IsCollisionEnabled())
 	{
+		//Damage Enemy for Combo Attack
+		// Might be needed as the attacks won't line up with animation right now 
+		// But idk might be able to put events into the animation for the damage
+		// Yet the animations need to be here to do it
+		// 
+		//AttackAnimTimer += DeltaTime;
+
+		//if (MeleeAttackSpeed <= AttackAnimTimer)
+		//{
+		//	ComboDamage();
+		//	AttackAnimTimer = 0;
+		//}
+
+		//Turns off Collisions after attack end
 		MeleeTimer += DeltaTime;
 
 		if (MeleeTimer >= MeleeAttackSpeed)
@@ -128,12 +139,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 			MeleeTimer = 0;
 			MeleePressTimer = 0;
 			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			EnemiesInRange.Empty();
+			//AttackAnimTimer = 0;
 		}
 	}
 
+	//Puts Attack on cooldown
 	if (MeleeAttackNum >= 3)
 	{
-		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		CanAttack = false;
 		IsAttacking = false;
 		MeleeCooldownTimer += DeltaTime;
@@ -146,6 +159,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	//Grapples to the hook point
 	if (Hooked)
 	{
 		if (!GrapplingHook->GetIsGrappling())
@@ -190,8 +204,9 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 	//{
 	//	if (OverlappedComponent->ComponentHasTag("MeleeZone"))
 	//	{
-	//		//DecreaseHealth();
-	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
+	//		ADamageable* otherDamageable = Cast<ADamageable>(OtherActor);
+	//		DecreaseHealth(otherDamageable->GetDamage());
+	//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage from Enemy"));
 	//	}
 	//}
 }
@@ -272,12 +287,18 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), GroundPoundRadius, traceObjectTypes, seekClass, ignoreActors, actors);
 		hasGroundPounded = false;
 		DrawDebugSphere(GetWorld(), GetActorLocation(), GroundPoundRadius, 12, FColor::Red, false, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
+
+		ADamageable* DamageableTarget;
+
 		for (AActor* overlappedActor : actors) 
 		{
-			//for now it just spits out the overlapped actors into the log. When we implement health, it will be simple
-			//to get the actors and call the function that removes health from them.
-			UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+			DamageableTarget = Cast<ADamageable>(overlappedActor);
+			DamageableTarget->DecreaseHealth(GroundPoundDamage);
+
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
+
+			//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
 		}
 	}
 }
@@ -304,26 +325,6 @@ void APlayerCharacter::LeftRightCheck(float amount)
 	{
 		leftRightPressed = false;
 	}
-}
-
-int APlayerCharacter::GetHealth()
-{
-	return Health;
-}
-
-int APlayerCharacter::GetMaxHealth()
-{
-	return MaxHealth;
-}
-
-void APlayerCharacter::IncreaseHealth(int amount)
-{
-	Health += amount;
-}
-
-void APlayerCharacter::DecreaseHealth(int amount)
-{
-	Health -= amount;
 }
 
 void APlayerCharacter::Jump()
@@ -376,13 +377,7 @@ void APlayerCharacter::Dash()
 
 void APlayerCharacter::GroundPound()
 {
-	FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - GroundPoundMinDist);
-	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
-
-	FHitResult Hit;
-	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
-	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
-	if(!Hit.IsValidBlockingHit())
+	if(!isGrounded())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("GroundPound"));
 		FVector downDir = FVector::DownVector;
@@ -391,9 +386,21 @@ void APlayerCharacter::GroundPound()
 	}
 }
 
+bool APlayerCharacter::isGrounded()
+{
+	FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - GroundPoundMinDist);
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+	DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
+
+	return Hit.IsValidBlockingHit();
+}
+
 void APlayerCharacter::MeleeAttack()
 { 
-	if (CanAttack)
+	if (CanAttack && isGrounded())
 	{
 		MeleeTimer = 0;
 		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -412,11 +419,13 @@ void APlayerCharacter::MeleeAttack()
 		case 2:
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
+			ComboDamage();
 			break;
 		}
 		case 3:
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
+			ComboDamage();
 			break;
 		}
 		default:
@@ -443,6 +452,11 @@ void APlayerCharacter::RangedAttackEnd()
 	}
 }
 
+void APlayerCharacter::AddEnemyInRange(ADamageable* newEnemy)
+{
+	EnemiesInRange.Add(newEnemy);
+}
+
 void APlayerCharacter::NextWeapon()
 {
 	++currentWeapon;
@@ -450,6 +464,15 @@ void APlayerCharacter::NextWeapon()
 		currentWeapon = 0;
 	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 	
+}
+
+void APlayerCharacter::ComboDamage()
+{
+	for (ADamageable* Damageable : EnemiesInRange)
+	{
+		Damageable->DecreaseHealth(Damage);
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy from Melee Player"));
 }
 
 void APlayerCharacter::HookShot()
@@ -474,6 +497,11 @@ void APlayerCharacter::HookShot()
 			}
 		}
 	}
+}
+
+void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
+{
+	EnemiesInRange.Remove(oldEnemy);
 }
 
 void APlayerCharacter::GrappleTo()

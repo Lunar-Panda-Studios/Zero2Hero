@@ -130,8 +130,11 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		{
 			if (OtherActor->ActorHasTag("Player"))
 			{
-				InRange = true;
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+				if (OtherComp->ComponentHasTag("MainBody"))
+				{
+					InRange = true;
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+				}
 			}
 		}
 	}
@@ -145,8 +148,11 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		{
 			if (OtherActor->ActorHasTag("Player"))
 			{
-				InRange = false;
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
+				if (OtherComp->ComponentHasTag("MainBody"))
+				{
+					InRange = false;
+					/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));*/
+				}
 			}
 		}
 	}
@@ -162,14 +168,9 @@ void AEnemy::SetFlameDamage(int amount)
 	FlameDamage = amount;
 }
 
-void AEnemy::DecreaseHealth(int amount)
+bool AEnemy::GetInRange()
 {
-	Health -= amount;
-}
-
-void AEnemy::IncreaseHealth(int amount)
-{
-	Health += amount;
+	return InRange;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -180,12 +181,32 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		{
 			if (OtherComp != nullptr)
 			{
-				if (OtherComp->ComponentHasTag("MeleeZone") || OtherComp->ComponentHasTag("Projectile"))
+				if (OtherComp->ComponentHasTag("MeleeZone"))
 				{
-					//DAMAGE SELF;
+					Cast<APlayerCharacter>(OtherActor)->AddEnemyInRange(this);
 
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
-					Destroy();
+					ADamageable* otherDamageable = Cast<ADamageable>(OtherActor);
+					DecreaseHealth(otherDamageable->GetDamage());
+
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy from Melee Player"));
+					//Destroy();
+				}
+			}
+		}
+	}
+}
+
+void AEnemy::OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor != nullptr)
+	{
+		if (OtherActor->ActorHasTag("Player"))
+		{
+			if (OtherComp != nullptr)
+			{
+				if (OtherComp->ComponentHasTag("MeleeZone"))
+				{
+					Cast<APlayerCharacter>(OtherActor)->DeleteEnemyInRange(this);
 				}
 			}
 		}
