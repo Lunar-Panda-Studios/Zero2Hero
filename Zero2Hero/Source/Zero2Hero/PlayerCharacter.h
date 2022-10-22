@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Damageable.h"
 #include "Projectile.h"
+#include "DialogueSystem.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -128,6 +129,12 @@ protected:
 		bool upDownPressed = false;
 	UPROPERTY()
 		bool leftRightPressed = false;
+	UPROPERTY()
+		ADialogueSystem* DialogueSystem;
+	UPROPERTY(EditAnywhere, Category = "Dialogue Settings")
+		TSubclassOf<ADialogueSystem> DialogueSystemClass;
+	UPROPERTY()
+		bool Allow = true;
 
 public:	
 	// Called every frame
@@ -175,4 +182,7 @@ public:
 
 	UFUNCTION()
 		void ComboDamage();
+
+	UFUNCTION()
+		void Dialogue();
 };

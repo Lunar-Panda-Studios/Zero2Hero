@@ -9,6 +9,7 @@ ADialogueSystem::ADialogueSystem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	InUseAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
 }
 
 // Called when the game starts or when spawned
@@ -20,8 +21,9 @@ void ADialogueSystem::BeginPlay()
 
 	HUDOverlay = Manager->LoadDialogueBox(HUDOverlayAsset);
 
-	StartDialogue(0);
+	//StartDialogue(0);
 
+	HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
 	
 }
 
@@ -36,12 +38,7 @@ void ADialogueSystem::Tick(float DeltaTime)
 
 		if (CharMax == CharNum)
 		{
-			//Will likely be change to say til click
-			if (Timer >= SayOnScreenTimer)
-			{
-				isPlaying = false;
-				Timer = 0;
-			}
+			isPlaying = false;
 		}
 		else
 		{
@@ -62,12 +59,17 @@ void ADialogueSystem::Tick(float DeltaTime)
 
 void ADialogueSystem::StartDialogue(int DialogueID)
 {
-	FullDisplay = DialogueInScene[DialogueID].Text;
-	Audio = DialogueInScene[DialogueID].Audio;
-	//DisplayBreakdown = FullDisplay.GetCharArray();
+	CurrentDialogue = DialogueInScene[DialogueID];
+	FullDisplay = CurrentDialogue.Text;
+	Audio = CurrentDialogue.Audio;
 	CharMax = FullDisplay.Len();
 	CurrentDisplay = "";
-	UGameplayStatics::PlaySoundAtLocation(this, Audio, GetActorLocation());
+	CharNum = 0;
+	HUDOverlay->TextToDisplay = CurrentDisplay;
+	//UGameplayStatics::PlaySoundAtLocation(this, Audio, GetActorLocation());
+
+	InUseAudio->SetSound(Audio);
+	InUseAudio->Play();
 
 	HUDOverlay->SetVisibility(ESlateVisibility::Visible);
 
@@ -77,5 +79,50 @@ void ADialogueSystem::StartDialogue(int DialogueID)
 FString ADialogueSystem::GetCurrentDisplay()
 {
 	return CurrentDisplay;
+}
+
+bool ADialogueSystem::CheckNextDialogue()
+{
+	if (CurrentDialogue.NextDialogueID >= 0)
+	{
+		StartDialogue(CurrentDialogue.NextDialogueID);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void ADialogueSystem::OnClick()
+{
+	if (HUDOverlay != nullptr)
+	{
+		if (HUDOverlay->GetIsVisible())
+		{
+			if (isPlaying)
+			{
+				CurrentDisplay = FullDisplay;
+				HUDOverlay->TextToDisplay = CurrentDisplay;
+				CharNum = CharMax;
+				isPlaying = false;
+				Timer = 0;
+			}
+			else if (!CheckNextDialogue() && !InUseAudio->IsPlaying())
+			{
+				HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+	}
+}
+
+UDialogueBox* ADialogueSystem::GetDialogueWidget()
+{
+	return HUDOverlay;
+}
+
+FDialogue ADialogueSystem::GetCurrentDialogue()
+{
+	return CurrentDialogue;
 }
 

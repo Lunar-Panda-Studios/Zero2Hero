@@ -38,16 +38,19 @@ void AProjectile::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 	{
 		if (!OtherActor->ActorHasTag("Player"))
 		{
-			if (!OtherActor->ActorHasTag("Projectile"))
+			if (!OtherActor->ActorHasTag("Ignore"))
 			{
-				if (OtherActor->ActorHasTag("Enemy"))
+				if (!OtherActor->ActorHasTag("Projectile"))
 				{
-					ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-					OtherDamageable->DecreaseHealth(Damage);
+					if (OtherActor->ActorHasTag("Enemy"))
+					{
+						ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+						OtherDamageable->DecreaseHealth(Damage);
 
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+					}
+					Destroy();
 				}
-				Destroy();
 			}
 		}
 	}

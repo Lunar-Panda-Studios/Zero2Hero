@@ -91,7 +91,19 @@ void APlayerCharacter::BeginPlay()
 		allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
 		allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
-	
+
+	if (DialogueSystemClass != nullptr)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), DialogueSystemClass, FoundActors);
+
+		DialogueSystem = Cast<ADialogueSystem>(FoundActors[0]);
+
+		if (DialogueSystemClass == nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cast Failed"));
+		}
+	}
 }
 
 // Called every frame
@@ -169,6 +181,22 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if (DialogueSystem->GetDialogueWidget()->IsVisible())
+	{
+		if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+		{
+			Allow = false;
+		}
+		else
+		{
+			Allow = true;
+		}
+	}
+	else
+	{
+		Allow = true;
+	}
+
 }
 
 // Called to bind functionality to input
@@ -193,9 +221,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
 	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
 	PlayerInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
-	
-
-
+	PlayerInputComponent->BindAction(TEXT("Dialogue"), IE_Pressed, this, &APlayerCharacter::Dialogue);
 }
 
 void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -243,20 +269,26 @@ void APlayerCharacter::cameraHorizontal(float amount)
 
 void APlayerCharacter::MoveLeftRight(float speed)
 {
-	FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+	if (Allow)
+	{
+		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
 
-	FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
+		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
 
-	this->AddMovementInput(Direction * speed);
+		this->AddMovementInput(Direction * speed);
+	}
 }
 
 void APlayerCharacter::MoveUpDown(float speed)
 {
-	FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+	if (Allow)
+	{
+		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
 
-	FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
+		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
 
-	this->AddMovementInput(Direction * speed);
+		this->AddMovementInput(Direction * speed);
+	}
 }
 
 void APlayerCharacter::BeginCrouch() 
@@ -329,8 +361,11 @@ void APlayerCharacter::LeftRightCheck(float amount)
 
 void APlayerCharacter::Jump()
 {
-	Super::Jump();
-	doubleJumpCount++;
+	if (Allow)
+	{
+		Super::Jump();
+		doubleJumpCount++;
+	}
 }
 
 void APlayerCharacter::DoubleJump()
@@ -350,39 +385,45 @@ void APlayerCharacter::DoubleJump()
 }
 void APlayerCharacter::Dash()
 {
-	if (currentDashCooldown >= dashCooldown)
+	if (Allow)
 	{
-		FVector forwardDir = GetActorRotation().Vector();
-
-		FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - dashGroundedCheck);
-		FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
-
-		FHitResult Hit;
-		GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
-		DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
-		FVector dir;
-		if (!Hit.IsValidBlockingHit())
+		if (currentDashCooldown >= dashCooldown)
 		{
-			dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
+			FVector forwardDir = GetActorRotation().Vector();
+
+			FVector LineTraceEnd = FVector(APlayerCharacter::GetActorLocation().X, APlayerCharacter::GetActorLocation().Y, APlayerCharacter::GetActorLocation().Z - dashGroundedCheck);
+			FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+			FHitResult Hit;
+			GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+			DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
+			FVector dir;
+			if (!Hit.IsValidBlockingHit())
+			{
+				dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
+			}
+			else
+			{
+				dir = forwardDir * dashVelocity;
+			}
+			LaunchCharacter(dir, true, true);
+			currentDashCooldown = 0.0f;
 		}
-		else
-		{
-			dir = forwardDir * dashVelocity;
-		}
-		LaunchCharacter(dir, true, true);
-		currentDashCooldown = 0.0f;
 	}
 }
 
 void APlayerCharacter::GroundPound()
 {
-	if(!isGrounded())
+	if (Allow)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("GroundPound"));
-		FVector downDir = FVector::DownVector;
-		LaunchCharacter(downDir * GroundPoundForce, true, true);
-		hasGroundPounded = true;
+		if (!isGrounded())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("GroundPound"));
+			FVector downDir = FVector::DownVector;
+			LaunchCharacter(downDir * GroundPoundForce, true, true);
+			hasGroundPounded = true;
+		}
 	}
 }
 
@@ -400,47 +441,53 @@ bool APlayerCharacter::isGrounded()
 
 void APlayerCharacter::MeleeAttack()
 { 
-	if (CanAttack && isGrounded())
+	if (Allow)
 	{
-		MeleeTimer = 0;
-		MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		MeleeAttackNum += 1;
-		MeleePressTimer = 0;
-		IsAttacking = true;
-		
+		if (CanAttack && isGrounded())
+		{
+			MeleeTimer = 0;
+			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			MeleeAttackNum += 1;
+			MeleePressTimer = 0;
+			IsAttacking = true;
 
-		switch (MeleeAttackNum)
-		{
-		case 1:
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
-			break;
+
+			switch (MeleeAttackNum)
+			{
+			case 1:
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
+				break;
+			}
+			case 2:
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
+				ComboDamage();
+				break;
+			}
+			case 3:
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
+				ComboDamage();
+				break;
+			}
+			default:
+				break;
+			}
 		}
-		case 2:
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
-			ComboDamage();
-			break;
-		}
-		case 3:
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
-			ComboDamage();
-			break;
-		}
-		default:
-			break;
-		} 
 	}
 
 }
 
 void APlayerCharacter::RangedAttack()
 {
-	if (CurrentRangedWeapon != nullptr)
+	if (Allow)
 	{
-		CurrentRangedWeapon->PrimaryAttack();
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		if (CurrentRangedWeapon != nullptr)
+		{
+			CurrentRangedWeapon->PrimaryAttack();
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+		}
 	}
 }
 
@@ -459,11 +506,13 @@ void APlayerCharacter::AddEnemyInRange(ADamageable* newEnemy)
 
 void APlayerCharacter::NextWeapon()
 {
-	++currentWeapon;
-	if (currentWeapon >= RangedWeapons.Num())
-		currentWeapon = 0;
-	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
-	
+	if (Allow)
+	{
+		++currentWeapon;
+		if (currentWeapon >= RangedWeapons.Num())
+			currentWeapon = 0;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	}
 }
 
 void APlayerCharacter::ComboDamage()
@@ -473,6 +522,15 @@ void APlayerCharacter::ComboDamage()
 		Damageable->DecreaseHealth(Damage);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy from Melee Player"));
+}
+
+void APlayerCharacter::Dialogue()
+{
+	if (DialogueSystem != nullptr)
+	{
+		DialogueSystem->OnClick();
+	}
+	
 }
 
 void APlayerCharacter::HookShot()

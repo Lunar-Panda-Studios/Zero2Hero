@@ -9,6 +9,7 @@
 #include "Misc/Char.h"
 #include "DialogueBox.h"
 #include "GameManager.h"
+#include "Components/AudioComponent.h"
 #include "DialogueSystem.generated.h"
 
 USTRUCT(BlueprintType)
@@ -18,12 +19,16 @@ struct FDialogue
 
 	UPROPERTY()
 		int DialogueID;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		FString Speaker;
 	UPROPERTY(EditAnywhere)
 		USoundBase* Audio;
 	UPROPERTY(EditAnywhere)
 		FString Text;
+	UPROPERTY(EditAnywhere)
+		int NextDialogueID = -1;
+	UPROPERTY(EditAnywhere)
+		bool DisableEverything = false;
 
 };
 
@@ -55,6 +60,10 @@ protected:
 		FString CurrentDisplay;
 	UPROPERTY()
 		FString FullDisplay;
+	UPROPERTY()
+		FDialogue CurrentDialogue;
+	UPROPERTY(EditAnywhere)
+		UAudioComponent* InUseAudio;
 
 	UPROPERTY()
 		float Timer = 0.0f;
@@ -63,7 +72,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float TimeBetweenLetters = 0.1f;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isPlaying = false;
 	UPROPERTY()
 		int CharNum = 0;
@@ -82,5 +91,13 @@ public:
 		void StartDialogue(int DialogueID);
 	UFUNCTION()
 		FString GetCurrentDisplay();
+	UFUNCTION()
+		bool CheckNextDialogue();
+	UFUNCTION(BlueprintCallable)
+		void OnClick();
+	UFUNCTION()
+		UDialogueBox* GetDialogueWidget();
+	UFUNCTION()
+		FDialogue GetCurrentDialogue();
 
 };
