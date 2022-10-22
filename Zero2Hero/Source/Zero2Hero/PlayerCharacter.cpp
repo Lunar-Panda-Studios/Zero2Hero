@@ -97,11 +97,14 @@ void APlayerCharacter::BeginPlay()
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), DialogueSystemClass, FoundActors);
 
-		DialogueSystem = Cast<ADialogueSystem>(FoundActors[0]);
-
-		if (DialogueSystemClass == nullptr)
+		if (FoundActors.Num() != 0)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cast Failed"));
+			DialogueSystem = Cast<ADialogueSystem>(FoundActors[0]);
+
+			if (DialogueSystemClass == nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cast Failed"));
+			}
 		}
 	}
 }
@@ -181,22 +184,24 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (DialogueSystem->GetDialogueWidget()->IsVisible())
+	if (DialogueSystem != nullptr)
 	{
-		if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+		if (DialogueSystem->GetDialogueWidget()->IsVisible())
 		{
-			Allow = false;
+			if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+			{
+				Allow = false;
+			}
+			else
+			{
+				Allow = true;
+			}
 		}
 		else
 		{
 			Allow = true;
 		}
 	}
-	else
-	{
-		Allow = true;
-	}
-
 }
 
 // Called to bind functionality to input
