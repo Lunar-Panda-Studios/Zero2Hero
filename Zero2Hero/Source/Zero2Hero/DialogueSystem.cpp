@@ -32,9 +32,13 @@ void ADialogueSystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Tick"));
+
 	if (isPlaying)
 	{
 		Timer += DeltaTime;
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("IsPlaying"));*/
 
 		if (CharMax == CharNum)
 		{
@@ -59,21 +63,24 @@ void ADialogueSystem::Tick(float DeltaTime)
 
 void ADialogueSystem::StartDialogue(int DialogueID)
 {
-	CurrentDialogue = DialogueInScene[DialogueID];
-	FullDisplay = CurrentDialogue.Text;
-	Audio = CurrentDialogue.Audio;
-	CharMax = FullDisplay.Len();
-	CurrentDisplay = "";
-	CharNum = 0;
-	HUDOverlay->TextToDisplay = CurrentDisplay;
-	//UGameplayStatics::PlaySoundAtLocation(this, Audio, GetActorLocation());
+	if (!InUseAudio->IsPlaying())
+	{
+		CurrentDialogue = DialogueInScene[DialogueID];
+		FullDisplay = CurrentDialogue.Text;
+		Audio = CurrentDialogue.Audio;
+		CharMax = FullDisplay.Len();
+		CurrentDisplay = "";
+		CharNum = 0;
+		HUDOverlay->TextToDisplay = CurrentDisplay;
+		//UGameplayStatics::PlaySoundAtLocation(this, Audio, GetActorLocation());
 
-	InUseAudio->SetSound(Audio);
-	InUseAudio->Play();
+		isPlaying = true;
 
-	HUDOverlay->SetVisibility(ESlateVisibility::Visible);
+		InUseAudio->SetSound(Audio);
+		InUseAudio->Play();
 
-	isPlaying = true;
+		HUDOverlay->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 FString ADialogueSystem::GetCurrentDisplay()

@@ -68,8 +68,6 @@ protected:
 	UPROPERTY()
 		float Timer = 0.0f;
 	UPROPERTY(EditAnywhere)
-		float SayOnScreenTimer = 0.0f;
-	UPROPERTY(EditAnywhere)
 		float TimeBetweenLetters = 0.1f;
 
 	UPROPERTY(BlueprintReadWrite)
