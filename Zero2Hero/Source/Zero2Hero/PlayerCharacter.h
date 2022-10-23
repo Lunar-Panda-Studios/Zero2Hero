@@ -174,9 +174,14 @@ public:
 	void EndCrouch();
 
 	virtual void Landed(const FHitResult& Hit) override;
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerLanded();
 	virtual void Jump() override;
 
+	
 	void DoubleJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartDoubleJump();
 
 	void Dash();
 	void GroundPound();
@@ -209,4 +214,6 @@ public:
 		void ChangeToWeapon3();
 	UFUNCTION(BlueprintCallable)
 		void ChangeToWeapon4();
+	UFUNCTION(BlueprintImplementableEvent)
+		void SwitchWeapon();
 };
