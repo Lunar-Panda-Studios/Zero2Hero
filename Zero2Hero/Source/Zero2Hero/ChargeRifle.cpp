@@ -41,13 +41,16 @@ void AChargeRifle::Attack()
 		spawnParams.Instigator = GetInstigator();
 		if (currentCooldown > fireRate)
 		{
-			FRotator rotation = GetActorRotation();
-			AProjectile* ChargeBolt = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
-			if (ChargeBolt != nullptr)
+			if (DecreaseCharge(ChargeUsage))
 			{
-				ChargeBolt->Damage = Damage;
+				FRotator rotation = GetActorRotation();
+				AProjectile* ChargeBolt = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+				if (ChargeBolt != nullptr)
+				{
+					ChargeBolt->Damage = Damage;
+				}
+				currentCooldown = 0.0f;
 			}
-			currentCooldown = 0.0f;
 
 		}
 	}
