@@ -31,10 +31,13 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
-
+	this->GetCharacterMovement();
 	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
 	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
-
+	
+	characterMovementComp = this->GetCharacterMovement();
+	normalFriction = characterMovementComp->GroundFriction;
+	
 	//Adds Custom Collisions
 	CapCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnComponentBeginOverlap);
 	//CapCollider->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnMyComponentEndOverlap);
@@ -82,8 +85,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (currentDashTime < dashTime && isDashing)
+	{
+		currentDashTime += DeltaTime;
+	}
+	else if (isDashing)
+	{
+		LaunchCharacter(GetActorForwardVector() * speedAfterDash, true, false);
+		currentDashTime = 0;
+		isDashing = false;
+		characterMovementComp->GroundFriction = normalFriction;
+	}
 	currentDashCooldown += DeltaTime;
-
+	
 
 	if (IsAttacking)
 	{
@@ -157,7 +171,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
 	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
-	PlayerInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
+	PlayerInputComponent->BindAction(TEXT("Weapon1"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon1);
+	PlayerInputComponent->BindAction(TEXT("Weapon2"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon2);
+	PlayerInputComponent->BindAction(TEXT("Weapon3"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon3);
+	PlayerInputComponent->BindAction(TEXT("Weapon4"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon4);
 	
 
 
@@ -368,6 +385,8 @@ void APlayerCharacter::Dash()
 		}
 		LaunchCharacter(dir, true, true);
 		currentDashCooldown = 0.0f;
+		isDashing = true;
+		characterMovementComp->GroundFriction = dashFriction;
 	}
 }
 
@@ -444,13 +463,28 @@ void APlayerCharacter::RangedAttackEnd()
 	}
 }
 
-void APlayerCharacter::NextWeapon()
+void APlayerCharacter::ChangeToWeapon1()
 {
-	++currentWeapon;
-	if (currentWeapon >= RangedWeapons.Num())
-		currentWeapon = 0;
+	currentWeapon = 0;
 	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
-	
+}
+
+void APlayerCharacter::ChangeToWeapon2()
+{
+	currentWeapon = 1;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+}
+
+void APlayerCharacter::ChangeToWeapon3()
+{
+	currentWeapon = 2;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+}
+
+void APlayerCharacter::ChangeToWeapon4()
+{
+	currentWeapon = 3;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 }
 
 void APlayerCharacter::HookShot()
