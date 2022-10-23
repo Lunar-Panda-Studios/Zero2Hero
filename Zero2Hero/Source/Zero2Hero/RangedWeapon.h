@@ -29,7 +29,7 @@ protected:
 		int Charge;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		int CurrentAmmo = 5;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		int AmmoMax = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		float MaxCharge = 100.0f;
@@ -65,7 +65,7 @@ public:
 		void IncreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
 		void DecreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 		bool AmmoCheck();
 	UFUNCTION(BlueprintCallable)
 		bool Reload();
