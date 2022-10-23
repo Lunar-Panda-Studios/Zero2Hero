@@ -258,6 +258,7 @@ void APlayerCharacter::EndCrouch()
 void APlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
+	PlayerLanded();
 	doubleJumpCount = 0;
 	if (hasGroundPounded)
 	{
@@ -473,26 +474,43 @@ void APlayerCharacter::RangedAttackEnd()
 
 void APlayerCharacter::ChangeToWeapon1()
 {
-	currentWeapon = 0;
-	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	if (currentWeapon != 0)
+	{
+		currentWeapon = 0;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
+	
 }
 
 void APlayerCharacter::ChangeToWeapon2()
 {
-	currentWeapon = 1;
-	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	if (currentWeapon != 1)
+	{
+		currentWeapon = 1;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
 }
 
 void APlayerCharacter::ChangeToWeapon3()
 {
-	currentWeapon = 2;
-	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	if (currentWeapon != 2)
+	{
+		currentWeapon = 2;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
 }
 
 void APlayerCharacter::ChangeToWeapon4()
 {
-	currentWeapon = 3;
-	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	if (currentWeapon != 3)
+	{
+		currentWeapon = 3;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
 }
 
 void APlayerCharacter::HookShot()
