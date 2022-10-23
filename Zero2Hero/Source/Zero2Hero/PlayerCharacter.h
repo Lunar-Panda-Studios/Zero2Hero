@@ -176,7 +176,10 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void Jump() override;
 
+	
 	void DoubleJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartDoubleJump();
 
 	void Dash();
 	void GroundPound();
