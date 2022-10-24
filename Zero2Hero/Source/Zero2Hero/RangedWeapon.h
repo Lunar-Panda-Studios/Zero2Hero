@@ -20,7 +20,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	UPROPERTY(BlueprintReadWrite)
+		int WeaponType;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
 		int Damage;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)

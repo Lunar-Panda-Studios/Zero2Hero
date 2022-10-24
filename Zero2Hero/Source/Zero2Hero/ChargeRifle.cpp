@@ -4,6 +4,7 @@ void AChargeRifle::BeginPlay()
 {
 	Super::BeginPlay();
 	FireLocation = FindComponentByClass<USphereComponent>();
+	WeaponType = 3;
 }
 
 void AChargeRifle::Tick(float DeltaTime)

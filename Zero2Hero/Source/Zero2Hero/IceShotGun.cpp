@@ -16,6 +16,7 @@ void AIceShotGun::BeginPlay()
 	Super::BeginPlay();
 
 	FireLocation = FindComponentByClass<USphereComponent>();
+	WeaponType = 1;
 	
 }
 
