@@ -10,6 +10,7 @@ void AMachineGun::BeginPlay()
 	Super::BeginPlay();
 
 	FireLocation = FindComponentByClass<USphereComponent>();
+	WeaponType = 2;
 }
 
 void AMachineGun::Tick(float DeltaTime)
