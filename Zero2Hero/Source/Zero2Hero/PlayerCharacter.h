@@ -111,9 +111,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashCooldown = 0.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float dashTime = 0.3f;
+	UPROPERTY()
+		float currentDashTime = 0.0f;
+	UPROPERTY()
+		bool isDashing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float speedAfterDash = 200.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashPushDown = 300.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashGroundedCheck = 30.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float dashFriction = 1.0f;
+	UPROPERTY()
+		float normalFriction;
 	UPROPERTY()
 		bool hasDashed = false;
 
@@ -131,6 +143,8 @@ protected:
 		bool upDownPressed = false;
 	UPROPERTY()
 		bool leftRightPressed = false;
+	UPROPERTY()
+		UCharacterMovementComponent* characterMovementComp;
 
 public:	
 	// Called every frame
@@ -160,9 +174,14 @@ public:
 	void EndCrouch();
 
 	virtual void Landed(const FHitResult& Hit) override;
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerLanded();
 	virtual void Jump() override;
 
+	
 	void DoubleJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartDoubleJump();
 
 	void Dash();
 	void GroundPound();
@@ -188,5 +207,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DecreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
-		void NextWeapon();
+		void ChangeToWeapon1();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon2();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon3();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon4();
+	UFUNCTION(BlueprintImplementableEvent)
+		void SwitchWeapon();
 };
