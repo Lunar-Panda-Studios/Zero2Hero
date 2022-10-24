@@ -41,13 +41,16 @@ void AIceShotGun::PrimaryAttack()
 		FRotator Max = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll + DegreesAroundCentre/2, GetActorRotation().Yaw);
 		FRotator Min = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll - DegreesAroundCentre/2, GetActorRotation().Yaw);
 
-		for (int i = 0; i < IcicleNumber; i++)
+		if (DecreaseCharge(ChargeUsage))
 		{
-			Rotation = FRotator(GetActorRotation().Pitch, (GetActorRotation().Yaw - DegreesAroundCentre/4) + FMath::FRandRange(Min.Yaw, Max.Yaw), (GetActorRotation().Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
-			AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-			if (Icicle != nullptr)
+			for (int i = 0; i < IcicleNumber; i++)
 			{
-				Icicle->Damage = Damage;
+				Rotation = FRotator(GetActorRotation().Pitch, (GetActorRotation().Yaw - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Yaw, Max.Yaw), (GetActorRotation().Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
+				AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+				if (Icicle != nullptr)
+				{
+					Icicle->Damage = Damage;
+				}
 			}
 		}
 	}
