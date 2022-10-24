@@ -32,20 +32,27 @@ void AHookPoint::Tick(float DeltaTime)
 void AHookPoint::OnOverlapRangeSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("OverLap"));
-	if (OtherComp->ComponentHasTag("PlayerView"))
+
+	if (OtherComp != nullptr)
 	{
-		InSight = true;
-		GrapplingHook->SetGrapplePoint(this);
+		if (OtherComp->ComponentHasTag("PlayerView"))
+		{
+			InSight = true;
+			GrapplingHook->SetGrapplePoint(this);
+		}
 	}
 }
 
 void AHookPoint::OnOverlapRangeSphereEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("EndOverlap"));
-	if (OtherComp->ComponentHasTag("PlayerView"))
+	if (OtherComp != nullptr)
 	{
-		InSight = false;
-		GrapplingHook->SetGrapplePoint(nullptr);
+		if (OtherComp->ComponentHasTag("PlayerView"))
+		{
+			InSight = false;
+			GrapplingHook->SetGrapplePoint(nullptr);
+		}
 	}
 }
 
