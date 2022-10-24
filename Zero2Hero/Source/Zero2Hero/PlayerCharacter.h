@@ -59,7 +59,7 @@ protected:
 		ARangedWeapon* CurrentRangedWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		int currentWeapon = 0;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
