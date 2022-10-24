@@ -20,9 +20,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
-		int Health;
+		float Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
-		int MaxHealth = 100;
+		float MaxHealth = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
 		int Damage;
 	UPROPERTY()
@@ -36,9 +36,9 @@ public:
 		int GetDamage();
 
 	UFUNCTION(BlueprintCallable)
-		int GetHealth();
+		float GetHealth();
 	UFUNCTION(BlueprintCallable)
-		int GetMaxHealth();
+		float GetMaxHealth();
 	UFUNCTION(BlueprintCallable)
 		void IncreaseHealth(int amount);
 	UFUNCTION(BlueprintCallable)
