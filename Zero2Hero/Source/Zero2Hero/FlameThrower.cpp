@@ -21,6 +21,7 @@ void AFlameThrower::BeginPlay()
 
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(NigaraSys);
+	WeaponType = 0;
 
 	//if (NiagaraComp != nullptr)
 	//{
