@@ -147,7 +147,9 @@ protected:
 		UCharacterMovementComponent* characterMovementComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
-		float minDistToWall = 500.0f;
+		bool canWallRun = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float minDistToWallRun = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
 		float wallRunSpeed = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
@@ -163,7 +165,28 @@ protected:
 	UPROPERTY()
 		float startingTurnSpeed;
 	UPROPERTY()
+		float startingAirControl;
+	UPROPERTY()
+		FRotator initialRotSpeed;
+	UPROPERTY()
 		int latestWallRunDir = 0;
+
+	UPROPERTY()
+		bool isWallJumping = false;
+	UPROPERTY()
+		bool hasWallJumped = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float minDistToWallJump = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpGravity = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpBackwardsVelocity = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpTime = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpGroundedCheck = 400.0f;
+	UPROPERTY()
+		float currentWallJumpTime = 0.0f;
 
 
 public:	
@@ -245,4 +268,13 @@ public:
 		void StopWallRun();
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartWallRun();
+
+	UFUNCTION()
+		void WalljumpCheck();
+	UFUNCTION()
+		void WallJump(FHitResult result);
+	UFUNCTION()
+		void StopWallJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartWallJump();
 };
