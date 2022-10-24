@@ -83,7 +83,7 @@ int ARangedWeapon::GetUsage()
 	return ChargeUsage;
 }
 
-int ARangedWeapon::GetAmmo()
+float ARangedWeapon::GetAmmo()
 {
 	return CurrentAmmo;
 }
