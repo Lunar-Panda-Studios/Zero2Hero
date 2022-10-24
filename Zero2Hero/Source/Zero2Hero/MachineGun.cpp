@@ -10,6 +10,7 @@ void AMachineGun::BeginPlay()
 	Super::BeginPlay();
 
 	FireLocation = FindComponentByClass<USphereComponent>();
+	WeaponType = 2;
 }
 
 void AMachineGun::Tick(float DeltaTime)
@@ -42,13 +43,16 @@ void AMachineGun::Attack()
 		spawnParams.Instigator = GetInstigator();
 		if (currentCooldown > fireRate)
 		{
-			FRotator rotation = GetActorRotation();
-			AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
-			if (Bullet != nullptr)
+			if (DecreaseCharge(ChargeUsage))
 			{
-				Bullet->Damage = Damage;
+				FRotator rotation = GetActorRotation();
+				AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+				if (Bullet != nullptr)
+				{
+					Bullet->Damage = Damage;
+				}
+				currentCooldown = 0.0f;
 			}
-			currentCooldown = 0.0f;
 			
 		}
 	}

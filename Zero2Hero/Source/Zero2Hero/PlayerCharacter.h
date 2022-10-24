@@ -12,10 +12,13 @@
 #include "GrapplingHook.h"
 #include "HookPoint.h"
 #include "Kismet/GameplayStatics.h"
+#include "Damageable.h"
+#include "Projectile.h"
+#include "DialogueSystem.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class ZERO2HERO_API APlayerCharacter : public ACharacter
+class ZERO2HERO_API APlayerCharacter : public ADamageable
 {
 	GENERATED_BODY()
 
@@ -26,15 +29,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		int Health;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		int Ammo;
-	UPROPERTY()
-		int MaxHealth;
-	UPROPERTY()
-		int MaxAmmo;
-
 	UPROPERTY()
 		float MeleePressTimer = 0;
 	UPROPERTY()
@@ -65,7 +59,7 @@ protected:
 		ARangedWeapon* CurrentRangedWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		int currentWeapon = 0;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
@@ -94,6 +88,10 @@ protected:
 		float MeleeAttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		float MeleeAttackCooldown;
+	UPROPERTY()
+		float AttackAnimTimer = 0.0f;
+	UPROPERTY()
+		TArray<ADamageable*> EnemiesInRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Settings")
 		bool canDoubleJump = true;
@@ -111,21 +109,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashCooldown = 0.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
-		float dashTime = 0.3f;
-	UPROPERTY()
-		float currentDashTime = 0.0f;
-	UPROPERTY()
-		bool isDashing;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
-		float speedAfterDash = 200.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashPushDown = 300.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashGroundedCheck = 30.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
-		float dashFriction = 1.0f;
-	UPROPERTY()
-		float normalFriction;
 	UPROPERTY()
 		bool hasDashed = false;
 
@@ -144,7 +130,11 @@ protected:
 	UPROPERTY()
 		bool leftRightPressed = false;
 	UPROPERTY()
-		UCharacterMovementComponent* characterMovementComp;
+		ADialogueSystem* DialogueSystem;
+	UPROPERTY(EditAnywhere, Category = "Dialogue Settings")
+		TSubclassOf<ADialogueSystem> DialogueSystemClass;
+	UPROPERTY()
+		bool Allow = true;
 
 public:	
 	// Called every frame
@@ -164,6 +154,8 @@ public:
 	void MoveUpDown(float speed);
 
 	void MeleeAttack();
+	void AddEnemyInRange(ADamageable* newEnemy);
+	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
 	void RangedAttackEnd();
 
@@ -174,46 +166,23 @@ public:
 	void EndCrouch();
 
 	virtual void Landed(const FHitResult& Hit) override;
-	UFUNCTION(BlueprintImplementableEvent)
-		void PlayerLanded();
 	virtual void Jump() override;
 
-	
 	void DoubleJump();
-	UFUNCTION(BlueprintImplementableEvent)
-		void StartDoubleJump();
 
 	void Dash();
 	void GroundPound();
+	bool isGrounded();
 
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
 
 	UFUNCTION(BlueprintCallable)
-		int GetHealth();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxHealth();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseHealth(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseHealth(int amount);
+		void NextWeapon();
 
-	UFUNCTION(BlueprintCallable)
-		int GetAmmo();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxAmmo();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
-		void ChangeToWeapon1();
-	UFUNCTION(BlueprintCallable)
-		void ChangeToWeapon2();
-	UFUNCTION(BlueprintCallable)
-		void ChangeToWeapon3();
-	UFUNCTION(BlueprintCallable)
-		void ChangeToWeapon4();
-	UFUNCTION(BlueprintImplementableEvent)
-		void SwitchWeapon();
+	UFUNCTION()
+		void ComboDamage();
+
+	UFUNCTION()
+		void Dialogue();
 };
