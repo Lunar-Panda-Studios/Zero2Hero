@@ -30,13 +30,13 @@ protected:
 		float DamageTimer = 0.0f;
 	UPROPERTY()
 		float DamageTimerMax = 1.0f;
-
 	UPROPERTY()
-		float TimerReset = 0.0f;
+		float Timer = 0.0f;
+	UPROPERTY()
+		float TimerMax = 1.0f;
 	
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* NiagaraComp;
-
 	UPROPERTY(EditAnywhere)
 		UNiagaraSystem* NigaraSys;
 
