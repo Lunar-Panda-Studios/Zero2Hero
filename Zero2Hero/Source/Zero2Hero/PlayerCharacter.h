@@ -146,6 +146,26 @@ protected:
 	UPROPERTY()
 		UCharacterMovementComponent* characterMovementComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float minDistToWall = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallRunSpeed = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallRunGravity = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallJumpUpwardsVelocity = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallJumpSidewaysVelocity = 500.0f;
+	UPROPERTY()
+		bool isWallRunning = false;
+	UPROPERTY()
+		float startingGravityScale;
+	UPROPERTY()
+		float startingTurnSpeed;
+	UPROPERTY()
+		int latestWallRunDir = 0;
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -216,4 +236,13 @@ public:
 		void ChangeToWeapon4();
 	UFUNCTION(BlueprintImplementableEvent)
 		void SwitchWeapon();
+
+	UFUNCTION()
+		void WallRunCheck();
+	UFUNCTION()
+		void WallRun(int dir, FHitResult result);
+	UFUNCTION()
+		void StopWallRun();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartWallRun();
 };

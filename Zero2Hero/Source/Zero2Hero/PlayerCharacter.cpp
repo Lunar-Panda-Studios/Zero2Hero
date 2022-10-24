@@ -30,6 +30,9 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	startingGravityScale = GetCharacterMovement()->GravityScale;
+	startingTurnSpeed = GetCharacterMovement()->RotationRate.Vector().Z;
+
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 	this->GetCharacterMovement();
 	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
@@ -88,6 +91,11 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetVelocity().Z < 0)
+	{
+		WallRunCheck();
+	}
 
 	if (currentDashTime < dashTime && isDashing)
 	{
@@ -260,6 +268,10 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 	PlayerLanded();
 	doubleJumpCount = 0;
+	if (isWallRunning)
+	{
+		StopWallRun();
+	}
 	if (hasGroundPounded)
 	{
 		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
@@ -354,7 +366,7 @@ void APlayerCharacter::Jump()
 
 void APlayerCharacter::DoubleJump()
 {
-	if (doubleJumpCount == 1 && canDoubleJump)
+	if (doubleJumpCount == 1 && canDoubleJump && !isWallRunning)
 	{
 		StartDoubleJump();
 		FVector forwardDir = GetActorRotation().Vector();
@@ -366,6 +378,21 @@ void APlayerCharacter::DoubleJump()
 		LaunchCharacter(dir, true, true);
 
 		doubleJumpCount++;
+	}
+	else if (isWallRunning)
+	{
+		if (latestWallRunDir == -90)
+		{
+			FVector dir = FVector(0, wallJumpSidewaysVelocity * GetActorRightVector().Y, wallJumpUpwardsVelocity);
+			LaunchCharacter(dir, false, true);
+			
+		}
+		else
+		{
+			FVector dir = FVector(0, -wallJumpSidewaysVelocity * GetActorRightVector().Y, wallJumpUpwardsVelocity);
+			LaunchCharacter(dir, false, true);
+		}
+		StopWallRun();
 	}
 }
 
@@ -511,6 +538,53 @@ void APlayerCharacter::ChangeToWeapon4()
 		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 		SwitchWeapon();
 	}
+}
+
+void APlayerCharacter::WallRunCheck()
+{
+	
+	FVector startPos = GetActorLocation();
+	FVector endPos = GetActorRightVector() * minDistToWall;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	TraceParams.AddIgnoredActor(this);
+	FHitResult HitResultLeft;
+	FHitResult HitResultRight;
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResultLeft, GetActorLocation(), GetActorLocation() + -endPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+	{
+		WallRun(-90, HitResultLeft); //left
+	}
+	else if (GetWorld()->LineTraceSingleByChannel(HitResultRight, GetActorLocation(), GetActorLocation() + endPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+	{
+		WallRun(90, HitResultRight); //right
+	}
+	else if(isWallRunning)
+	{
+		StopWallRun();
+	}
+}
+
+void APlayerCharacter::WallRun(int dir, FHitResult result)
+{
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	StartWallRun();
+	isWallRunning = true;
+	FRotator RotationOf90Degrees(0, dir, 0);
+	FRotator LeftOrRightDirection = RotationOf90Degrees.RotateVector(result.Normal).Rotation();
+	FRotator newRotation(0, LeftOrRightDirection.Yaw, 0);
+	SetActorRotation(newRotation, ETeleportType::TeleportPhysics);
+	LaunchCharacter(GetActorForwardVector() * wallRunSpeed, true, false);
+	moveComp->GravityScale = 0.5f;
+	latestWallRunDir = dir;
+	moveComp->RotationRate.Vector() = FVector(moveComp->RotationRate.Vector().X, moveComp->RotationRate.Vector().Y, 0);
+}
+
+void APlayerCharacter::StopWallRun()
+{
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	isWallRunning = false;
+	moveComp->GravityScale = startingGravityScale;
+	moveComp->RotationRate.Vector() = FVector(moveComp->RotationRate.Vector().X, moveComp->RotationRate.Vector().Y, startingTurnSpeed);
 }
 
 void APlayerCharacter::HookShot()
