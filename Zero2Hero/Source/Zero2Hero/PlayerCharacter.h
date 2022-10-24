@@ -238,31 +238,12 @@ public:
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
 
-	UFUNCTION(BlueprintCallable)
-		void NextWeapon();
-
 	UFUNCTION()
 		void ComboDamage();
 
 	UFUNCTION()
 		void Dialogue();
-  UFUNCTION(BlueprintCallable)
-		int GetHealth();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxHealth();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseHealth(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseHealth(int amount);
 
-	UFUNCTION(BlueprintCallable)
-		int GetAmmo();
-	UFUNCTION(BlueprintCallable)
-		int GetMaxAmmo();
-	UFUNCTION(BlueprintCallable)
-		void IncreaseAmmo(int amount);
-	UFUNCTION(BlueprintCallable)
-		void DecreaseAmmo(int amount);
 	UFUNCTION(BlueprintCallable)
 		void ChangeToWeapon1();
 	UFUNCTION(BlueprintCallable)

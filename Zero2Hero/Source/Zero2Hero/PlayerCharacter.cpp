@@ -499,6 +499,8 @@ void APlayerCharacter::Dash()
 			}
 			LaunchCharacter(dir, true, true);
 			currentDashCooldown = 0.0f;
+			isDashing = true;
+			characterMovementComp->GroundFriction = dashFriction;
 		}
 	}
 }
@@ -514,10 +516,7 @@ void APlayerCharacter::GroundPound()
 			LaunchCharacter(downDir * GroundPoundForce, true, true);
 			hasGroundPounded = true;
 		}
-		LaunchCharacter(dir, true, true);
-		currentDashCooldown = 0.0f;
-		isDashing = true;
-		characterMovementComp->GroundFriction = dashFriction;
+		
 	}
 }
 
@@ -613,6 +612,7 @@ void APlayerCharacter::Dialogue()
 	{
 		DialogueSystem->OnClick();
 	}
+}
 
 void APlayerCharacter::ChangeToWeapon1()
 {
