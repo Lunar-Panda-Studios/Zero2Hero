@@ -109,9 +109,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashCooldown = 0.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float dashTime = 0.3f;
+	UPROPERTY()
+		float currentDashTime = 0.0f;
+	UPROPERTY()
+		bool isDashing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float speedAfterDash = 200.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashPushDown = 300.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashGroundedCheck = 30.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		float dashFriction = 1.0f;
+	UPROPERTY()
+		float normalFriction;
 	UPROPERTY()
 		bool hasDashed = false;
 
@@ -135,6 +147,50 @@ protected:
 		TSubclassOf<ADialogueSystem> DialogueSystemClass;
 	UPROPERTY()
 		bool Allow = true;
+  UPROPERTY()
+		UCharacterMovementComponent* characterMovementComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		bool canWallRun = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float minDistToWallRun = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallRunSpeed = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallRunGravity = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallJumpUpwardsVelocity = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+		float wallJumpSidewaysVelocity = 500.0f;
+	UPROPERTY()
+		bool isWallRunning = false;
+	UPROPERTY()
+		float startingGravityScale;
+	UPROPERTY()
+		float startingTurnSpeed;
+	UPROPERTY()
+		float startingAirControl;
+	UPROPERTY()
+		FRotator initialRotSpeed;
+	UPROPERTY()
+		int latestWallRunDir = 0;
+
+	UPROPERTY()
+		bool isWallJumping = false;
+	UPROPERTY()
+		bool hasWallJumped = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float minDistToWallJump = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpGravity = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpBackwardsVelocity = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpTime = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
+		float wallJumpGroundedCheck = 400.0f;
+	UPROPERTY()
+		float currentWallJumpTime = 0.0f;
 
 public:	
 	// Called every frame
@@ -166,9 +222,14 @@ public:
 	void EndCrouch();
 
 	virtual void Landed(const FHitResult& Hit) override;
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerLanded();
 	virtual void Jump() override;
 
+	
 	void DoubleJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartDoubleJump();
 
 	void Dash();
 	void GroundPound();
@@ -177,12 +238,38 @@ public:
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
 
-	UFUNCTION(BlueprintCallable)
-		void NextWeapon();
-
 	UFUNCTION()
 		void ComboDamage();
 
 	UFUNCTION()
 		void Dialogue();
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon1();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon2();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon3();
+	UFUNCTION(BlueprintCallable)
+		void ChangeToWeapon4();
+	UFUNCTION(BlueprintImplementableEvent)
+		void SwitchWeapon();
+
+	UFUNCTION()
+		void WallRunCheck();
+	UFUNCTION()
+		void WallRun(int dir, FHitResult result);
+	UFUNCTION()
+		void StopWallRun();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartWallRun();
+
+	UFUNCTION()
+		void WalljumpCheck();
+	UFUNCTION()
+		void WallJump(FHitResult result);
+	UFUNCTION()
+		void StopWallJump();
+	UFUNCTION(BlueprintImplementableEvent)
+		void StartWallJump();
 };
