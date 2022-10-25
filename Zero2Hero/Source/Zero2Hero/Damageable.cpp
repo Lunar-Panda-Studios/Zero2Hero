@@ -33,12 +33,12 @@ int ADamageable::GetDamage()
 }
 
 
-int ADamageable::GetHealth()
+float ADamageable::GetHealth()
 {
 	return Health;
 }
 
-int ADamageable::GetMaxHealth()
+float ADamageable::GetMaxHealth()
 {
 	return MaxHealth;
 }
