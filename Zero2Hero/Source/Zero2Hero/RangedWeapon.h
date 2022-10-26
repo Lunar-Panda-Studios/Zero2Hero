@@ -20,19 +20,28 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
+	UPROPERTY(BlueprintReadWrite)
+		int WeaponType;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
 		int Damage;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
 		int ChargeUsage = 10;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		int Charge;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
-		float MaxCharge;
+		float CurrentAmmo = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float AmmoMax = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float MaxCharge = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		TSubclassOf<AProjectile> Projectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		USphereComponent* FireLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float TimeToReload = 0.0f;
+	UPROPERTY(BlueprintReadWrite)
+		float TimerReload = 0.0f;
 
 public:	
 	// Called every frame
@@ -50,5 +59,22 @@ public:
 		bool DecreaseCharge(int amount);
 	UFUNCTION(BlueprintCallable)
 		int GetUsage();
+
+	UFUNCTION(BlueprintCallable)
+		float GetAmmo();
+	UFUNCTION(BlueprintCallable)
+		void IncreaseAmmo(int amount);
+	UFUNCTION(BlueprintCallable)
+		void DecreaseAmmo(int amount);
+	UFUNCTION()
+		bool AmmoCheck();
+	UFUNCTION(BlueprintCallable)
+		bool Reload();
+	UFUNCTION()
+		float GetTimerReload();
+	UFUNCTION()
+		void SetTimerReload(float amount);
+	UFUNCTION()
+		float GetTimeToReload();
 
 };
