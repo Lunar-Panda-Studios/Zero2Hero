@@ -15,10 +15,8 @@ AEnemy::AEnemy()
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
-	BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
-	BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
-
-
+	//BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
+	//BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
 }
 
 // Called when the game starts or when spawned
@@ -116,6 +114,15 @@ bool AEnemy::GetCanSee()
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
 	CanSee = stimulus.WasSuccessfullySensed();
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsBool("LineOfSight", CanSee);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No BBC"));
+	}
 
 	//if (CanSee)
 	//{
@@ -231,6 +238,16 @@ bool AEnemy::IsPositionReachable(FVector Position)
 	}
 
 	return !NavPath->IsPartial();
+}
+
+void AEnemy::SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree)
+{
+	BTC = BehaviourTree;
+}
+
+void AEnemy::SetBlackboard(UBlackboardComponent* Blackboard)
+{
+	BBC = Blackboard;
 }
 
 

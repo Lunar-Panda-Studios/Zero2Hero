@@ -118,4 +118,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool IsPositionReachable(FVector Position);
+
+	UFUNCTION()
+		void SetBlackboard(UBlackboardComponent* Blackboard);
+	UFUNCTION()
+		void SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree);
 };
