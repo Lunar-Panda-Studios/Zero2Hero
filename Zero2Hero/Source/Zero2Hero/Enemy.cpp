@@ -113,27 +113,19 @@ bool AEnemy::GetCanSee()
 
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
-	CanSee = stimulus.WasSuccessfullySensed();
-
-	if (BBC != nullptr)
+	if (actor->ActorHasTag("Player"))
 	{
-		BBC->SetValueAsBool("LineOfSight", CanSee);
+		CanSee = stimulus.WasSuccessfullySensed();
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("LineOfSight", CanSee);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No BBC"));
+		}
 	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No BBC"));
-	}
-
-	//if (CanSee)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Can See"));
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No See"));
-	//}
-
-
 }
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

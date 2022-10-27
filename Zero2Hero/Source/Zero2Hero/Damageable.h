@@ -29,8 +29,8 @@ protected:
 		bool isDead = false;
 	UPROPERTY()
 		float AnimationTime;
-	UPROPERTY()
-		float AnimationTimer;
+	UPROPERTY(EditAnywhere, Category = "Character Stats")
+		float AnimationTimer = 1.0f;
 
 public:	
 	// Called every frame

@@ -31,7 +31,10 @@ void ACannonFodder::BeginPlay()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Melee Collider - Cannon Fodder"));
+		if (!CanExplode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Melee Collider - Cannon Fodder"));
+		}
 	}
 }
 
@@ -61,21 +64,22 @@ void ACannonFodder::Tick(float DeltaTime)
 			}
 		}
 	}
-
-	if (InRange)
-	{
-		Timer += DeltaTime;
-
-		if (Timer >= TimeToExplode)
-		{
-			Explode();
-		}
-	}
 	else
 	{
-		Timer = 0;
-	}
+		if (InRange)
+		{
+			Timer += DeltaTime;
 
+			if (Timer >= TimeToExplode)
+			{
+				Explode();
+			}
+		}
+		else
+		{
+			Timer = 0;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -88,7 +92,9 @@ void ACannonFodder::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void ACannonFodder::Explode()
 {
 	BlastRadius->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	SetLifeSpan(AnimationTimer);
+	//SetLifeSpan(AnimationTimer);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
+	Destroy();
 
 }
 
@@ -101,10 +107,27 @@ void ACannonFodder::OnOverlapBeginExplode(UPrimitiveComponent* OverlappedCompone
 			APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 			Player->DecreaseHealth(Damage);
 
-			FVector Direction = GetActorLocation() - Player->GetActorLocation();
+			FVector Direction = Player->GetActorLocation() - GetActorLocation();
 			Direction.Normalize();
 
-			Player->LaunchCharacter(Direction*KnockbackSpeed, true, true);
+
+			FVector LineTraceEnd = FVector(Player->GetActorLocation().X, Player->GetActorLocation().Y, Player->GetActorLocation().Z - GroundLimit);
+			FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+			FHitResult Hit;
+			GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+			//DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
+
+			if (!Hit.IsValidBlockingHit())
+			{
+				Player->LaunchCharacter(Direction * (KnockbackSpeed/10), true, true);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not On Ground"));
+			}
+			else
+			{
+				Player->LaunchCharacter(Direction * KnockbackSpeed, true, true);
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("OnGround"));
+			}
 			
 		}
 	}

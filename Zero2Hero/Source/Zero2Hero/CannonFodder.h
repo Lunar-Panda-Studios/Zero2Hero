@@ -34,6 +34,8 @@ protected:
 		float Timer = 0.0f;
 	UPROPERTY(EditAnywhere)
 		float TimeToExplode;
+	UPROPERTY()
+		float GroundLimit = 100.0f;
 
 public:	
 	// Called every frame
