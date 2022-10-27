@@ -5,24 +5,31 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Enemy.h"
-#include "Components/SphereComponent.h"
-#include "EnemyChaseMelee.generated.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "EnemyWondering.generated.h"
 
 UCLASS()
-class ZERO2HERO_API AEnemyChaseMelee : public AEnemy
+class ZERO2HERO_API AEnemyWondering : public AEnemy
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AEnemyChaseMelee();
+	AEnemyWondering();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-		USphereComponent* MeleeCollider;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector StartLocation;
+
+	UPROPERTY(EditAnywhere, Category = "Wondering")
+		float XRadius;
+	UPROPERTY(EditAnywhere, Category = "Wondering")
+		float YRadius;
 
 public:	
 	// Called every frame
@@ -32,9 +39,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-		void Attack() override;
-
+		float GetXRadius();
 	UFUNCTION()
-	void OnOverlapMelee(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		float GetYRadius();
+	UFUNCTION()
+		FVector GetStartLocation();
+
 
 };

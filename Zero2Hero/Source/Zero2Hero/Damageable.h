@@ -27,6 +27,10 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
+	UPROPERTY()
+		float AnimationTime;
+	UPROPERTY()
+		float AnimationTimer;
 
 public:	
 	// Called every frame

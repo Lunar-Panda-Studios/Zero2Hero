@@ -15,6 +15,9 @@ AEnemy::AEnemy()
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
+	BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
+	BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
+
 
 }
 
@@ -66,6 +69,10 @@ void AEnemy::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Movement Component - Enemy"));
 	}
+
+	Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+
+	//BTC->Run
 }
 
 // Called every frame
@@ -211,6 +218,19 @@ void AEnemy::OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			}
 		}
 	}
+}
+
+bool AEnemy::IsPositionReachable(FVector Position) 
+{
+	FVector PathStart = GetActorLocation();
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
+
+	if (!NavPath)
+	{
+		return false;
+	}
+
+	return !NavPath->IsPartial();
 }
 
 

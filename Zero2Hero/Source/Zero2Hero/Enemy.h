@@ -14,6 +14,12 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Damageable.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AIController.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -28,6 +34,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBehaviorTree* BT;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBlackboardComponent* BBC;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBehaviorTreeComponent* BTC;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float MovementSpeed = 600.0f;
@@ -102,4 +115,7 @@ public:
 		void OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsPositionReachable(FVector Position);
 };
