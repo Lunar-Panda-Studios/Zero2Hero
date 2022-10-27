@@ -30,11 +30,19 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MeleePressMax = MeleeAttackSpeed + 0.2;
+	startingGravityScale = GetCharacterMovement()->GravityScale;
+	startingTurnSpeed = GetCharacterMovement()->RotationRate.Vector().Z;
+	startingAirControl = GetCharacterMovement()->AirControl;
+	initialRotSpeed = GetCharacterMovement()->RotationRate;
 
+	MeleePressMax = MeleeAttackSpeed + 0.2;
+	this->GetCharacterMovement();
 	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
 	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
-
+	
+	characterMovementComp = this->GetCharacterMovement();
+	normalFriction = characterMovementComp->GroundFriction;
+	
 	//Adds Custom Collisions
 	if (CapCollider != nullptr)
 	{
@@ -88,8 +96,12 @@ void APlayerCharacter::BeginPlay()
 
 	for (int i = 0; i < RangedWeapons.Num(); i++)
 	{
-		allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-		allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		if (RangedWeapons[i] != nullptr)
+		{
+			//this may spawn the ice shotgun twice. gotta check this
+			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
+			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
 	}
 
 	if (DialogueSystemClass != nullptr)
@@ -113,9 +125,40 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!hasWallJumped && !isWallJumping)
+	{
+		WalljumpCheck();
+	}
+	if (GetVelocity().Z < 0 && canWallRun && !isWallJumping && !hasWallJumped)
+	{
+		WallRunCheck();
+	}
 
+
+	if (isWallJumping)
+	{
+		currentWallJumpTime += DeltaTime;
+		if (currentWallJumpTime > wallJumpTime)
+		{
+			hasWallJumped = true;
+			StopWallJump();
+			currentWallJumpTime = 0.0f;
+		}
+	}
+
+	if (currentDashTime < dashTime && isDashing)
+	{
+		currentDashTime += DeltaTime;
+	}
+	else if (isDashing)
+	{
+		LaunchCharacter(GetActorForwardVector() * speedAfterDash, true, false);
+		currentDashTime = 0;
+		isDashing = false;
+		characterMovementComp->GroundFriction = normalFriction;
+	}
 	currentDashCooldown += DeltaTime;
-
+	
 
 	if (IsAttacking)
 	{
@@ -225,8 +268,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
 	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
-	PlayerInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
 	PlayerInputComponent->BindAction(TEXT("Dialogue"), IE_Pressed, this, &APlayerCharacter::Dialogue);
+	PlayerInputComponent->BindAction(TEXT("Weapon1"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon1);
+	PlayerInputComponent->BindAction(TEXT("Weapon2"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon2);
+	PlayerInputComponent->BindAction(TEXT("Weapon3"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon3);
+	PlayerInputComponent->BindAction(TEXT("Weapon4"), IE_Pressed, this, &APlayerCharacter::ChangeToWeapon4);
 }
 
 void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -312,7 +358,15 @@ void APlayerCharacter::EndCrouch()
 void APlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
+	PlayerLanded();
 	doubleJumpCount = 0;
+	
+	GetCharacterMovement()->RotationRate.Vector() = FVector(GetCharacterMovement()->RotationRate.Vector().X, GetCharacterMovement()->RotationRate.Vector().Y, startingTurnSpeed);
+	if (hasWallJumped)
+	{
+		hasWallJumped = false;
+		StopWallRun();
+	}
 	if (hasGroundPounded)
 	{
 		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
@@ -373,10 +427,12 @@ void APlayerCharacter::Jump()
 	}
 }
 
+
 void APlayerCharacter::DoubleJump()
 {
-	if (doubleJumpCount == 1 && canDoubleJump)
+	if (doubleJumpCount == 1 && canDoubleJump && !isWallRunning && !isWallJumping)
 	{
+		StartDoubleJump();
 		FVector forwardDir = GetActorRotation().Vector();
 		FVector dir = FVector(0, 0, doubleJumpHeight);
 		if (upDownPressed || leftRightPressed)
@@ -384,10 +440,39 @@ void APlayerCharacter::DoubleJump()
 			dir = forwardDir * doubleJumpThrust + FVector(0, 0, doubleJumpHeight);
 		}
 		LaunchCharacter(dir, true, true);
-		
+
 		doubleJumpCount++;
 	}
+	else if (isWallJumping)
+	{
+		StopWallJump();
+		FVector rot = -GetActorForwardVector();
+		SetActorRotation(rot.Rotation());
+		FVector dir = FVector(wallJumpBackwardsVelocity * GetActorForwardVector());
+		dir.Z = wallJumpUpwardsVelocity;
+		hasWallJumped = false;
+		LaunchCharacter(dir, true, true);
+	}
+	else if (isWallRunning && !isWallJumping)
+	{
+		if (latestWallRunDir == -90)
+		{
+			FVector dir = FVector(wallJumpSidewaysVelocity * GetActorRightVector());
+			dir.Z = wallJumpUpwardsVelocity;
+			LaunchCharacter(dir, false, true);
+			
+		}
+		else
+		{
+			FVector dir = FVector(-wallJumpSidewaysVelocity * GetActorRightVector());
+			dir.Z = wallJumpUpwardsVelocity;
+			LaunchCharacter(dir, false, true);
+		}
+		StopWallRun();
+	}
 }
+
+
 void APlayerCharacter::Dash()
 {
 	if (Allow)
@@ -414,6 +499,8 @@ void APlayerCharacter::Dash()
 			}
 			LaunchCharacter(dir, true, true);
 			currentDashCooldown = 0.0f;
+			isDashing = true;
+			characterMovementComp->GroundFriction = dashFriction;
 		}
 	}
 }
@@ -429,6 +516,7 @@ void APlayerCharacter::GroundPound()
 			LaunchCharacter(downDir * GroundPoundForce, true, true);
 			hasGroundPounded = true;
 		}
+		
 	}
 }
 
@@ -509,17 +597,6 @@ void APlayerCharacter::AddEnemyInRange(ADamageable* newEnemy)
 	EnemiesInRange.Add(newEnemy);
 }
 
-void APlayerCharacter::NextWeapon()
-{
-	if (Allow)
-	{
-		++currentWeapon;
-		if (currentWeapon >= RangedWeapons.Num())
-			currentWeapon = 0;
-		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
-	}
-}
-
 void APlayerCharacter::ComboDamage()
 {
 	for (ADamageable* Damageable : EnemiesInRange)
@@ -535,7 +612,158 @@ void APlayerCharacter::Dialogue()
 	{
 		DialogueSystem->OnClick();
 	}
+}
+
+void APlayerCharacter::ChangeToWeapon1()
+{
+	if (currentWeapon != 0 && Allow)
+	{
+		currentWeapon = 0;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
 	
+}
+
+void APlayerCharacter::ChangeToWeapon2()
+{
+	if (currentWeapon != 1 && Allow)
+	{
+		currentWeapon = 1;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
+}
+
+void APlayerCharacter::ChangeToWeapon3()
+{
+	if (currentWeapon != 2 && Allow)
+	{
+		currentWeapon = 2;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
+}
+
+void APlayerCharacter::ChangeToWeapon4()
+{
+	if (currentWeapon != 3 && Allow)
+	{
+		currentWeapon = 3;
+		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+		SwitchWeapon();
+	}
+}
+
+void APlayerCharacter::WallRunCheck()
+{
+	FVector startPos = GetActorLocation();
+	FVector endPos = GetActorRightVector() * minDistToWallRun;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	TraceParams.AddIgnoredActor(this);
+	FHitResult HitResultLeft;
+	FHitResult HitResultRight;
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResultLeft, GetActorLocation(), GetActorLocation() + -endPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+	{
+		if (HitResultLeft.GetActor() != nullptr)
+		{
+			if (HitResultLeft.GetComponent()->ComponentHasTag(FName("Wall")))
+			{
+				WallRun(-90, HitResultLeft); //left
+			}
+		}
+	}
+	else if (GetWorld()->LineTraceSingleByChannel(HitResultRight, GetActorLocation(), GetActorLocation() + endPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+	{
+		if (HitResultRight.GetActor() != nullptr)
+		{
+			if (HitResultRight.GetComponent()->ComponentHasTag(FName("Wall")))
+			{
+				WallRun(90, HitResultRight); //right
+			}
+		}
+	}
+	else if(isWallRunning)
+	{
+		StopWallRun();
+	}
+}
+
+void APlayerCharacter::WallRun(int dir, FHitResult result)
+{
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	StartWallRun();
+	isWallRunning = true;
+	FRotator RotationOf90Degrees(0, dir, 0);
+	FRotator LeftOrRightDirection = RotationOf90Degrees.RotateVector(result.Normal).Rotation();
+	FRotator newRotation(0, LeftOrRightDirection.Yaw, 0);
+	SetActorRotation(newRotation, ETeleportType::TeleportPhysics);
+	LaunchCharacter(GetActorForwardVector() * wallRunSpeed, true, false);
+	moveComp->GravityScale = wallRunGravity;
+	latestWallRunDir = dir;
+	moveComp->RotationRate.Vector() = FVector(moveComp->RotationRate.Vector().X, moveComp->RotationRate.Vector().Y, 0);
+}
+
+void APlayerCharacter::StopWallRun()
+{
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	isWallRunning = false;
+	moveComp->GravityScale = startingGravityScale;
+	moveComp->RotationRate.Vector() = FVector(moveComp->RotationRate.Vector().X, moveComp->RotationRate.Vector().Y, startingTurnSpeed);
+}
+
+void APlayerCharacter::WalljumpCheck()
+{
+	FVector endPos = GetActorForwardVector() * minDistToWallJump;
+	FVector downPos = -GetActorUpVector() * wallJumpGroundedCheck;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	TraceParams.AddIgnoredActor(this);
+	FHitResult result;
+	FHitResult downResult;
+	if (!GetWorld()->LineTraceSingleByChannel(downResult, GetActorLocation(), GetActorLocation() + downPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+	{
+		if (GetWorld()->LineTraceSingleByChannel(result, GetActorLocation(), GetActorLocation() + endPos, ECollisionChannel::ECC_WorldStatic, TraceParams))
+		{
+			if (result.GetActor() != nullptr && !isWallJumping)
+			{
+				if (result.GetComponent()->ComponentHasTag(FName("Wall")))
+				{
+					WallJump(result);
+				}
+			}
+		}
+		else if (isWallJumping)
+		{
+			StopWallJump();
+		}
+	}
+	else if (isWallJumping)
+	{
+		StopWallJump();
+	}
+	
+}
+
+void APlayerCharacter::WallJump(FHitResult result)
+{	
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	moveComp->StopMovementKeepPathing();
+	StartWallJump();
+	isWallJumping = true;
+	moveComp->GravityScale = wallJumpGravity;
+	moveComp->RotationRate = FRotator::ZeroRotator;
+	moveComp->AirControl = 0.0f;
+}
+
+void APlayerCharacter::StopWallJump()
+{
+	UCharacterMovementComponent* moveComp = GetCharacterMovement();
+	moveComp->RotationRate = initialRotSpeed;	
+	isWallJumping = false;
+	moveComp->GravityScale = startingGravityScale;
+	moveComp->AirControl = startingAirControl;
+	currentWallJumpTime = 0;
 }
 
 void APlayerCharacter::HookShot()
