@@ -17,8 +17,10 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MainBody = FindComponentByClass<UCapsuleComponent>();
-	OnActorBeginOverlap.AddDynamic(this, &AProjectile::OnHit);
+	MainBody = FindComponentByClass<UStaticMeshComponent>();
+	//OnActorBeginOverlap.AddDynamic(this, &AProjectile::OnHit);
+
+	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnComponentHit);
 
 	SetLifeSpan(10);
 
@@ -36,20 +38,97 @@ void AProjectile::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
 	if (OtherActor != nullptr)
 	{
-		if (!OtherActor->ActorHasTag("Player"))
+		if (isEnemyProjectile)
 		{
-			if (!OtherActor->ActorHasTag("Ignore"))
+			if (!OtherActor->ActorHasTag("Player"))
 			{
-				if (!OtherActor->ActorHasTag("Projectile"))
+				if (!OtherActor->ActorHasTag("Ignore"))
 				{
-					if (OtherActor->ActorHasTag("Enemy"))
+					if (!OtherActor->ActorHasTag("Projectile"))
 					{
-						ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-						OtherDamageable->DecreaseHealth(Damage);
+						if (OtherActor->ActorHasTag("Enemy"))
+						{
+							ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+							OtherDamageable->DecreaseHealth(Damage);
 
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+						}
+						Destroy();
 					}
-					Destroy();
+				}
+			}
+		}
+		else
+		{
+			if (!OtherActor->ActorHasTag("Enemy"))
+			{
+				if (!OtherActor->ActorHasTag("Ignore"))
+				{
+					if (!OtherActor->ActorHasTag("Projectile"))
+					{
+						if (OtherActor->ActorHasTag("Player"))
+						{
+							ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+							OtherDamageable->DecreaseHealth(Damage);
+
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+						}
+						Destroy();
+					}
+				}
+			}
+		}
+	}
+}
+
+void AProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
+	if (OtherActor != nullptr)
+	{
+		if (!isEnemyProjectile)
+		{
+			if (!OtherActor->ActorHasTag("Player"))
+			{
+				if (!OtherActor->ActorHasTag("Ignore"))
+				{
+					if (!OtherActor->ActorHasTag("Projectile"))
+					{
+						if (!OtherComp->ComponentHasTag("Ignore"))
+						{
+							if (OtherActor->ActorHasTag("Enemy"))
+							{
+								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+								OtherDamageable->DecreaseHealth(Damage);
+
+								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+							}
+							Destroy();
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (!OtherActor->ActorHasTag("Enemy"))
+			{
+				if (!OtherActor->ActorHasTag("Ignore"))
+				{
+					if (!OtherActor->ActorHasTag("Projectile"))
+					{
+						if (!OtherComp->ComponentHasTag("Ignore"))
+						{
+							if (OtherActor->ActorHasTag("Player"))
+							{
+								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+								OtherDamageable->DecreaseHealth(Damage);
+
+								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+							}
+							Destroy();
+						}
+					}
 				}
 			}
 		}
