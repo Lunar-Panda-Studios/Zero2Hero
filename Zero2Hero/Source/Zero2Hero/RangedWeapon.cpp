@@ -11,15 +11,15 @@ ARangedWeapon::ARangedWeapon()
 
 	//FireLocation = FindComponentByClass<USphereComponent>();
 
-	//FireLocation = CreateDefaultSubobject<USphereComponent>(TEXT("Fire Location"));
-	//FireLocation->SetupAttachment(RootComponent);
-
 }
 
 // Called when the game starts or when spawned
 void ARangedWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Charge = MaxCharge;
+	CurrentAmmo = AmmoMax;
 	
 }
 
@@ -27,6 +27,20 @@ void ARangedWeapon::BeginPlay()
 void ARangedWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (Reload())
+	{
+		SetTimerReload(GetTimerReload() + DeltaTime);
+
+		if (GetTimerReload() >= GetTimeToReload())
+		{
+			SetTimerReload(0);
+			AmmoCheck();
+			Charge = MaxCharge;
+		}
+	}
+
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Tick"));
 
 }
 
@@ -67,5 +81,62 @@ bool ARangedWeapon::DecreaseCharge(int amount)
 int ARangedWeapon::GetUsage()
 {
 	return ChargeUsage;
+}
+
+float ARangedWeapon::GetAmmo()
+{
+	return CurrentAmmo;
+}
+
+void ARangedWeapon::IncreaseAmmo(int amount)
+{
+	CurrentAmmo += amount;
+}
+
+void ARangedWeapon::DecreaseAmmo(int amount)
+{
+	CurrentAmmo -= amount;
+}
+
+bool ARangedWeapon::AmmoCheck()
+{
+	if (CurrentAmmo - 1 >= 0)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Pass Ammo Check"));
+		CurrentAmmo -= 1;
+		return true;
+	}
+
+	return false;
+}
+
+bool ARangedWeapon::Reload()
+{
+	if (Charge - ChargeUsage < 0)
+	{
+		if (CurrentAmmo == 0)
+		{
+			return false;
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Reload"));
+		return true;
+	}
+
+	return false;
+}
+
+float ARangedWeapon::GetTimerReload()
+{
+	return TimerReload;
+}
+
+void ARangedWeapon::SetTimerReload(float amount)
+{
+	TimerReload += amount;
+}
+
+float ARangedWeapon::GetTimeToReload()
+{
+	return TimeToReload;
 }
 
