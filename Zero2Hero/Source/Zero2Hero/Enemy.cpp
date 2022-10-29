@@ -70,7 +70,6 @@ void AEnemy::BeginPlay()
 
 	Cast<AAIController>(GetController())->RunBehaviorTree(BT);
 
-	//BTC->Run
 }
 
 // Called every frame

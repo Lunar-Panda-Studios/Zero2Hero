@@ -21,8 +21,18 @@ void ACannonFodder::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BlastRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	BlastRadius->OnComponentBeginOverlap.AddDynamic(this, &ACannonFodder::OnOverlapBeginExplode);
+	if (BlastRadius != nullptr)
+	{
+		BlastRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BlastRadius->OnComponentBeginOverlap.AddDynamic(this, &ACannonFodder::OnOverlapBeginExplode);
+	}
+	else
+	{
+		if (!CanExplode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Blast Radius - Cannon Fodder"));
+		}
+	}
 
 	if (MeleeCollider != nullptr)
 	{
