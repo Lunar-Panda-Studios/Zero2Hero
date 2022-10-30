@@ -42,16 +42,16 @@ void ADialogueSystem::Tick(float DeltaTime)
 
 		if (CharMax == CharNum)
 		{
-			isPlaying = false;
-
 			if (!CurrentDialogue.ContinueOnClick)
 			{
-				TimerStayOnScreen = TimerStayOnScreen + DeltaTime;
+				TimerStayOnScreen += DeltaTime;
 
 				if (TimerStayOnScreen >= MaxTimer)
 				{
 					HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
 					TimerStayOnScreen = 0;
+					isPlaying = false;
+
 				}
 			}
 		}

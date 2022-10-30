@@ -245,6 +245,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 			Allow = true;
 		}
 	}
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
+	}
 }
 
 // Called to bind functionality to input
