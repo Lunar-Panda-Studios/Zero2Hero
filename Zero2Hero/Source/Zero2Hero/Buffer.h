@@ -37,6 +37,8 @@ protected:
 		TSubclassOf<AProjectile> ProjectileBP;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* FireLocation;
+	UPROPERTY(EditAnywhere)
+		bool isReflectorVariant = false;
 
 
 

@@ -217,9 +217,9 @@ void AEnemy::SetShieldType(TEnumAsByte<ElementType> newElement)
 	isShielded = true;
 }
 
-bool AEnemy::SetisReflectorShield()
+void AEnemy::SetisReflectorShield(bool isReflector)
 {
-	return false;
+	ReflectorShield = isReflector;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -125,6 +125,17 @@ bool ABuffer::SeekNewTarget()
 			CurrentShieldType = ElementType::Fire;
 			PairedEnemy->SetShieldType(ElementType::Fire);
 
+			if (isReflectorVariant)
+			{
+				SetisReflectorShield(true);
+				PairedEnemy->SetisReflectorShield(true);
+			}
+			else
+			{
+				SetisReflectorShield(false);
+				PairedEnemy->SetisReflectorShield(false);
+			}
+
 			return true;
 		}
 		else

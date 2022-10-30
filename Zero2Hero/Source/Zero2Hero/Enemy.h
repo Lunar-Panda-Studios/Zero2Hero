@@ -136,7 +136,7 @@ public:
 	UFUNCTION()
 		void SetShieldType(TEnumAsByte<ElementType> newElement);
 	UFUNCTION()
-		bool SetisReflectorShield();
+		void SetisReflectorShield(bool isReflector);
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
