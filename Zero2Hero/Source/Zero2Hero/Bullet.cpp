@@ -3,3 +3,7 @@
 
 #include "Bullet.h"
 
+void ABullet::BeginPlay()
+{
+	ElementType = ElementType::Nature;
+}

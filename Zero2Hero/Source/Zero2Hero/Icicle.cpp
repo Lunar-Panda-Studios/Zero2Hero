@@ -3,3 +3,7 @@
 
 #include "Icicle.h"
 
+void AIcicle::BeginPlay()
+{
+	ElementType = ElementType::Ice;
+}

@@ -13,5 +13,7 @@ UCLASS()
 class ZERO2HERO_API AIcicle : public AProjectile
 {
 	GENERATED_BODY()
+
+	virtual void BeginPlay() override;
 	
 };

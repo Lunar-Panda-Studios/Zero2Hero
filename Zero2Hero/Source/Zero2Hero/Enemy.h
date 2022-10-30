@@ -22,6 +22,16 @@
 #include "NavigationPath.h"
 #include "Enemy.generated.h"
 
+UENUM()
+enum ElementType
+{
+	Ice  UMETA(DisplayName = "Ice"),
+	Fire UMETA(DisplayName = "Fire"),
+	Electric  UMETA(DisplayName = "Electric"),
+	Nature UMETA(DisplayName = "Nature"),
+	None UMETA(DisplayName = "None"),
+};
+
 UCLASS()
 class ZERO2HERO_API AEnemy : public ADamageable
 {
@@ -72,6 +82,14 @@ protected:
 		bool OnFire = false;
 	UPROPERTY()
 		int FlameDamage;
+	UPROPERTY()
+		bool isShielded = false;
+	UPROPERTY()
+		TEnumAsByte<ElementType> CurrentShieldType = ElementType::None;
+	UPROPERTY()
+		bool ReflectorShield = false;
+	UPROPERTY()
+		AEnemy* PairedEnemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -103,6 +121,22 @@ public:
 		void SetFlameDamage(int amount);
 	UFUNCTION()
 		bool GetInRange();
+	UFUNCTION()
+		bool GetIsShielded();
+	UFUNCTION()
+		bool GetIsShieldReflect();
+	UFUNCTION()
+		TEnumAsByte<ElementType> GetShieldType();
+	UFUNCTION()
+		void UnshieldEnemy();
+	UFUNCTION()
+		void SetEnemyPair(AEnemy* newPair);
+	UFUNCTION()
+		void UnPair();
+	UFUNCTION()
+		void SetShieldType(TEnumAsByte<ElementType> newElement);
+	UFUNCTION()
+		bool SetisReflectorShield();
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
