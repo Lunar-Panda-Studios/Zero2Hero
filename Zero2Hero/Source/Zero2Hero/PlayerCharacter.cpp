@@ -360,6 +360,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 	PlayerLanded();
 	doubleJumpCount = 0;
+	hasDashedInAir = false;
 	
 	GetCharacterMovement()->RotationRate.Vector() = FVector(GetCharacterMovement()->RotationRate.Vector().X, GetCharacterMovement()->RotationRate.Vector().Y, startingTurnSpeed);
 	if (hasWallJumped)
@@ -490,8 +491,13 @@ void APlayerCharacter::Dash()
 			FVector dir;
 			if (!Hit.IsValidBlockingHit())
 			{
+				if (hasDashedInAir)
+				{
+					return;
+				}
 				dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
+				hasDashedInAir = true;
 			}
 			else
 			{
@@ -501,6 +507,7 @@ void APlayerCharacter::Dash()
 			currentDashCooldown = 0.0f;
 			isDashing = true;
 			characterMovementComp->GroundFriction = dashFriction;
+
 		}
 	}
 }
