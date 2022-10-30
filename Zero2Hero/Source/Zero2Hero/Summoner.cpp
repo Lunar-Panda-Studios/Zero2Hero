@@ -26,8 +26,9 @@ void ASummoner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (InRange)
+	if (InRange && CanSummon)
 	{
+		BBC->SetValueAsBool("IsSummoning", true);
 		TimerToSummon += DeltaTime;
 
 		if (TimerToSummon >= TimeToSummon)
@@ -35,6 +36,7 @@ void ASummoner::Tick(float DeltaTime)
 			Summon();
 			TimerToSummon = 0;
 			CanSummon = false;
+			BBC->SetValueAsBool("IsSummoning", false);
 		}
 	}
 
