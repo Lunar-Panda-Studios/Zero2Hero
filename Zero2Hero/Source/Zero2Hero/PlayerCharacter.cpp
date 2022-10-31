@@ -65,6 +65,12 @@ void APlayerCharacter::BeginPlay()
 	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
 	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+	for (int i = 0; i < RangedWeapons.Num(); i++)
+	{
+		allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
+		allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+
 	//Sets health
 	MaxHealth = Health;
 	MaxAmmo = Ammo;
@@ -151,6 +157,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
 	PlayerInputComponent->BindAction(TEXT("GrapplingHook"), IE_Pressed, this, &APlayerCharacter::HookShot);
+	PlayerInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
 	
 
 
@@ -170,12 +177,15 @@ void APlayerCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
+	if (OtherActor != nullptr)
 	{
-		GrapplingHook->GetCable()->SetVisibility(false);
-		GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
-		GrapplingHook->GetInUseHook()->Destroy();
-		
+		if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
+		{
+			GrapplingHook->GetCable()->SetVisibility(false);
+			GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
+			GrapplingHook->GetInUseHook()->Destroy();
+
+		}
 	}
 }
 
@@ -432,6 +442,15 @@ void APlayerCharacter::RangedAttackEnd()
 	{
 		CurrentRangedWeapon->PrimaryAttackEnd();
 	}
+}
+
+void APlayerCharacter::NextWeapon()
+{
+	++currentWeapon;
+	if (currentWeapon >= RangedWeapons.Num())
+		currentWeapon = 0;
+	CurrentRangedWeapon = allRangedWeapons[currentWeapon];
+	
 }
 
 void APlayerCharacter::HookShot()
