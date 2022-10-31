@@ -36,10 +36,12 @@ void AChargeRifle::SecondaryAttack()
 		spawnParams.Instigator = GetInstigator();
 		FRotator rotation = GetActorRotation();
 		ASuctionGrenade* succ = GetWorld()->SpawnActor<ASuctionGrenade>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
-		UStaticMeshComponent* meshComp = succ->FindComponentByClass<UStaticMeshComponent>();
-		if (meshComp && succ)
+		/*UStaticMeshComponent* meshComp = succ->FindComponentByClass<UStaticMeshComponent>();*/
+		USphereComponent* sphereCol = succ->FindComponentByClass<USphereComponent>();
+		if (sphereCol && succ)
 		{
-			meshComp->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);
+			sphereCol->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);/*
+			meshComp->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);*/
 		}
 		secondaryCurrentCooldown = 0.0f;
 		

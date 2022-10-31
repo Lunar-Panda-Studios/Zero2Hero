@@ -32,6 +32,10 @@ void ASuctionGrenade::Tick(float DeltaTime)
 	
 	if (currentExplodeTime > explodeTime)
 	{
+		USphereComponent* sphereCol = FindComponentByClass<USphereComponent>();
+		sphereCol->SetSimulatePhysics(false);
+		sphereCol->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		sphereCol->SetEnableGravity(false);
 		isSucking = true;
 	}
 
@@ -45,6 +49,7 @@ void ASuctionGrenade::Tick(float DeltaTime)
 		TArray<AActor*> actors;
 		UClass* seekClass = AActor::StaticClass();
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), succRadius, traceObjectTypes, seekClass, ignoreActors, actors);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), succRadius, 12, FColor::Red, true, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
 		ADamageable* DamageableTarget;
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 		for (AActor* a : actors)
