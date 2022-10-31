@@ -213,7 +213,7 @@ void ABuffer::OnBeginOverlapTargetRange(UPrimitiveComponent* OverlappedComponent
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not null"));
 		if (OtherActor->ActorHasTag("Enemy"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Enemy In Targetting Range"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Enemy In Targetting Range"));
 			PairedEnemy = Cast<AEnemy>(OtherActor);
 			TargetsInRange.Add(PairedEnemy);
 		}

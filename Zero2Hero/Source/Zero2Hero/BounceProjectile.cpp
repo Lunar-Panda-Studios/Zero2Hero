@@ -15,6 +15,10 @@ ABounceProjectile::ABounceProjectile()
 void ABounceProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//MainBody->OnComponentBeginOverlap.AddDynamic(this, &ABounceProjectile::OnComponentDestruction);
+
+	MainBody->OnComponentHit.AddDynamic(this, &ABounceProjectile::OnComponentBodyHit);
 	
 }
 
@@ -32,35 +36,40 @@ void ABounceProjectile::Split(AActor* OtherActor)
 	spawnParams.Instigator = GetInstigator();
 
 	UWorld* World = GEngine->GameViewport->GetWorld();
-	//AActor* Player = World->GetFirstPlayerController()->GetPawn();
-
-	//FVector AimedLocation = Player->GetActorLocation();
 
 	FRotator OtherObject = OtherActor->GetActorRotation();
 	FRotator Aimed = GetActorRotation() * -1;
 
-	//float Difference = OtherObject.Yaw - Aimed.Yaw;
+	FVector CrossProduct = FVector::CrossProduct(OtherActor->GetActorRotation().Vector(), GetActorRotation().Vector());
 
-	//if (OtherObject.Yaw - 90 > Aimed.Yaw)
-	//{
+	Aimed = CrossProduct.Rotation();
 
-	//}
-
-	//Aimed = FRotator(Aimed.Pitch, Aimed.Roll - SplitAngle/(NoSplitInto/2), Aimed.Yaw);
+	Aimed = FRotator(CrossProduct.X, -OtherActor->GetActorRotation().Yaw + CrossProduct.Y - (SplitAngle / (NoSplitInto/2)), CrossProduct.Z);
+	//Aimed = FRotator(Aimed.Pitch, Aimed.Yaw - (SplitAngle / (NoSplitInto / 2)), Aimed.Roll);
 
 	for (int i = 0; i < NoSplitInto; i++)
 	{
 		AProjectile* Projectile = World->SpawnActor<AProjectile>(SplitInto, GetActorLocation(), Aimed, spawnParams);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 
-		//Aimed = FRotator(Aimed.Pitch, Aimed.Roll - SplitAngle, Aimed.Yaw);
+		Aimed = FRotator(Aimed.Pitch, Aimed.Roll + SplitAngle, Aimed.Yaw);
 	}
+
+	Destroy();
 }
 
-//void ABounceProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	if (!OtherActor->ActorHasTag("Player"))
-//	{
-//		Split(OtherActor);
-//	}
-//}
+void ABounceProjectile::OnComponentBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor != nullptr)
+	{
+		if (!OtherActor->ActorHasTag("Enemy") && !OtherActor->ActorHasTag("Projectile") && !OtherActor->ActorHasTag("Player"))
+		{
+			if (!OtherComp->ComponentHasTag("Ignore"))
+			{
+				Split(OtherActor);
+			}
+		}
+
+		Destroy();
+	}
+}

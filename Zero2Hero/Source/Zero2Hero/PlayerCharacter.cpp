@@ -802,6 +802,7 @@ void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
 void APlayerCharacter::GrappleTo()
 {
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 
