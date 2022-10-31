@@ -106,5 +106,7 @@ void AFlameThrower::SecondaryAttack()
 	FVector Dir = FVector(GetActorRotation().Vector() * FBlaunchForward) + FVector(0, 0, FBlaunchUP);
 	UStaticMeshComponent* MeshComp = fb->FindComponentByClass<UStaticMeshComponent>();
 	MeshComp->AddImpulse(Dir);
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Fire bombing"));
 }
 

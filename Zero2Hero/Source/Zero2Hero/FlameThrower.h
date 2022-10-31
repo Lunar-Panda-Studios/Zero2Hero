@@ -9,8 +9,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "FlameThrower.generated.h"
 #include "FireBomb.h"
+#include "FlameThrower.generated.h"
 
 UCLASS()
 class ZERO2HERO_API AFlameThrower : public ARangedWeapon
