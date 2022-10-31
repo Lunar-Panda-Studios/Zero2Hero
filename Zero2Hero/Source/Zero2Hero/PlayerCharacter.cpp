@@ -89,11 +89,6 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
 
-
-	//Gives Weapon
-	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
-	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
 	for (int i = 0; i < RangedWeapons.Num(); i++)
 	{
 		if (RangedWeapons[i] != nullptr)
@@ -103,6 +98,7 @@ void APlayerCharacter::BeginPlay()
 			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
 	}
+	CurrentRangedWeapon = allRangedWeapons[0];
 
 	if (DialogueSystemClass != nullptr)
 	{
