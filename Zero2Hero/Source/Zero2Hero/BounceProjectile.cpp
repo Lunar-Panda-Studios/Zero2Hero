@@ -40,22 +40,14 @@ void ABounceProjectile::Split(AActor* OtherActor)
 
 	FRotator newRoatation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation());
 
-	//FRotator OtherObject = OtherActor->GetActorRotation();
-	//FRotator Aimed = GetActorRotation() * -1;
-	//FVector CrossProduct = FVector::CrossProduct(OtherActor->GetActorRotation().Vector(), GetActorRotation().Vector());
-	//Aimed = CrossProduct.Rotation();
-
-	//Aimed = FRotator(CrossProduct.X, -OtherActor->GetActorRotation().Yaw + CrossProduct.Y - (SplitAngle / (NoSplitInto/2)), CrossProduct.Z);
-	//Aimed = FRotator(Aimed.Pitch, Aimed.Yaw - (SplitAngle / (NoSplitInto / 2)), Aimed.Roll);
-
-	newRoatation = FRotator(newRoatation.Pitch, newRoatation.Yaw - (SplitAngle / (NoSplitInto / 2)), newRoatation.Roll);
+	newRoatation = FRotator(newRoatation.Pitch, newRoatation.Yaw - (SplitAngle / (2)), newRoatation.Roll);
 
 	for (int i = 0; i < NoSplitInto; i++)
 	{
 		AProjectile* Projectile = World->SpawnActor<AProjectile>(SplitInto, GetActorLocation(), newRoatation, spawnParams);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 
-		newRoatation = FRotator(newRoatation.Pitch, newRoatation.Roll + SplitAngle, newRoatation.Yaw);
+		newRoatation = FRotator(newRoatation.Pitch, newRoatation.Yaw + SplitAngle, newRoatation.Roll);
 	}
 
 	Destroy();
