@@ -97,6 +97,14 @@ void AFlameThrower::PrimaryAttackEnd()
 
 void AFlameThrower::SecondaryAttack()
 {
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
 
+	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, GetActorLocation(), GetActorRotation(), spawnParams);
+
+	FVector Dir = FVector(GetActorRotation().Vector() * FBlaunchForward) + FVector(0, 0, FBlaunchUP);
+	UStaticMeshComponent* MeshComp = fb->FindComponentByClass<UStaticMeshComponent>();
+	MeshComp->AddImpulse(Dir);
 }
 

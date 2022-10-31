@@ -10,6 +10,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "FlameThrower.generated.h"
+#include "FireBomb.h"
 
 UCLASS()
 class ZERO2HERO_API AFlameThrower : public ARangedWeapon
@@ -34,11 +35,17 @@ protected:
 		float Timer = 0.0f;
 	UPROPERTY()
 		float TimerMax = 1.0f;
+	UPROPERTY(EditAnywhere)
+		float FBlaunchUP = 0.0f;
+	UPROPERTY(EditAnywhere)
+		float FBlaunchForward = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* NiagaraComp;
 	UPROPERTY(EditAnywhere)
 		UNiagaraSystem* NigaraSys;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AFireBomb> FireBomb;		
 
 
 public:	
