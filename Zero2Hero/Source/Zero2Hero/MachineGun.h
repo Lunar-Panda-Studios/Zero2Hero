@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RangedWeapon.h"
+#include "TurretSeed.h"
 #include "MachineGun.generated.h"
 
 UCLASS()
@@ -30,7 +31,10 @@ public:
 		float fireRate = 1.0f;
 	UPROPERTY()
 		float currentCooldown = 0.0f;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float secondaryCooldown = 2.0f;
+	UPROPERTY()
+		float currentSecondaryCooldown = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool shooting = false;
 

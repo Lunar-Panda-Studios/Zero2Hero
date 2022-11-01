@@ -245,6 +245,9 @@ public:
 		void ComboDamage();
 
 	UFUNCTION()
+		void SecondaryAttack();
+
+	UFUNCTION()
 		void Dialogue();
 
 	UFUNCTION(BlueprintCallable)
