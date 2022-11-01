@@ -21,6 +21,7 @@ void AFlameThrower::BeginPlay()
 
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(NigaraSys);
+	WeaponType = 0;
 
 	//if (NiagaraComp != nullptr)
 	//{
@@ -39,6 +40,21 @@ void AFlameThrower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (InUse)
+	{
+		Timer += DeltaTime;
+		if (TimerMax < Timer)
+		{
+			Timer = 0.0f;
+			if (!DecreaseCharge(ChargeUsage))
+			{
+				PrimaryAttackEnd();
+			}
+		}
+
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(Charge));
+	}
+
 }
 
 void AFlameThrower::PrimaryAttack()
@@ -48,20 +64,26 @@ void AFlameThrower::PrimaryAttack()
 
 	if (NiagaraComp != nullptr)
 	{
-		NiagaraComp->ActivateSystem();
+		if (DecreaseCharge(ChargeUsage))
+		{
+			NiagaraComp->ActivateSystem();
+		}
 	}
 }
 
 void AFlameThrower::OnParticleHit(AEnemy* Enemy)
 {
-	Enemy->SetOnFire(true);
-	Enemy->SetFlameDamage(Damage);
-	Enemy->DecreaseHealth(Damage);
+	if (Enemy != nullptr)
+	{
+		Enemy->SetOnFire(true);
+		Enemy->SetFlameDamage(Damage);
+		Enemy->DecreaseHealth(Damage);
+	}
 }
 
 void AFlameThrower::PrimaryAttackEnd()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Deactive Flamethrower"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Deactive Flamethrower"));
 
 	InUse = false;
 
@@ -69,6 +91,8 @@ void AFlameThrower::PrimaryAttackEnd()
 	{
 		NiagaraComp->Deactivate();
 	}
+
+	Timer = 0.0f;
 }
 
 void AFlameThrower::SecondaryAttack()

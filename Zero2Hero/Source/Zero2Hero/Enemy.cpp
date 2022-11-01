@@ -15,7 +15,8 @@ AEnemy::AEnemy()
 	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
 	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
-
+	//BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
+	//BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
 }
 
 // Called when the game starts or when spawned
@@ -28,18 +29,47 @@ void AEnemy::BeginPlay()
 	MainBody = FindComponentByClass<UBoxComponent>();
 	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 
-	PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
-	PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
+	if (PlayerRadius != nullptr)
+	{
+		PlayerRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
+		PlayerRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Player Radius Collider - Enemy"));
+	}
 
-	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
+	if (MainBody != nullptr)
+	{
+		MainBody->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnMainBodyHit);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Main Body Collider (Box Collider) - Enemy"));
+	}
 
 	if (AIPC != nullptr)
 	{
 		AIPC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy::OnTargetDetected);
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No AI Perception Component - Enemy"));
+	}
 
 	MovementComp = FindComponentByClass<UCharacterMovementComponent>();
-	MovementComp->MaxWalkSpeed = MovementSpeed;
+
+	if (MovementComp)
+	{
+		MovementComp->MaxWalkSpeed = MovementSpeed;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Movement Component - Enemy"));
+	}
+
+	Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+
 }
 
 // Called every frame
@@ -82,40 +112,53 @@ bool AEnemy::GetCanSee()
 
 void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
-	CanSee = stimulus.WasSuccessfullySensed();
+	if (actor->ActorHasTag("Player"))
+	{
+		CanSee = stimulus.WasSuccessfullySensed();
 
-	//if (CanSee)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Can See"));
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No See"));
-	//}
-
-
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("LineOfSight", CanSee);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No BBC"));
+		}
+	}
 }
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != this)
+	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("Player"))
+		if (OtherActor != this)
 		{
-			InRange = true;
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+			if (OtherActor->ActorHasTag("Player"))
+			{
+				if (OtherComp->ComponentHasTag("MainBody"))
+				{
+					InRange = true;
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In Range"));
+				}
+			}
 		}
 	}
 }
 
 void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor != this)
+	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("Player"))
+		if (OtherActor != this)
 		{
-			InRange = false;
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
+			if (OtherActor->ActorHasTag("Player"))
+			{
+				if (OtherComp->ComponentHasTag("MainBody"))
+				{
+					InRange = false;
+					/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));*/
+				}
+			}
 		}
 	}
 }
@@ -130,28 +173,92 @@ void AEnemy::SetFlameDamage(int amount)
 	FlameDamage = amount;
 }
 
-void AEnemy::DecreaseHealth(int amount)
+bool AEnemy::GetInRange()
 {
-	Health -= amount;
-}
-
-void AEnemy::IncreaseHealth(int amount)
-{
-	Health += amount;
+	return InRange;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->ActorHasTag("Player"))
+	if (OtherActor != nullptr)
 	{
-		if (OtherComp->ComponentHasTag("MeleeZone") || OtherComp->ComponentHasTag("Projectile"))
+		if (OtherActor->ActorHasTag("Player"))
 		{
-			//DAMAGE SELF;
+			if (OtherComp != nullptr)
+			{
+				if (OtherComp->ComponentHasTag("MeleeZone"))
+				{
+					if (!isShielded)
+					{
+						Cast<APlayerCharacter>(OtherActor)->AddEnemyInRange(this);
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy"));
-			Destroy();
+						ADamageable* otherDamageable = Cast<ADamageable>(OtherActor);
+						DecreaseHealth(otherDamageable->GetDamage());
+
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy from Melee Player"));
+						//Destroy();
+					}
+					else
+					{
+						if (GetIsShieldReflect())
+						{
+							APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+							Player->AddEnemyInRange(this);
+
+							ADamageable* otherDamageable = Cast<ADamageable>(OtherActor);
+							DecreaseHealth(otherDamageable->GetDamage());
+
+							Player->DecreaseHealth(otherDamageable->GetDamage());
+						}
+						else
+						{
+							UnshieldEnemy();
+						}
+					}
+				}
+			}
 		}
 	}
+}
+
+void AEnemy::OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor != nullptr)
+	{
+		if (OtherActor->ActorHasTag("Player"))
+		{
+			if (OtherComp != nullptr)
+			{
+				if (OtherComp->ComponentHasTag("MeleeZone"))
+				{
+					Cast<APlayerCharacter>(OtherActor)->DeleteEnemyInRange(this);
+				}
+			}
+		}
+	}
+}
+
+bool AEnemy::IsPositionReachable(FVector Position) 
+{
+	FVector PathStart = GetActorLocation();
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
+
+	if (!NavPath)
+	{
+		return false;
+	}
+
+	return !NavPath->IsPartial();
+}
+
+void AEnemy::SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree)
+{
+	BTC = BehaviourTree;
+}
+
+void AEnemy::SetBlackboard(UBlackboardComponent* Blackboard)
+{
+	BBC = Blackboard;
 }
 
 

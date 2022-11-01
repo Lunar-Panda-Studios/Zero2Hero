@@ -17,9 +17,16 @@ void AHook::BeginPlay()
 	Super::BeginPlay();
 	
 	MainBody = FindComponentByClass<UStaticMeshComponent>();
-
 	ProjectileMoveComp = FindComponentByClass<UProjectileMovementComponent>();
-	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AHook::OnHit);
+
+	if (MainBody != nullptr)
+	{
+		MainBody->OnComponentBeginOverlap.AddDynamic(this, &AHook::OnHit);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Main Body (Static Mesh Component) missing"));
+	}
 	
 }
 
@@ -47,13 +54,16 @@ bool AHook::GetHookAttached()
 
 void AHook::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->ActorHasTag("GrapplePoint"))
+	if (OtherActor != nullptr)
 	{
-		if (OtherComp->ComponentHasTag(("MainBody")))
+		if (OtherActor->ActorHasTag("GrapplePoint"))
 		{
-			HookAttached = true;
-			ProjectileMoveComp->Deactivate();
-			SetLifeSpan(10);
+			if (OtherComp->ComponentHasTag(("MainBody")))
+			{
+				HookAttached = true;
+				ProjectileMoveComp->Deactivate();
+				SetLifeSpan(10);
+			}
 		}
 	}
 }

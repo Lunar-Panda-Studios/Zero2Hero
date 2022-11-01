@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "ChargeBolt.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet\KismetSystemLibrary.h"
+#include "ChargeBolt.h"
 
 AChargeBolt::AChargeBolt()
 {
@@ -17,6 +16,7 @@ void AChargeBolt::BeginPlay()
 {
 	//GEngine->ClearOnScreenDebugMessages();
 	Super::BeginPlay();
+	this->ElementType = ElementType::Electric;
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(ElectricSystem);
 	
@@ -24,18 +24,26 @@ void AChargeBolt::BeginPlay()
 
 void AChargeBolt::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (OtherActor->ActorHasTag("Enemy"))
+	if (OtherActor != nullptr)
 	{
-		if (NiagaraComp != nullptr)
+		if (OtherActor->ActorHasTag("Enemy"))
 		{
-			NiagaraComp->ActivateSystem();
+			if (NiagaraComp != nullptr)
+			{
+				NiagaraComp->ActivateSystem();
+			}
+			electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
+			++currentEnemiesHit;
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
+			CheckArea(OtherActor->GetActorLocation());
+
+			ADamageable* Damageable = Cast<ADamageable>(OtherActor);
+			Damageable->DecreaseHealth(Damage);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage Projectile"));
+
+			Destroy();
+
 		}
-		electricutedEnemies.Add(Cast<AEnemy>(OtherActor));
-		++currentEnemiesHit;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, OtherActor->GetName());
-		CheckArea(OtherActor->GetActorLocation());
-		Destroy();
-		
 	}
 }
 
