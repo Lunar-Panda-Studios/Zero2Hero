@@ -1,5 +1,6 @@
-#include "SuctionGrenade.h"
 #include "ChargeRifle.h"
+#include "SuctionGrenade.h"
+
 
 void AChargeRifle::BeginPlay()
 {

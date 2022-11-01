@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "SuctionGrenade.h"
 #include "Kismet\KismetSystemLibrary.h"
 #include "Damageable.h"
 #include "Enemy.h"
-#include "SuctionGrenade.h"
 
 // Sets default values
 ASuctionGrenade::ASuctionGrenade()
