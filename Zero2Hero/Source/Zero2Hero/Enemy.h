@@ -14,7 +14,23 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Damageable.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AIController.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
 #include "Enemy.generated.h"
+
+UENUM()
+enum ElementType
+{
+	Ice  UMETA(DisplayName = "Ice"),
+	Fire UMETA(DisplayName = "Fire"),
+	Electric  UMETA(DisplayName = "Electric"),
+	Nature UMETA(DisplayName = "Nature"),
+	None UMETA(DisplayName = "None"),
+};
 
 UCLASS()
 class ZERO2HERO_API AEnemy : public ADamageable
@@ -28,6 +44,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBehaviorTree* BT;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBlackboardComponent* BBC;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		UBehaviorTreeComponent* BTC;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float MovementSpeed = 600.0f;
@@ -59,6 +82,14 @@ protected:
 		bool OnFire = false;
 	UPROPERTY()
 		int FlameDamage;
+	UPROPERTY()
+		bool isShielded = false;
+	UPROPERTY()
+		TEnumAsByte<ElementType> CurrentShieldType = ElementType::None;
+	UPROPERTY()
+		bool ReflectorShield = false;
+	UPROPERTY()
+		AEnemy* PairedEnemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -90,6 +121,22 @@ public:
 		void SetFlameDamage(int amount);
 	UFUNCTION()
 		bool GetInRange();
+	UFUNCTION()
+		bool GetIsShielded();
+	UFUNCTION()
+		bool GetIsShieldReflect();
+	UFUNCTION()
+		TEnumAsByte<ElementType> GetShieldType();
+	UFUNCTION()
+		void UnshieldEnemy();
+	UFUNCTION()
+		void SetEnemyPair(AEnemy* newPair);
+	UFUNCTION()
+		void UnPair();
+	UFUNCTION()
+		void SetShieldType(TEnumAsByte<ElementType> newElement);
+	UFUNCTION()
+		void SetisReflectorShield(bool isReflector);
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
@@ -102,4 +149,12 @@ public:
 		void OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsPositionReachable(FVector Position);
+
+	UFUNCTION()
+		void SetBlackboard(UBlackboardComponent* Blackboard);
+	UFUNCTION()
+		void SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree);
 };

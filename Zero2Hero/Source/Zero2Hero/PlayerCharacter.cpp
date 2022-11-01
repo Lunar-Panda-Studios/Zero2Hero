@@ -241,6 +241,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 			Allow = true;
 		}
 	}
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
+	}
 }
 
 // Called to bind functionality to input
@@ -813,6 +817,7 @@ void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
 void APlayerCharacter::GrappleTo()
 {
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 

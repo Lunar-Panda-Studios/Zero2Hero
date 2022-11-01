@@ -13,5 +13,7 @@ UCLASS()
 class ZERO2HERO_API ABullet : public AProjectile
 {
 	GENERATED_BODY()
+
+	virtual void BeginPlay() override;
 	
 };

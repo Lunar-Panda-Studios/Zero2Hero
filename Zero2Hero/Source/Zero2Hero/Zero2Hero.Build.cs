@@ -8,7 +8,7 @@ public class Zero2Hero : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTasks", "Niagara", "CableComponent", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTasks", "Niagara", "CableComponent", "UMG", "NavigationSystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 

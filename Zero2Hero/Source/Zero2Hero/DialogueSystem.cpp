@@ -42,7 +42,18 @@ void ADialogueSystem::Tick(float DeltaTime)
 
 		if (CharMax == CharNum)
 		{
-			isPlaying = false;
+			if (!CurrentDialogue.ContinueOnClick)
+			{
+				TimerStayOnScreen += DeltaTime;
+
+				if (TimerStayOnScreen >= MaxTimer)
+				{
+					HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
+					TimerStayOnScreen = 0;
+					isPlaying = false;
+
+				}
+			}
 		}
 		else
 		{
@@ -107,17 +118,20 @@ void ADialogueSystem::OnClick()
 	{
 		if (HUDOverlay->GetIsVisible())
 		{
-			if (isPlaying)
+			if (CurrentDialogue.ContinueOnClick)
 			{
-				CurrentDisplay = FullDisplay;
-				HUDOverlay->TextToDisplay = CurrentDisplay;
-				CharNum = CharMax;
-				isPlaying = false;
-				Timer = 0;
-			}
-			else if (!CheckNextDialogue() && !InUseAudio->IsPlaying())
-			{
-				HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
+				if (isPlaying)
+				{
+					CurrentDisplay = FullDisplay;
+					HUDOverlay->TextToDisplay = CurrentDisplay;
+					CharNum = CharMax;
+					isPlaying = false;
+					Timer = 0;
+				}
+				else if (!CheckNextDialogue() && !InUseAudio->IsPlaying())
+				{
+					HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
 		}
 	}
