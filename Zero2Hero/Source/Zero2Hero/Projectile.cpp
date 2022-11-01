@@ -88,7 +88,7 @@ void AProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		if (!isEnemyProjectile)
 		{
-			//if (!OtherActor->ActorHasTag("Player"))
+			if (!OtherActor->ActorHasTag("Player"))
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Player"));
 				if (!OtherActor->ActorHasTag("Ignore"))
@@ -184,7 +184,7 @@ void AProjectile::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent
 	{
 		if (!isEnemyProjectile)
 		{
-			//if (!OtherActor->ActorHasTag("Player"))
+			if (!OtherActor->ActorHasTag("Player"))
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Player"));
 				if (!OtherActor->ActorHasTag("Ignore"))
