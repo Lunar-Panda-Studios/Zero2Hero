@@ -3,40 +3,46 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SuctionGrenade.generated.h"
+#include "Projectile.h"
+#include "Turret.generated.h"
 
 UCLASS()
-class ZERO2HERO_API ASuctionGrenade : public AActor
+class ZERO2HERO_API ATurret : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ASuctionGrenade();
+	ATurret();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 	UPROPERTY()
-		bool isSucking = false;
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	UPROPERTY()
+		TArray<AActor*> ignoreActors;
+	UPROPERTY()
+		TArray<AActor*> actors;
+	UPROPERTY()
+		UClass* seekClass;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float succTime = 5.0f;
+		float turretRange = 1000.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float succRadius = 500.0f;
+		int turretAmmo = 12;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float succSpeed = 50.0f;
+		float turretFireRate = 0.3f;
 	UPROPERTY()
-		float currentSuccTime;
-
+		float fireRateCooldown = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float explodeTime = 3.0f;
-	UPROPERTY()
-		float currentExplodeTime = 0.0f;
+		float damage = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AProjectile> projectile;
+	
 
 };
