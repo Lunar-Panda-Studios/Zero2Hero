@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "TurretSeed.h"
 #include "Turret.h"
 #include "Kismet\KismetSystemLibrary.h"
-#include "TurretSeed.h"
+
 
 ATurretSeed::ATurretSeed()
 {
