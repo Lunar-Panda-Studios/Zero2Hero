@@ -10,6 +10,7 @@ void AMachineGun::BeginPlay()
 	Super::BeginPlay();
 
 	FireLocation = FindComponentByClass<USphereComponent>();
+	currentSecondaryCooldown = secondaryCooldown;
 	WeaponType = 2;
 }
 
@@ -17,6 +18,7 @@ void AMachineGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	currentCooldown += DeltaTime;
+	currentSecondaryCooldown += DeltaTime;
 	Attack();
 }
 
@@ -27,6 +29,15 @@ void AMachineGun::PrimaryAttack()
 
 void AMachineGun::SecondaryAttack()
 {
+	if (currentSecondaryCooldown > secondaryCooldown && DecreaseCharge(SecondaryChargeUsage))
+	{
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+		FRotator rotation = GetActorRotation();
+		AActor* turretSeed = GetWorld()->SpawnActor<AActor>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+		currentSecondaryCooldown = 0;
+	}
 }
 
 void AMachineGun::PrimaryAttackEnd()

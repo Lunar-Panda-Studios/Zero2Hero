@@ -25,6 +25,14 @@ void ADamageable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (isDead)
+	//{
+	//	AnimationTimer += DeltaTime;
+	//	if (AnimationTime <= AnimationTimer)
+	//	{
+	//		Destroy(ac)
+	//	}
+	//}
 }
 
 int ADamageable::GetDamage()
@@ -58,7 +66,7 @@ void ADamageable::CheckDeath()
 	if (Health <= 0)
 	{
 		isDead = true;
-		//this->Destroy();
+		SetLifeSpan(AnimationTimer);
 	}
 }
 
