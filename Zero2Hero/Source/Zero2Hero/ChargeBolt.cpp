@@ -17,7 +17,7 @@ void AChargeBolt::BeginPlay()
 {
 	//GEngine->ClearOnScreenDebugMessages();
 	Super::BeginPlay();
-	this->ElementType = ElementType::Electric;
+	//this->ElementType = ElementType::Electric;
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(ElectricSystem);
 	

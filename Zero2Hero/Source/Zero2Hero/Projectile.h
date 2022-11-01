@@ -7,7 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Damageable.h"
-#include "Enemy.h"
+//#include "Enemy.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -27,8 +27,8 @@ public:
 		UStaticMeshComponent* MainBody;
 	UPROPERTY(EditAnywhere)
 		bool isEnemyProjectile = false;
-	UPROPERTY()
-		TEnumAsByte<ElementType> ElementType = ElementType::None;
+	//UPROPERTY()
+	//	TEnumAsByte<ElementType> ElementType = ElementType::None;
 
 protected:
 	// Called when the game starts or when spawned
