@@ -7,7 +7,6 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Damageable.h"
-#include "Enemy.h"
 #include "Projectile.generated.h"
 
 UCLASS()

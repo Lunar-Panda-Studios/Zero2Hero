@@ -214,7 +214,7 @@ void ABuffer::OnBeginOverlapTargetRange(UPrimitiveComponent* OverlappedComponent
 		if (OtherActor->ActorHasTag("Enemy"))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Enemy In Targetting Range"));
-			PairedEnemy = Cast<AEnemy>(OtherActor);
+			PairedEnemy = Cast<ADamageable>(OtherActor);
 			TargetsInRange.Add(PairedEnemy);
 		}
 	}
@@ -227,7 +227,7 @@ void ABuffer::OnEndOverlapTargetRange(UPrimitiveComponent* OverlappedComponent, 
 		if (OtherActor->ActorHasTag("Enemy"))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Enemy Out of Targetting Range"));
-			PairedEnemy = Cast<AEnemy>(OtherActor);
+			PairedEnemy = Cast<ADamageable>(OtherActor);
 			TargetsInRange.Remove(PairedEnemy);
 		}
 	}

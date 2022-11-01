@@ -103,7 +103,7 @@ void AProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActo
 							if (OtherActor->ActorHasTag("Enemy"))
 							{
 								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
-								AEnemy* OtherDamageable = Cast<AEnemy>(OtherActor);
+								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
 
 								if (OtherDamageable->GetIsShielded())
 								{

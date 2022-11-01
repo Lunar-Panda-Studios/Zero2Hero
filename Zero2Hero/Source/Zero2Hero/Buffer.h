@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 		USphereComponent* TargetRange;
 	UPROPERTY()
-		TArray<AEnemy*> TargetsInRange;
+		TArray<ADamageable*> TargetsInRange;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* MeleeCollider;
 	UPROPERTY(EditAnywhere)
