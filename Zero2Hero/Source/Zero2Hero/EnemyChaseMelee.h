@@ -17,12 +17,12 @@ public:
 	// Sets default values for this character's properties
 	AEnemyChaseMelee();
 
-	UPROPERTY(EditAnywhere)
-		USphereComponent* MeleeCollider;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+		USphereComponent* MeleeCollider;
 
 public:	
 	// Called every frame
