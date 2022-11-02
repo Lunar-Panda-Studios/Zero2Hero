@@ -29,6 +29,9 @@ struct FDialogue
 		int NextDialogueID = -1;
 	UPROPERTY(EditAnywhere)
 		bool DisableEverything = false;
+	UPROPERTY(EditAnywhere)
+		bool ContinueOnClick = false;
+
 
 };
 
@@ -79,6 +82,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FDialogue> DialogueInScene;
+
+	UPROPERTY()
+		float TimerStayOnScreen = 0.0f;
+	UPROPERTY(EditAnywhere)
+		float MaxTimer;
 
 
 public:	

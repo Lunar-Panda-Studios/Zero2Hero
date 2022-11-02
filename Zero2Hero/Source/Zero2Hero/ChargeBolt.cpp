@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ChargeBolt.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet\KismetSystemLibrary.h"
@@ -17,6 +15,7 @@ void AChargeBolt::BeginPlay()
 {
 	//GEngine->ClearOnScreenDebugMessages();
 	Super::BeginPlay();
+	this->ElementType = ElementType::Electric;
 	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
 	NiagaraComp->SetAsset(ElectricSystem);
 	

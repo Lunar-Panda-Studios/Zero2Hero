@@ -89,11 +89,6 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
 
-
-	//Gives Weapon
-	CurrentRangedWeapon = GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[0], GetActorLocation(), GetActorRotation(), spawnParams);
-	CurrentRangedWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
 	for (int i = 0; i < RangedWeapons.Num(); i++)
 	{
 		if (RangedWeapons[i] != nullptr)
@@ -103,6 +98,7 @@ void APlayerCharacter::BeginPlay()
 			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
 	}
+	CurrentRangedWeapon = allRangedWeapons[0];
 
 	if (DialogueSystemClass != nullptr)
 	{
@@ -245,6 +241,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 			Allow = true;
 		}
 	}
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
+	}
 }
 
 // Called to bind functionality to input
@@ -264,6 +264,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::GroundPound);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Pressed, this, &APlayerCharacter::RangedAttack);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Released, this, &APlayerCharacter::RangedAttackEnd);
+	PlayerInputComponent->BindAction(TEXT("SecondaryAttack"), IE_Pressed, this, &APlayerCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &APlayerCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
@@ -613,6 +614,17 @@ void APlayerCharacter::ComboDamage()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy from Melee Player"));
 }
 
+void APlayerCharacter::SecondaryAttack()
+{
+	if (Allow)
+	{
+		if (CurrentRangedWeapon != nullptr)
+		{
+			CurrentRangedWeapon->SecondaryAttack();
+		}
+	}
+}
+
 void APlayerCharacter::Dialogue()
 {
 	if (DialogueSystem != nullptr)
@@ -805,6 +817,7 @@ void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
 void APlayerCharacter::GrappleTo()
 {
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 
