@@ -33,235 +33,102 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
-void AProjectile::OnHit(AActor* OverlappedActor, AActor* OtherActor)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
-	//if (OtherActor != nullptr)
-	//{
-	//	if (isEnemyProjectile)
-	//	{
-	//		if (!OtherActor->ActorHasTag("Player"))
-	//		{
-	//			if (!OtherActor->ActorHasTag("Ignore"))
-	//			{
-	//				if (!OtherActor->ActorHasTag("Projectile"))
-	//				{
-	//					if (OtherActor->ActorHasTag("Enemy"))
-	//					{
-	//						ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-	//						OtherDamageable->DecreaseHealth(Damage);
-
-	//						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-	//					}
-	//					Destroy();
-	//				}
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (!OtherActor->ActorHasTag("Enemy"))
-	//		{
-	//			if (!OtherActor->ActorHasTag("Ignore"))
-	//			{
-	//				if (!OtherActor->ActorHasTag("Projectile"))
-	//				{
-	//					if (OtherActor->ActorHasTag("Player"))
-	//					{
-	//						ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-	//						OtherDamageable->DecreaseHealth(Damage);
-
-	//						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-	//					}
-	//					Destroy();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-}
-
 void AProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
 	if (OtherActor != nullptr)
 	{
-		if (!isEnemyProjectile)
+		if (isEnemyProjectile)
 		{
-			if (!OtherActor->ActorHasTag("Player"))
+
+			if (OtherActor->ActorHasTag("Player"))
 			{
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Player"));
-				if (!OtherActor->ActorHasTag("Ignore"))
+				return;
+			}
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Player"));
+			if (OtherActor->ActorHasTag("Ignore"))
+			{
+				return;
+			}
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
+			if (OtherActor->ActorHasTag("Projectile"))
+			{
+
+			}
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Projectile"));
+			if (OtherComp->ComponentHasTag("Ignore"))
+			{
+				return;
+			}
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
+			if (OtherActor->ActorHasTag("Enemy"))
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
+				ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+
+				if (OtherDamageable->GetIsShielded())
 				{
-					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
-					if (!OtherActor->ActorHasTag("Projectile"))
+					if (!OtherDamageable->GetIsShieldReflect())
 					{
-						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Projectile"));
-						if (!OtherComp->ComponentHasTag("Ignore"))
+						if (OtherDamageable->GetShieldType() == ElementType)
 						{
-							//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
-							if (OtherActor->ActorHasTag("Enemy"))
-							{
-								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
-								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+							OtherDamageable->DecreaseHealth(Damage);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
+						}
+					}
+					else
+					{
+						if (OtherDamageable->GetShieldType() != ElementType)
+						{
+							OtherDamageable->DecreaseHealth(Damage);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
+						}
+						else
+						{
+							UWorld* World = GEngine->GameViewport->GetWorld();
+							ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
 
-								if (OtherDamageable->GetIsShielded())
-								{
-									if (!OtherDamageable->GetIsShieldReflect())
-									{
-										if (OtherDamageable->GetShieldType() == ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
-										}
-									}
-									else
-									{
-										if (OtherDamageable->GetShieldType() != ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
-										}
-										else
-										{
-											UWorld* World = GEngine->GameViewport->GetWorld();
-											ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
+							Player->DecreaseHealth(Damage);
 
-											Player->DecreaseHealth(Damage);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
 
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
-
-										}
-									}
-								}
-								else
-								{
-									OtherDamageable->DecreaseHealth(Damage);
-
-									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-								}
-							}
-							Destroy();
 						}
 					}
 				}
-			}
-		}
-		else
-		{
-			if (!OtherActor->ActorHasTag("Enemy"))
-			{
-				if (!OtherActor->ActorHasTag("Ignore"))
+				else
 				{
-					if (!OtherActor->ActorHasTag("Projectile"))
-					{
-						if (!OtherComp->ComponentHasTag("Ignore"))
-						{
-							if (OtherActor->ActorHasTag("Player"))
-							{
-								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-								OtherDamageable->DecreaseHealth(Damage);
+					OtherDamageable->DecreaseHealth(Damage);
 
-								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-							}
-							Destroy();
-						}
-					}
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 				}
 			}
+			Destroy();						
 		}
 	}
-}
-
-void AProjectile::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Overlap"));
-	if (OtherActor != nullptr)
+	else
 	{
-		if (!isEnemyProjectile)
+		if (OtherActor->ActorHasTag("Enemy"))
 		{
-			if (!OtherActor->ActorHasTag("Player"))
-			{
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Player"));
-				if (!OtherActor->ActorHasTag("Ignore"))
-				{
-					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
-					if (!OtherActor->ActorHasTag("Projectile"))
-					{
-						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Projectile"));
-						if (!OtherComp->ComponentHasTag("Ignore"))
-						{
-							//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("!Ignore"));
-							if (OtherActor->ActorHasTag("Enemy"))
-							{
-								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
-								AEnemy* OtherDamageable = Cast<AEnemy>(OtherActor);
-
-								if (OtherDamageable->GetIsShielded())
-								{
-									if (!OtherDamageable->GetIsShieldReflect())
-									{
-										if (OtherDamageable->GetShieldType() == ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
-										}
-									}
-									else
-									{
-										if (OtherDamageable->GetShieldType() != ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
-										}
-										else
-										{
-											UWorld* World = GEngine->GameViewport->GetWorld();
-											ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
-
-											Player->DecreaseHealth(Damage);
-
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
-
-										}
-									}
-								}
-								else
-								{
-									OtherDamageable->DecreaseHealth(Damage);
-
-									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-								}
-							}
-							Destroy();
-						}
-					}
-				}
-			}
+			return;
 		}
-		else
+		if (OtherActor->ActorHasTag("Ignore"))
 		{
-			if (!OtherActor->ActorHasTag("Enemy"))
+			return;
+		}
+		if (OtherActor->ActorHasTag("Projectile"))
+		{
+			return;
+		}
+		if (!OtherComp->ComponentHasTag("Ignore"))
+		{
+			if (OtherActor->ActorHasTag("Player"))
 			{
-				if (!OtherActor->ActorHasTag("Ignore"))
-				{
-					if (!OtherActor->ActorHasTag("Projectile"))
-					{
-						if (!OtherComp->ComponentHasTag("Ignore"))
-						{
-							if (OtherActor->ActorHasTag("Player"))
-							{
-								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
-								OtherDamageable->DecreaseHealth(Damage);
+				ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
+				OtherDamageable->DecreaseHealth(Damage);
 
-								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-							}
-							Destroy();
-						}
-					}
-				}
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 			}
+			Destroy();
 		}
 	}
 }
-
