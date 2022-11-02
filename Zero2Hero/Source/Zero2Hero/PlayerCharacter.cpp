@@ -225,20 +225,23 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (DialogueSystem != nullptr)
 	{
-		if (DialogueSystem->GetDialogueWidget()->IsVisible())
+		if (DialogueSystem->GetUsingDialogue())
 		{
-			if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+			if (DialogueSystem->GetDialogueWidget()->IsVisible())
 			{
-				Allow = false;
+				if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+				{
+					Allow = false;
+				}
+				else
+				{
+					Allow = true;
+				}
 			}
 			else
 			{
 				Allow = true;
 			}
-		}
-		else
-		{
-			Allow = true;
 		}
 	}
 	else
@@ -385,13 +388,23 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		for (AActor* overlappedActor : actors) 
 		{
+
 			DamageableTarget = Cast<ADamageable>(overlappedActor);
-			DamageableTarget->DecreaseHealth(GroundPoundDamage);
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
+			if (DamageableTarget->GetShieldType() != ElementType::None)
+			{
+				DamageableTarget->DecreaseHealth(GroundPoundDamage);
 
-			//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
+
+				//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+			}
+			else
+			{
+				UnshieldEnemy();
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
+			}
 		}
 	}
 }
