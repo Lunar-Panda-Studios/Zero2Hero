@@ -248,6 +248,16 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
 	}
+
+	if (isDead)
+	{
+		if (DropAmmo)
+		{
+			DropAmmo = false;
+		}
+
+		Allow = false;
+	}
 }
 
 // Called to bind functionality to input
@@ -832,5 +842,16 @@ void APlayerCharacter::GrappleTo()
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
 
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+}
+
+void APlayerCharacter::DropExcessAmmo()
+{
+	for(ARangedWeapon* Weapon:allRangedWeapons)
+	{
+		for (int i = 1; i < Weapon->GetAmmo(); i++)
+		{
+			//Drop ammo in random spots in radius
+		}
+	}
 }
 
