@@ -4,7 +4,6 @@
 #include "Damageable.h"
 #include "Enemy.h"
 
-
 // Sets default values
 ASuctionGrenade::ASuctionGrenade()
 {
