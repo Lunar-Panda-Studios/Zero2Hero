@@ -34,5 +34,13 @@ public:
 		float currentCooldown = 5.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float secondaryFireRate = 2.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float secondaryLaunchSpeed = 500.0f;
+
+	UPROPERTY()
+		float secondaryCurrentCooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool shooting = false;
 };
