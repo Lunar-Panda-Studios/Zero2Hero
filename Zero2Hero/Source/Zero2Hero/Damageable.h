@@ -92,4 +92,14 @@ public:
 	UFUNCTION()
 		void SetisReflectorShield(bool isReflector);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void EnemyDamaged();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EnemyDies();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerDamaged();
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerDies();
+
 };

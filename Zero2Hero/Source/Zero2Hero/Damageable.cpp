@@ -72,6 +72,14 @@ void ADamageable::IncreaseHealth(int amount)
 void ADamageable::DecreaseHealth(int amount)
 {
 	Health -= amount;
+	if (ActorHasTag("Enemy"))
+	{
+		EnemyDamaged();
+	}
+	else if (ActorHasTag("Player"))
+	{
+		PlayerDamaged();
+	}
 	CheckDeath();
 }
 
@@ -79,6 +87,14 @@ void ADamageable::CheckDeath()
 {
 	if (Health <= 0)
 	{
+		if (ActorHasTag("Enemy"))
+		{
+			EnemyDies();
+		}
+		else if (ActorHasTag("Player"))
+		{
+			PlayerDies();
+		}
 		isDead = true;
 		//SetLifeSpan(AnimationTimer);
 		AnimationTimer = 0;
