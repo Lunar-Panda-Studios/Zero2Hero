@@ -178,50 +178,6 @@ bool AEnemy::GetInRange()
 	return InRange;
 }
 
-bool AEnemy::GetIsShielded()
-{
-	return isShielded;
-}
-
-bool AEnemy::GetIsShieldReflect()
-{
-	return ReflectorShield;
-}
-
-TEnumAsByte<ElementType> AEnemy::GetShieldType()
-{
-	return CurrentShieldType;
-}
-
-void AEnemy::UnshieldEnemy()
-{
-	isShielded = false;
-	PairedEnemy->PairedEnemy = nullptr;
-	PairedEnemy = nullptr;
-	CurrentShieldType = ElementType::None;
-}
-
-void AEnemy::SetEnemyPair(AEnemy* newPair)
-{
-	PairedEnemy = newPair;
-}
-
-void AEnemy::UnPair()
-{
-	PairedEnemy = nullptr;
-}
-
-void AEnemy::SetShieldType(TEnumAsByte<ElementType> newElement)
-{
-	CurrentShieldType = newElement;
-	isShielded = true;
-}
-
-void AEnemy::SetisReflectorShield(bool isReflector)
-{
-	ReflectorShield = isReflector;
-}
-
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr)

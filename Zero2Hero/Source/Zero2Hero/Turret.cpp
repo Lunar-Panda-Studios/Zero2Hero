@@ -5,7 +5,6 @@
 #include "Damageable.h"
 #include "Enemy.h"
 
-
 // Sets default values
 ATurret::ATurret()
 {

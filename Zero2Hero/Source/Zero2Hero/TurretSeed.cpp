@@ -3,7 +3,6 @@
 #include "Turret.h"
 #include "Kismet\KismetSystemLibrary.h"
 
-
 ATurretSeed::ATurretSeed()
 {
 
