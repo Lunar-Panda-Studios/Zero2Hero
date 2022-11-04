@@ -18,6 +18,8 @@ void ADamageable::BeginPlay()
 	
 	//Sets health
 	Health = MaxHealth;
+
+	Manager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
 // Called every frame
@@ -25,14 +27,25 @@ void ADamageable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (isDead)
-	//{
-	//	AnimationTimer += DeltaTime;
-	//	if (AnimationTime <= AnimationTimer)
-	//	{
-	//		Destroy(ac)
-	//	}
-	//}
+	if (isDead)
+	{
+		AnimationTimer += DeltaTime;
+		if (AnimationTime <= AnimationTimer)
+		{
+			if (ActorHasTag("Player"))
+			{
+				AnimationTimer = 0;
+				Manager->Respawn(this);
+				Health = MaxHealth;
+				isDead = false;
+				Allow = true;
+			}
+			else
+			{
+				Destroy();
+			}
+		}
+	}
 }
 
 int ADamageable::GetDamage()
@@ -59,14 +72,35 @@ void ADamageable::IncreaseHealth(int amount)
 void ADamageable::DecreaseHealth(int amount)
 {
 	Health -= amount;
+	if (ActorHasTag("Enemy"))
+	{
+		EnemyDamaged();
+	}
+	else if (ActorHasTag("Player"))
+	{
+		PlayerDamaged();
+	}
+	CheckDeath();
 }
 
 void ADamageable::CheckDeath()
 {
 	if (Health <= 0)
 	{
+		if (ActorHasTag("Enemy"))
+		{
+			EnemyDies();
+		}
+		else if (ActorHasTag("Player"))
+		{
+			PlayerDies();
+		}
 		isDead = true;
-		SetLifeSpan(AnimationTimer);
+		//SetLifeSpan(AnimationTimer);
+		AnimationTimer = 0;
+		Allow = false;
+
+
 	}
 }
 
