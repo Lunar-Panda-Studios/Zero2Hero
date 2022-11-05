@@ -34,11 +34,11 @@ protected:
 		UCameraComponent* CameraComponent;
 	UPROPERTY()
 		FHitResult HookHit;
-	UPROPERTY(EditAnywhere, Category = "Grappling")
-		float FiringRate = 5.0f;
+	//UPROPERTY(EditAnywhere, Category = "Grappling")
+	//	float FiringRate = 5.0f;
 	UPROPERTY(EditAnywhere, Category = "Grappling")
 		TSubclassOf<AHook> Hook;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isGrappling = false;
 
 	UPROPERTY()
