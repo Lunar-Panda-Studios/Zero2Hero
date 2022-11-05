@@ -67,6 +67,8 @@ protected:
 		FDialogue CurrentDialogue;
 	UPROPERTY(EditAnywhere)
 		UAudioComponent* InUseAudio;
+	UPROPERTY()
+		bool UsingDialogue = false;
 
 	UPROPERTY()
 		float Timer = 0.0f;
@@ -88,7 +90,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float MaxTimer;
 
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -105,5 +106,6 @@ public:
 		UDialogueBox* GetDialogueWidget();
 	UFUNCTION()
 		FDialogue GetCurrentDialogue();
-
+	UFUNCTION()
+		bool GetUsingDialogue();
 };
