@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameManager.h"
 #include "Damageable.generated.h"
 
 UENUM()
@@ -39,10 +37,10 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
-	UPROPERTY(EditAnywhere, Category = "Character Stats")
-		float AnimationTime;
 	UPROPERTY()
-		float AnimationTimer = 0.0f;
+		float AnimationTime;
+	UPROPERTY(EditAnywhere, Category = "Character Stats")
+		float AnimationTimer = 1.0f;
 	UPROPERTY()
 		bool isShielded = false;
 	UPROPERTY()
@@ -51,12 +49,6 @@ protected:
 		bool ReflectorShield = false;
 	UPROPERTY()
 		ADamageable* PairedEnemy;
-	UPROPERTY()
-		UGameManager* Manager;
-	UPROPERTY()
-		bool Allow = true;
-	UPROPERTY()
-		bool DropAmmo = false;
 
 public:	
 	// Called every frame
@@ -91,15 +83,5 @@ public:
 		void SetShieldType(TEnumAsByte<ElementType> newElement);
 	UFUNCTION()
 		void SetisReflectorShield(bool isReflector);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void EnemyDamaged();
-	UFUNCTION(BlueprintImplementableEvent)
-		void EnemyDies();
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void PlayerDamaged();
-	UFUNCTION(BlueprintImplementableEvent)
-		void PlayerDies();
 
 };

@@ -225,38 +225,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (DialogueSystem != nullptr)
 	{
-		if (DialogueSystem->GetUsingDialogue())
+		if (DialogueSystem->GetDialogueWidget()->IsVisible())
 		{
-			if (DialogueSystem->GetDialogueWidget()->IsVisible())
+			if (DialogueSystem->GetCurrentDialogue().DisableEverything)
 			{
-				if (DialogueSystem->GetCurrentDialogue().DisableEverything)
-				{
-					Allow = false;
-				}
-				else
-				{
-					Allow = true;
-				}
+				Allow = false;
 			}
 			else
 			{
 				Allow = true;
 			}
 		}
+		else
+		{
+			Allow = true;
+		}
 	}
 	else
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
-	}
-
-	if (isDead)
-	{
-		if (DropAmmo)
-		{
-			DropAmmo = false;
-		}
-
-		Allow = false;
 	}
 }
 
@@ -313,7 +300,6 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 				GrapplingHook->GetCable()->SetVisibility(false);
 				GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
 				GrapplingHook->GetInUseHook()->Destroy();
-				GrappleEnd();
 			}
 		}
 	}
@@ -399,23 +385,13 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		for (AActor* overlappedActor : actors) 
 		{
-
 			DamageableTarget = Cast<ADamageable>(overlappedActor);
+			DamageableTarget->DecreaseHealth(GroundPoundDamage);
 
-			if (DamageableTarget->GetShieldType() != ElementType::None)
-			{
-				DamageableTarget->DecreaseHealth(GroundPoundDamage);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
 
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
-
-				//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
-			}
-			else
-			{
-				UnshieldEnemy();
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
-			}
+			//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
 		}
 	}
 }
@@ -843,16 +819,5 @@ void APlayerCharacter::GrappleTo()
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
 
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
-}
-
-void APlayerCharacter::DropExcessAmmo()
-{
-	for(ARangedWeapon* Weapon:allRangedWeapons)
-	{
-		for (int i = 1; i < Weapon->GetAmmo(); i++)
-		{
-			//Drop ammo in random spots in radius
-		}
-	}
 }
 

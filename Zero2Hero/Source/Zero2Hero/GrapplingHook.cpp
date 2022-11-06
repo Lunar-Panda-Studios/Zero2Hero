@@ -61,8 +61,6 @@ bool AGrapplingHook::Fire()
 
 			FRotator rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), HookHit.GetActor()->GetActorLocation());;
 
-			GrappleShoot();
-
 			InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
 			isGrappling = true;
 			return true;
@@ -84,7 +82,6 @@ bool AGrapplingHook::HookReturned()
 
 FHitResult AGrapplingHook::GetHit()
 {
-	GrappleHit();
 	return HookHit;
 }
 
