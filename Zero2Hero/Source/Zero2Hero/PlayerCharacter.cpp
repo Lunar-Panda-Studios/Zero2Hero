@@ -119,6 +119,8 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+
+	Manager->SetCurrentCheckPoint(GetActorLocation());
 }
 
 // Called every frame
@@ -860,6 +862,8 @@ void APlayerCharacter::DropExcessAmmo()
 		for (int i = 1; i < Weapon->GetAmmo(); i++)
 		{
 			//Drop ammo in random spots in radius
+
+			//GetWorld()->SpawnActor<AActor>(AmmoDrop)
 		}
 	}
 }

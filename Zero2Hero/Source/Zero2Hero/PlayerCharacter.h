@@ -201,6 +201,8 @@ protected:
 		float wallJumpGroundedCheck = 400.0f;
 	UPROPERTY()
 		float currentWallJumpTime = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
+		TSubclassOf<AActor> AmmoDropBP;
 
 public:	
 	// Called every frame
