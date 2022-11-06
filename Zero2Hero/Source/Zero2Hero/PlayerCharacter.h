@@ -15,6 +15,7 @@
 #include "Damageable.h"
 #include "Projectile.h"
 #include "DialogueSystem.h"
+#include "Camera.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -43,15 +44,22 @@ protected:
 		int MeleeAttackNum = 0;
 	UPROPERTY()
 		bool IsAttacking = false;
-
+	UPROPERTY()
+		ACamera* CameraFollowPoint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 		float CameraSensitivity = 0.2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		TSubclassOf<ACamera> CameraClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		float ClampVerticalUp = 80.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		float ClampVerticalDown = -80.0f;
 	UPROPERTY()
 		UCapsuleComponent* CapCollider;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
-		USpringArmComponent* springArm;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
-		UCameraComponent* Camera;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	//	USpringArmComponent* springArm;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	//	UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		TArray<TSubclassOf<ARangedWeapon>> RangedWeapons;

@@ -14,11 +14,11 @@ APlayerCharacter::APlayerCharacter()
 
 	CapCollider = FindComponentByClass<UCapsuleComponent>();
 
-	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	springArm->SetupAttachment(GetRootComponent());
+	//springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	//springArm->SetupAttachment(GetRootComponent());
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
+	//Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//Camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
 
 	MeleeCollider = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeZone"));
 	MeleeCollider->SetupAttachment(GetRootComponent());
@@ -34,6 +34,14 @@ void APlayerCharacter::BeginPlay()
 	startingTurnSpeed = GetCharacterMovement()->RotationRate.Vector().Z;
 	startingAirControl = GetCharacterMovement()->AirControl;
 	initialRotSpeed = GetCharacterMovement()->RotationRate;
+
+	//Spawn Params
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	CameraFollowPoint = GetWorld()->SpawnActor<ACamera>(CameraClass, GetActorLocation(), GetActorRotation(), spawnParams);
+	CameraFollowPoint->SetPlayer(this);
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 	this->GetCharacterMovement();
@@ -63,11 +71,6 @@ void APlayerCharacter::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Capsule Collider"));
 	}
-
-	//Spawn Params
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = this;
-	spawnParams.Instigator = GetInstigator();
 
 	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
@@ -322,21 +325,24 @@ void APlayerCharacter::cameraVertical(float amount)
 {
 	AddControllerPitchInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
-	//springArm->AddLocalRotation(FRotator(amount, 0, 0));
+	if (CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1) < ClampVerticalDown &&
+		CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1) > ClampVerticalUp)
+	{
+		CameraFollowPoint->GetSpringArm()->SetWorldRotation(FRotator(CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1), CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Roll));
+	}
 }
 
 void APlayerCharacter::cameraHorizontal(float amount)
 {
 	AddControllerYawInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
-
-	//springArm->AddLocalRotation(FRotator(0, amount, 0));
+	CameraFollowPoint->GetSpringArm()->SetWorldRotation(FRotator(CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw + (amount * CameraSensitivity), CameraFollowPoint->GetSpringArm()->GetComponentRotation().Roll));
 }
 
 void APlayerCharacter::MoveLeftRight(float speed)
 {
 	if (Allow)
 	{
-		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+		FRotator Rotation(0, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, 0);
 
 		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
 
@@ -348,7 +354,7 @@ void APlayerCharacter::MoveUpDown(float speed)
 {
 	if (Allow)
 	{
-		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+		FRotator Rotation(0, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, 0);
 
 		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
 
