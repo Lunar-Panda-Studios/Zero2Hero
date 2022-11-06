@@ -6,6 +6,16 @@
 #include "GameFramework/Character.h"
 #include "Damageable.generated.h"
 
+UENUM()
+enum ElementType
+{
+	Ice  UMETA(DisplayName = "Ice"),
+	Fire UMETA(DisplayName = "Fire"),
+	Electric  UMETA(DisplayName = "Electric"),
+	Nature UMETA(DisplayName = "Nature"),
+	None UMETA(DisplayName = "None"),
+};
+
 UCLASS()
 class ZERO2HERO_API ADamageable : public ACharacter
 {
@@ -27,6 +37,18 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
+	UPROPERTY()
+		float AnimationTime;
+	UPROPERTY(EditAnywhere, Category = "Character Stats")
+		float AnimationTimer = 1.0f;
+	UPROPERTY()
+		bool isShielded = false;
+	UPROPERTY()
+		TEnumAsByte<ElementType> CurrentShieldType = ElementType::None;
+	UPROPERTY()
+		bool ReflectorShield = false;
+	UPROPERTY()
+		ADamageable* PairedEnemy;
 
 public:	
 	// Called every frame
@@ -45,5 +67,21 @@ public:
 		void DecreaseHealth(int amount);
 	UFUNCTION()
 		void CheckDeath();
+	UFUNCTION()
+		bool GetIsShielded();
+	UFUNCTION()
+		bool GetIsShieldReflect();
+	UFUNCTION()
+		TEnumAsByte<ElementType> GetShieldType();
+	UFUNCTION()
+		void UnshieldEnemy();
+	UFUNCTION()
+		void SetEnemyPair(ADamageable* newPair);
+	UFUNCTION()
+		void UnPair();
+	UFUNCTION()
+		void SetShieldType(TEnumAsByte<ElementType> newElement);
+	UFUNCTION()
+		void SetisReflectorShield(bool isReflector);
 
 };

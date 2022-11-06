@@ -25,6 +25,14 @@ void ADamageable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (isDead)
+	//{
+	//	AnimationTimer += DeltaTime;
+	//	if (AnimationTime <= AnimationTimer)
+	//	{
+	//		Destroy(ac)
+	//	}
+	//}
 }
 
 int ADamageable::GetDamage()
@@ -58,7 +66,51 @@ void ADamageable::CheckDeath()
 	if (Health <= 0)
 	{
 		isDead = true;
-		//this->Destroy();
+		SetLifeSpan(AnimationTimer);
 	}
 }
+
+	bool ADamageable::GetIsShielded()
+	{
+		return isShielded;
+	}
+
+	bool ADamageable::GetIsShieldReflect()
+	{
+		return ReflectorShield;
+	}
+
+	TEnumAsByte<ElementType> ADamageable::GetShieldType()
+	{
+		return CurrentShieldType;
+	}
+
+	void ADamageable::UnshieldEnemy()
+	{
+		isShielded = false;
+		PairedEnemy->SetEnemyPair(nullptr);
+		PairedEnemy = nullptr;
+		CurrentShieldType = ElementType::None;
+	}
+
+	void ADamageable::SetEnemyPair(ADamageable* newPair)
+	{
+		PairedEnemy = newPair;
+	}
+
+	void ADamageable::UnPair()
+	{
+		PairedEnemy = nullptr;
+	}
+
+	void ADamageable::SetShieldType(TEnumAsByte<ElementType> newElement)
+	{
+		CurrentShieldType = newElement;
+		isShielded = true;
+	}
+
+	void ADamageable::SetisReflectorShield(bool isReflector)
+	{
+		ReflectorShield = isReflector;
+	}
 
