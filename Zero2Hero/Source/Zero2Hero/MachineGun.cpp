@@ -36,7 +36,12 @@ void AMachineGun::SecondaryAttack()
 		spawnParams.Instigator = GetInstigator();
 		FRotator rotation = GetActorRotation();
 		AActor* turretSeed = GetWorld()->SpawnActor<AActor>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+		ATurretSeed* seed = Cast<ATurretSeed>(turretSeed);
+		seed->ammo = Charge;
+		Charge = 0;
+		seed->chargeUsage = ChargeUsage;
 		currentSecondaryCooldown = 0;
+		AmmoCheck();
 	}
 }
 
