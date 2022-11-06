@@ -26,6 +26,8 @@ protected:
 		int Damage;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
 		int ChargeUsage = 10;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
+		int SecondaryChargeUsage = 30;
 	UPROPERTY(BlueprintReadWrite)
 		int Charge;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
@@ -36,6 +38,8 @@ protected:
 		float MaxCharge = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		TSubclassOf<AProjectile> Projectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		TSubclassOf<AActor> SecondaryProjectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		USphereComponent* FireLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")

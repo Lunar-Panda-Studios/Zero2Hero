@@ -103,6 +103,7 @@ protected:
 		float doubleJumpHeight = 600.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Settings")
 		float doubleJumpThrust = 400.0f;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float dashVelocity = 500.0f;
@@ -112,8 +113,10 @@ protected:
 		float dashTime = 0.3f;
 	UPROPERTY()
 		float currentDashTime = 0.0f;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "Dash Settings")
 		bool isDashing;
+	UPROPERTY()
+		bool hasDashedInAir = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
 		float speedAfterDash = 200.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
@@ -240,6 +243,9 @@ public:
 
 	UFUNCTION()
 		void ComboDamage();
+
+	UFUNCTION()
+		void SecondaryAttack();
 
 	UFUNCTION()
 		void Dialogue();
