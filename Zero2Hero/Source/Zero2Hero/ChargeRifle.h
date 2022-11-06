@@ -28,6 +28,9 @@ public:
 	UFUNCTION()
 		void Attack(float DeltaTime);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void StopCharging();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float fireRate = 5.0f;
 	UPROPERTY()
@@ -51,4 +54,7 @@ public:
 
 	UPROPERTY()
 		bool hasFired = false;
+
+	
+
 };

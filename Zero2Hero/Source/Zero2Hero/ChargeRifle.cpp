@@ -55,6 +55,7 @@ void AChargeRifle::PrimaryAttackEnd()
 	shooting = false;
 	currentFireTime = 0.0f;
 	hasFired = false;
+	StopCharging();
 }
 
 void AChargeRifle::Attack(float DeltaTime)
