@@ -20,7 +20,6 @@ void ARangedWeapon::BeginPlay()
 
 	Charge = MaxCharge;
 	CurrentAmmo = AmmoMax;
-	
 }
 
 // Called every frame
@@ -138,5 +137,10 @@ void ARangedWeapon::SetTimerReload(float amount)
 float ARangedWeapon::GetTimeToReload()
 {
 	return TimeToReload;
+}
+
+void ARangedWeapon::SetCamera(ACamera* newCamera)
+{
+	Camera = newCamera;
 }
 

@@ -34,7 +34,8 @@ void AMachineGun::SecondaryAttack()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
-		FRotator rotation = GetActorRotation();
+		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+		rotation.Pitch += CameraAimDifference;
 		AActor* turretSeed = GetWorld()->SpawnActor<AActor>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 		currentSecondaryCooldown = 0;
 	}
@@ -56,7 +57,8 @@ void AMachineGun::Attack()
 		{
 			if (DecreaseCharge(ChargeUsage))
 			{
-				FRotator rotation = GetActorRotation();
+				FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+				rotation.Pitch += CameraAimDifference;
 				AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 				if (Bullet != nullptr)
 				{

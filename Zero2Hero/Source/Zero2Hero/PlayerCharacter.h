@@ -16,6 +16,7 @@
 #include "Projectile.h"
 #include "DialogueSystem.h"
 #include "Camera.h"
+#include "Math/UnrealMathUtility.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()

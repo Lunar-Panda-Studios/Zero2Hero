@@ -35,7 +35,10 @@ void AChargeRifle::SecondaryAttack()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
-		FRotator rotation = GetActorRotation();
+
+		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+		rotation.Pitch += CameraAimDifference;
+
 		ASuctionGrenade* succ = GetWorld()->SpawnActor<ASuctionGrenade>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 		/*UStaticMeshComponent* meshComp = succ->FindComponentByClass<UStaticMeshComponent>();*/
 		USphereComponent* sphereCol = succ->FindComponentByClass<USphereComponent>();
@@ -66,7 +69,8 @@ void AChargeRifle::Attack()
 				FActorSpawnParameters spawnParams;
 				spawnParams.Owner = this;
 				spawnParams.Instigator = GetInstigator();
-				FRotator rotation = GetActorRotation();
+				FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+				rotation.Pitch += CameraAimDifference;
 				AProjectile* ChargeBolt = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 				if (ChargeBolt != nullptr)
 				{

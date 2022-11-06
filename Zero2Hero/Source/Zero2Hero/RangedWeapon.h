@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.h"
 #include "Components/SphereComponent.h"
+#include "Camera.h"
 #include "RangedWeapon.generated.h"
 
 UCLASS()
@@ -46,6 +47,11 @@ protected:
 		float TimeToReload = 0.0f;
 	UPROPERTY(BlueprintReadWrite)
 		float TimerReload = 0.0f;
+	UPROPERTY()
+		ACamera* Camera;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CameraAimDifference = 15.0f;
+
 
 public:	
 	// Called every frame
@@ -80,5 +86,7 @@ public:
 		void SetTimerReload(float amount);
 	UFUNCTION()
 		float GetTimeToReload();
+	UFUNCTION()
+		void SetCamera(ACamera* newCamera);
 
 };

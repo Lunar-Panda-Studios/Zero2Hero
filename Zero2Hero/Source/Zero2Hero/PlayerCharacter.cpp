@@ -99,6 +99,7 @@ void APlayerCharacter::BeginPlay()
 			//this may spawn the ice shotgun twice. gotta check this
 			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
 			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			allRangedWeapons[i]->SetCamera(CameraFollowPoint);
 		}
 	}
 	CurrentRangedWeapon = allRangedWeapons[0];
@@ -615,6 +616,8 @@ void APlayerCharacter::RangedAttack()
 	{
 		if (CurrentRangedWeapon != nullptr)
 		{
+			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
+			SetActorRotation(Rotator);
 			CurrentRangedWeapon->PrimaryAttack();
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
 		}
