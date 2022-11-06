@@ -213,7 +213,6 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 						else
 						{
 							UnshieldEnemy();
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
 						}
 					}
 				}

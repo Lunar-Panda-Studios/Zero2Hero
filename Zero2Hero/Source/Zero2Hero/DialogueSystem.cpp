@@ -19,17 +19,12 @@ void ADialogueSystem::BeginPlay()
 
 	Manager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(GetWorld()));
 
-	if (Manager != nullptr)
-	{
-		HUDOverlay = Manager->LoadDialogueBox(HUDOverlayAsset);
-		//StartDialogue(0);
-		HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
-		UsingDialogue = true;
-	}
-	else
-	{
-		UsingDialogue = false;
-	}
+	HUDOverlay = Manager->LoadDialogueBox(HUDOverlayAsset);
+
+	//StartDialogue(0);
+
+	HUDOverlay->SetVisibility(ESlateVisibility::Hidden);
+	
 }
 
 // Called every frame
@@ -150,10 +145,5 @@ UDialogueBox* ADialogueSystem::GetDialogueWidget()
 FDialogue ADialogueSystem::GetCurrentDialogue()
 {
 	return CurrentDialogue;
-}
-
-bool ADialogueSystem::GetUsingDialogue()
-{
-	return UsingDialogue;
 }
 
