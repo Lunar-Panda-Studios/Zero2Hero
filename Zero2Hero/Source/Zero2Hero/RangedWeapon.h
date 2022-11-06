@@ -83,4 +83,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void Reloading();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnFire();
+
 };
