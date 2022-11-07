@@ -39,14 +39,17 @@ void AIceShotGun::PrimaryAttack()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire Location Set"));
 		FRotator Rotation;
 
-		FRotator Max = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll + DegreesAroundCentre/2, GetActorRotation().Yaw);
-		FRotator Min = FRotator(GetActorRotation().Pitch, GetActorRotation().Roll - DegreesAroundCentre/2, GetActorRotation().Yaw);
+		FRotator Temp = Camera->GetSpringArm()->GetComponentRotation();
+		Temp.Pitch += CameraAimDifference;
+
+		FRotator Max = FRotator(Temp.Pitch, Temp.Roll + DegreesAroundCentre/2, Temp.Roll);
+		FRotator Min = FRotator(Temp.Pitch, Temp.Roll - DegreesAroundCentre/2, Temp.Roll);
 
 		if (DecreaseCharge(ChargeUsage))
 		{
 			for (int i = 0; i < IcicleNumber; i++)
 			{
-				Rotation = FRotator(GetActorRotation().Pitch, (GetActorRotation().Yaw - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Yaw, Max.Yaw), (GetActorRotation().Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
+				Rotation = FRotator(Temp.Pitch, (Temp.Yaw - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Yaw, Max.Yaw), (Temp.Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
 				AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
 				if (Icicle != nullptr)
 				{
