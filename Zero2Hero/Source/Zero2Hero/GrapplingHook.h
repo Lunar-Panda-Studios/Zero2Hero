@@ -34,11 +34,11 @@ protected:
 		UCameraComponent* CameraComponent;
 	UPROPERTY()
 		FHitResult HookHit;
-	//UPROPERTY(EditAnywhere, Category = "Grappling")
-	//	float FiringRate = 5.0f;
+	UPROPERTY(EditAnywhere, Category = "Grappling")
+		float FiringRate = 5.0f;
 	UPROPERTY(EditAnywhere, Category = "Grappling")
 		TSubclassOf<AHook> Hook;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY()
 		bool isGrappling = false;
 
 	UPROPERTY()
@@ -81,9 +81,4 @@ public:
 	UFUNCTION()
 		void CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void GrappleShoot();
-	UFUNCTION(BlueprintImplementableEvent)
-		void GrappleHit();
-	
 };
