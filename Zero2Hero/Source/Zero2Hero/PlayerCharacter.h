@@ -148,8 +148,6 @@ protected:
 		ADialogueSystem* DialogueSystem;
 	UPROPERTY(EditAnywhere, Category = "Dialogue Settings")
 		TSubclassOf<ADialogueSystem> DialogueSystemClass;
-	UPROPERTY()
-		bool Allow = true;
   UPROPERTY()
 		UCharacterMovementComponent* characterMovementComp;
 
@@ -278,4 +276,10 @@ public:
 		void StopWallJump();
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartWallJump();
+
+	UFUNCTION()
+		void DropExcessAmmo();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void GrappleEnd();
 };
