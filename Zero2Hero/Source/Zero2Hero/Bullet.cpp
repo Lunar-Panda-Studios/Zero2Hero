@@ -7,5 +7,5 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ElementType = ElementType::Nature;
+	//ElementType = ElementType::Nature;
 }
