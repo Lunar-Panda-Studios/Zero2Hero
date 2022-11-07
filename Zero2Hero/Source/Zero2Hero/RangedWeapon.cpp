@@ -118,6 +118,7 @@ bool ARangedWeapon::Reload()
 			return false;
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Reload"));
+		Reloading();
 		return true;
 	}
 

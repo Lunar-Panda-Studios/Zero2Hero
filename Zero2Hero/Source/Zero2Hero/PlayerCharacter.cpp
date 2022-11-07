@@ -319,6 +319,7 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 				GrapplingHook->GetCable()->SetVisibility(false);
 				GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
 				GrapplingHook->GetInUseHook()->Destroy();
+				GrappleEnd();
 			}
 		}
 	}

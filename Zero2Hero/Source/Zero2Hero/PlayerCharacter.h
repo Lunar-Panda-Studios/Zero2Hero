@@ -290,4 +290,7 @@ public:
 
 	UFUNCTION()
 		void DropExcessAmmo();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void GrappleEnd();
 };

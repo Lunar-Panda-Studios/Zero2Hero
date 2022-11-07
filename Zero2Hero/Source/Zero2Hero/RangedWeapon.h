@@ -88,5 +88,10 @@ public:
 		float GetTimeToReload();
 	UFUNCTION()
 		void SetCamera(ACamera* newCamera);
+	UFUNCTION(BlueprintImplementableEvent)
+		void Reloading();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnFire();
 
 };

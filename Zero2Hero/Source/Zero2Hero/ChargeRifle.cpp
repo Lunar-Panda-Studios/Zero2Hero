@@ -14,8 +14,9 @@ void AChargeRifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	currentCooldown += DeltaTime;
+	
 	secondaryCurrentCooldown += DeltaTime;
-	Attack();
+	Attack(DeltaTime);
 }
 
 AChargeRifle::AChargeRifle()
@@ -55,17 +56,27 @@ void AChargeRifle::SecondaryAttack()
 void AChargeRifle::PrimaryAttackEnd()
 {
 	shooting = false;
+	currentFireTime = 0.0f;
+	hasFired = false;
+	StopCharging();
 }
 
-void AChargeRifle::Attack()
+void AChargeRifle::Attack(float DeltaTime)
 {
 	if (shooting)
 	{
+		currentFireTime += DeltaTime;
+		if (!hasFired && currentCooldown > fireRate - fireTime)
+		{
+			OnFire();
+			hasFired = true;
+		}
 		
-		if (currentCooldown > fireRate)
+		if (currentCooldown > fireRate && currentFireTime > fireTime)
 		{
 			if (DecreaseCharge(ChargeUsage))
 			{
+				
 				FActorSpawnParameters spawnParams;
 				spawnParams.Owner = this;
 				spawnParams.Instigator = GetInstigator();
@@ -77,7 +88,8 @@ void AChargeRifle::Attack()
 					ChargeBolt->Damage = Damage;
 				}
 				currentCooldown = 0.0f;
-				
+				currentFireTime = 0.0f;
+				hasFired = false;
 			}
 
 		}
