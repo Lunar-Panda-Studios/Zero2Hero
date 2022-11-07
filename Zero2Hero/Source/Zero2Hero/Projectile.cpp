@@ -105,41 +105,45 @@ void AProjectile::OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActo
 								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
 								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
 
-								if (OtherDamageable->GetIsShielded())
-								{
-									if (!OtherDamageable->GetIsShieldReflect())
-									{
-										if (OtherDamageable->GetShieldType() == ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
-										}
-									}
-									else
-									{
-										if (OtherDamageable->GetShieldType() != ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
-										}
-										else
-										{
-											UWorld* World = GEngine->GameViewport->GetWorld();
-											ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
+								//if (OtherDamageable->GetIsShielded())
+								//{
+								//	if (!OtherDamageable->GetIsShieldReflect())
+								//	{
+								//		if (OtherDamageable->GetShieldType() == ElementType)
+								//		{
+								//			OtherDamageable->DecreaseHealth(Damage);
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
+								//		}
+								//	}
+								//	else
+								//	{
+								//		if (OtherDamageable->GetShieldType() != ElementType)
+								//		{
+								//			OtherDamageable->DecreaseHealth(Damage);
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
+								//		}
+								//		else
+								//		{
+								//			UWorld* World = GEngine->GameViewport->GetWorld();
+								//			ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
 
-											Player->DecreaseHealth(Damage);
+								//			Player->DecreaseHealth(Damage);
 
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
 
-										}
-									}
-								}
-								else
-								{
-									OtherDamageable->DecreaseHealth(Damage);
+								//		}
+								//	}
+								//}
+								//else
+								//{
+								//	OtherDamageable->DecreaseHealth(Damage);
 
-									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-								}
+								//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+								//}
+
+
+								OtherDamageable->DecreaseHealth(Damage);
+								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 							}
 							Destroy();
 						}
@@ -195,43 +199,47 @@ void AProjectile::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent
 							if (OtherActor->ActorHasTag("Enemy"))
 							{
 								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Has Tag Enemy"));
-								AEnemy* OtherDamageable = Cast<AEnemy>(OtherActor);
+								ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
 
-								if (OtherDamageable->GetIsShielded())
-								{
-									if (!OtherDamageable->GetIsShieldReflect())
-									{
-										if (OtherDamageable->GetShieldType() == ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
-										}
-									}
-									else
-									{
-										if (OtherDamageable->GetShieldType() != ElementType)
-										{
-											OtherDamageable->DecreaseHealth(Damage);
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
-										}
-										else
-										{
-											UWorld* World = GEngine->GameViewport->GetWorld();
-											ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
+								//if (OtherDamageable->GetIsShielded())
+								//{
+								//	if (!OtherDamageable->GetIsShieldReflect())
+								//	{
+								//		if (OtherDamageable->GetShieldType() == ElementType)
+								//		{
+								//			OtherDamageable->DecreaseHealth(Damage);
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
+								//		}
+								//	}
+								//	else
+								//	{
+								//		if (OtherDamageable->GetShieldType() != ElementType)
+								//		{
+								//			OtherDamageable->DecreaseHealth(Damage);
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
+								//		}
+								//		else
+								//		{
+								//			UWorld* World = GEngine->GameViewport->GetWorld();
+								//			ADamageable* Player = Cast<ADamageable>(World->GetFirstPlayerController()->GetPawn());
 
-											Player->DecreaseHealth(Damage);
+								//			Player->DecreaseHealth(Damage);
 
-											GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
+								//			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
 
-										}
-									}
-								}
-								else
-								{
-									OtherDamageable->DecreaseHealth(Damage);
+								//		}
+								//	}
+								//}
+								//else
+								//{
+								//	OtherDamageable->DecreaseHealth(Damage);
 
-									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
-								}
+								//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+								//}
+
+
+								OtherDamageable->DecreaseHealth(Damage);
+								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 							}
 							Destroy();
 						}
