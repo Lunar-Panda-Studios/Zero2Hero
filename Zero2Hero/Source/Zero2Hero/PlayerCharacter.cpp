@@ -45,8 +45,8 @@ void APlayerCharacter::BeginPlay()
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 	this->GetCharacterMovement();
-	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
-	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
+
+	ConeSight = CameraFollowPoint->GetConeSight();
 	
 	characterMovementComp = this->GetCharacterMovement();
 	normalFriction = characterMovementComp->GroundFriction;
