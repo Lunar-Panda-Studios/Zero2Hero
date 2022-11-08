@@ -80,5 +80,7 @@ public:
 		void SetTimerReload(float amount);
 	UFUNCTION()
 		float GetTimeToReload();
+	UFUNCTION(BlueprintImplementableEvent)
+		void Reloading();
 
 };
