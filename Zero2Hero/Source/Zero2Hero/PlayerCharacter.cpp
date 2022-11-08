@@ -119,8 +119,10 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
-
-	Manager->SetCurrentCheckPoint(GetActorLocation());
+	if (Manager != nullptr)
+	{
+		Manager->SetCurrentCheckPoint(GetActorLocation());
+	}
 }
 
 // Called every frame
