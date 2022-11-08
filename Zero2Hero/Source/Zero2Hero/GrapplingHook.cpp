@@ -55,18 +55,30 @@ bool AGrapplingHook::Fire()
 	{
 		if (HookHit.GetActor()->ActorHasTag("GrapplePoint"))
 		{
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Correct Tag"));
 			FActorSpawnParameters spawnParams;
 			spawnParams.Owner = this;
 			spawnParams.Instigator = GetInstigator();
 
 			FRotator rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), HookHit.GetActor()->GetActorLocation());;
 
+			GrappleShoot();
+
 			InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
 			isGrappling = true;
+
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("True"));
 			return true;
 		}
 	}
-
+	if (HookHit.GetActor() != NULL)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HookHit.GetActor()->GetFName().ToString());
+	}
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Hit"));
+	}
 	return false;
 }
 
@@ -82,6 +94,7 @@ bool AGrapplingHook::HookReturned()
 
 FHitResult AGrapplingHook::GetHit()
 {
+	GrappleHit();
 	return HookHit;
 }
 
