@@ -18,6 +18,7 @@ void ACamera::BeginPlay()
 	CameraComp = FindComponentByClass<UCameraComponent>();
 	Center = FindComponentByClass<USphereComponent>();
 	SpringArmComp = FindComponentByClass<USpringArmComponent>();
+	ConeSight = FindComponentByClass<UStaticMeshComponent>();
 
 	if (SpringArmComp == nullptr)
 	{
@@ -53,5 +54,10 @@ USphereComponent* ACamera::GetSphereComp()
 void ACamera::SetPlayer(AActor* newPlayer)
 {
 	Player = newPlayer;
+}
+
+UStaticMeshComponent* ACamera::GetConeSight()
+{
+	return ConeSight;
 }
 

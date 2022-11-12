@@ -43,6 +43,13 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 		return;
 	}
 
+	if (OtherComp->ComponentHasTag("PlayerView"))
+	{
+		return;
+	}
+	/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OtherActor->GetFName().ToString());
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, OtherComp->GetFName().ToString());*/
+
 	if (!isEnemyProjectile)
 	{
 		if (OtherActor->ActorHasTag("Player"))

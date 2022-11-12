@@ -45,8 +45,8 @@ void APlayerCharacter::BeginPlay()
 
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 	this->GetCharacterMovement();
-	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
-	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
+
+	ConeSight = CameraFollowPoint->GetConeSight();
 	
 	characterMovementComp = this->GetCharacterMovement();
 	normalFriction = characterMovementComp->GroundFriction;
@@ -119,8 +119,10 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
-
-	Manager->SetCurrentCheckPoint(GetActorLocation());
+	if (Manager != nullptr)
+	{
+		Manager->SetCurrentCheckPoint(GetActorLocation());
+	}
 }
 
 // Called every frame
@@ -162,19 +164,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 	currentDashCooldown += DeltaTime;
 	
 
-	if (IsAttacking)
-	{
+	//if (IsAttacking)
+	//{
 
-		//Pressing Timer for combo
-		MeleePressTimer += DeltaTime;
+	//	//Pressing Timer for combo
+	//	MeleePressTimer += DeltaTime;
 
-		if (MeleePressTimer >= MeleePressMax)
-		{
-			MeleeAttackNum = 0;
-			MeleePressTimer = 0;
-			IsAttacking = false;
-		}
-	}
+	//	if (MeleePressTimer >= MeleePressMax)
+	//	{
+	//		MeleeAttackNum = 0;
+	//		MeleePressTimer = 0;
+	//		IsAttacking = false;
+	//	}
+	//}
 
 	if (MeleeCollider->IsCollisionEnabled())
 	{
@@ -205,19 +207,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 
 	//Puts Attack on cooldown
-	if (MeleeAttackNum >= 3)
-	{
-		CanAttack = false;
-		IsAttacking = false;
-		MeleeCooldownTimer += DeltaTime;
-		if (MeleeCooldownTimer >= MeleeAttackCooldown)
-		{
-			MeleeCooldownTimer = 0;
-			MeleeTimer = 0;
-			CanAttack = true;
-			MeleeAttackNum = 0;
-		}
-	}
+	//if (MeleeAttackNum >= 3)
+	//{
+	//	CanAttack = false;
+	//	IsAttacking = false;
+	//	MeleeCooldownTimer += DeltaTime;
+	//	if (MeleeCooldownTimer >= MeleeAttackCooldown)
+	//	{
+	//		MeleeCooldownTimer = 0;
+	//		MeleeTimer = 0;
+	//		CanAttack = true;
+	//		MeleeAttackNum = 0;
+	//	}
+	//}
 
 	//Grapples to the hook point
 	if (Hooked)
@@ -581,33 +583,33 @@ void APlayerCharacter::MeleeAttack()
 		{
 			MeleeTimer = 0;
 			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			MeleeAttackNum += 1;
+			//MeleeAttackNum += 1;
 			MeleePressTimer = 0;
 			IsAttacking = true;
 
 
-			switch (MeleeAttackNum)
-			{
-			case 1:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
-				break;
-			}
-			case 2:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
-				ComboDamage();
-				break;
-			}
-			case 3:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
-				ComboDamage();
-				break;
-			}
-			default:
-				break;
-			}
+			//switch (MeleeAttackNum)
+			//{
+			//case 1:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
+			//	break;
+			//}
+			//case 2:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
+			//	ComboDamage();
+			//	break;
+			//}
+			//case 3:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
+			//	ComboDamage();
+			//	break;
+			//}
+			//default:
+			//	break;
+			//}
 		}
 	}
 

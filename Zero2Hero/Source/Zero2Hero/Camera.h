@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Camera.generated.h"
 
 UCLASS()
@@ -29,6 +30,8 @@ protected:
 		UCameraComponent* CameraComp;
 	UPROPERTY()
 		USphereComponent* Center;
+	UPROPERTY()
+		UStaticMeshComponent* ConeSight;
 
 	UPROPERTY()
 		AActor* Player;
@@ -45,6 +48,8 @@ public:
 		USphereComponent* GetSphereComp();
 	UFUNCTION()
 		void SetPlayer(AActor* newPlayer);
+	UFUNCTION()
+		UStaticMeshComponent* GetConeSight();
 
 
 };

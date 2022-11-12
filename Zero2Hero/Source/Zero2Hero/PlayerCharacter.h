@@ -55,7 +55,7 @@ protected:
 		float ClampVerticalUp = 80.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 		float ClampVerticalDown = -80.0f;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		UCapsuleComponent* CapCollider;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	//	USpringArmComponent* springArm;
@@ -245,7 +245,9 @@ public:
 
 	void Dash();
 	void GroundPound();
-	bool isGrounded();
+
+	UFUNCTION(BlueprintCallable)
+		bool isGrounded();
 
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
