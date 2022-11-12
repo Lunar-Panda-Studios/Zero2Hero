@@ -15,9 +15,12 @@ EBTNodeResult::Type UBTTask_PerceptionCheck::ExecuteTask(UBehaviorTreeComponent&
 
 	AEnemy* enemy = Cast<AEnemy>(BBC->GetValue<UBlackboardKeyType_Object>("SelfActor"));
 
+	enemy->SetBehaviourTree(&OwnerComp);
+	enemy->SetBlackboard(BBC);
+
 	if (enemy != nullptr)
 	{
-		BBC->SetValue<UBlackboardKeyType_Bool>("LineOfSight", enemy->CanSee);
+		BBC->SetValue<UBlackboardKeyType_Bool>("LineOfSight", enemy->GetCanSee());
 
 		return EBTNodeResult::Succeeded;
 	}

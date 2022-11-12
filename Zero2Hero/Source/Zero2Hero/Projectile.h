@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Damageable.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -22,7 +23,11 @@ public:
 	UPROPERTY(EditAnywhere)
 		UProjectileMovementComponent* ProjectMovementComp;
 	UPROPERTY()
-		UCapsuleComponent* MainBody;
+		UStaticMeshComponent* MainBody;
+	UPROPERTY(EditAnywhere)
+		bool isEnemyProjectile = false;
+	UPROPERTY()
+		TEnumAsByte<ElementType> ElementType = ElementType::None;
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,8 +38,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void OnHit(AActor* OverlappedActor, AActor* OtherActor);
+	virtual void OnHit(AActor* OverlappedActor, AActor* OtherActor);
 
-	//void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	virtual void OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 };

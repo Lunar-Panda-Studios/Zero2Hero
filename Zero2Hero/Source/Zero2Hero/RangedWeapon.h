@@ -17,26 +17,68 @@ public:
 	// Sets default values for this actor's properties
 	ARangedWeapon();
 
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		int Damage;
-	UPROPERTY()
-		float Charge;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		float MaxCharge;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		TSubclassOf<AProjectile> Projectile;
-	UPROPERTY(EditAnywhere, Category = "Ranged Stats")
-		USphereComponent* FireLocation;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY(BlueprintReadWrite)
+		int WeaponType;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
+		int Damage;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
+		int ChargeUsage = 10;
+	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
+		int SecondaryChargeUsage = 30;
+	UPROPERTY(BlueprintReadWrite)
+		int Charge;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CurrentAmmo = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float AmmoMax = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float MaxCharge = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		TSubclassOf<AProjectile> Projectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		TSubclassOf<AActor> SecondaryProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		USphereComponent* FireLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float TimeToReload = 0.0f;
+	UPROPERTY(BlueprintReadWrite)
+		float TimerReload = 0.0f;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void PrimaryAttack();
+	virtual void PrimaryAttackEnd();
 	virtual void SecondaryAttack();
+
+	UFUNCTION(BlueprintCallable)
+		int GetCharge();
+	UFUNCTION(BlueprintCallable)
+		void IncreaseCharge(int amount);
+	UFUNCTION(BlueprintCallable)
+		bool DecreaseCharge(int amount);
+	UFUNCTION(BlueprintCallable)
+		int GetUsage();
+
+	UFUNCTION(BlueprintCallable)
+		float GetAmmo();
+	UFUNCTION(BlueprintCallable)
+		void IncreaseAmmo(int amount);
+	UFUNCTION(BlueprintCallable)
+		void DecreaseAmmo(int amount);
+	UFUNCTION()
+		bool AmmoCheck();
+	UFUNCTION(BlueprintCallable)
+		bool Reload();
+	UFUNCTION()
+		float GetTimerReload();
+	UFUNCTION()
+		void SetTimerReload(float amount);
+	UFUNCTION()
+		float GetTimeToReload();
 
 };
