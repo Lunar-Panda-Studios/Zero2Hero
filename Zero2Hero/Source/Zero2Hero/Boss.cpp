@@ -118,7 +118,7 @@ void ABoss::SummonType1()
 				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
 				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
 
-			Distance = (GetActorLocation() - RandLocation).Size();
+			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
 
 		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
 
@@ -147,7 +147,7 @@ void ABoss::SummonType2()
 				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
 				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
 
-			Distance = (GetActorLocation() - RandLocation).Size();
+			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
 
 		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
 
