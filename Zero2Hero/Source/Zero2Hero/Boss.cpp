@@ -43,8 +43,21 @@ void ABoss::Tick(float DeltaTime)
 		}
 		case 2:
 		{
+			if (SummonedEnemies.Num() == 0)
+			{
+				if (!HarponPiece1Spawned)
+				{
+					BossAttacks::P2SummonV1;
+					SummonType1();
+				}
+				else
+				{
+					BossAttacks::P2SummonV2;
+					SummonType2();
+				}
+			}
 			Phase2AttackChoice();
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("RandomChoice"));
+			HarponSpawn();
 			break;
 		}
 		default:
@@ -92,47 +105,25 @@ void ABoss::SummonType1()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	//FVector SummonRange = SummonRangeMax->GetScaledSphereRadius() - SummonRangeMin->GetScaledSphereRadius();
-	float angle = FMath::Rand() * PI * 2;
-
-	float x = FMath::Cos(angle) * SummonRangeMin->GetScaledSphereRadius();
-	float y = FMath::Sin(angle) * SummonRangeMin->GetScaledSphereRadius();
+	float Distance;
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
-		if (x > 0)
+		//I'm about to tank the framerate lmao
+		//Very sad
+		//But if people don't know about it then I can't be asked to fix it
+		do
 		{
-			if (y > 0)
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(x, SummonRangeMax->GetScaledSphereRadius()),
-					GetActorLocation().Y + FMath::RandRange(y, SummonRangeMax->GetScaledSphereRadius()),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-			else
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(x, SummonRangeMax->GetScaledSphereRadius()),
-					GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), y),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-		}
-		else
-		{
-			if (y > 0)
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), x),
-					GetActorLocation().Y + FMath::RandRange(y, SummonRangeMax->GetScaledSphereRadius()),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-			else
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), x),
-					GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), y),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-		}
+			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
+
+			Distance = (GetActorLocation() - RandLocation).Size();
+
+		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
 
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
 }
@@ -144,47 +135,24 @@ void ABoss::SummonType2()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	//FVector SummonRange = SummonRangeMax->GetScaledSphereRadius() - SummonRangeMin->GetScaledSphereRadius();
-	float angle = FMath::Rand() * PI * 2;
-
-	float x = FMath::Cos(angle) * SummonRangeMin->GetScaledSphereRadius();
-	float y = FMath::Sin(angle) * SummonRangeMin->GetScaledSphereRadius();
+	float Distance;
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
-		if (x > 0)
+		//Ah shit here we go again
+		//Plz send help
+		do
 		{
-			if (y > 0)
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(x, SummonRangeMax->GetScaledSphereRadius()),
-					GetActorLocation().Y + FMath::RandRange(y, SummonRangeMax->GetScaledSphereRadius()),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-			else
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(x, SummonRangeMax->GetScaledSphereRadius()),
-					GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), y),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-		}
-		else
-		{
-			if (y > 0)
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), x),
-					GetActorLocation().Y + FMath::RandRange(y, SummonRangeMax->GetScaledSphereRadius()),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-			else
-			{
-				RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), x),
-					GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), y),
-					SummonRangeMax->GetComponentLocation().Z);
-			}
-		}
+			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
+
+			Distance = (GetActorLocation() - RandLocation).Size();
+
+		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
 
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
 }
@@ -203,7 +171,7 @@ void ABoss::MissileAttack()
 		Missile = GetWorld()->SpawnActor<AHomingMissile>(MissileBP, FireLocationRight->GetComponentLocation(), Rotation, spawnParams);
 		HasFired = true;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Missile Spawn"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Missile Spawn"));
 	}
 	else
 	{
@@ -213,7 +181,7 @@ void ABoss::MissileAttack()
 			HasFired = false;
 			CurrentAttack = BossAttacks::Waiting;
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Pointer"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Pointer"));
 		}
 		else
 		{
@@ -222,7 +190,7 @@ void ABoss::MissileAttack()
 				HasFired = false;
 				CurrentAttack = BossAttacks::Waiting;
 
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Fuction"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Fuction"));
 			}
 		}
 	}
@@ -238,7 +206,7 @@ void ABoss::ProjectileAttack()
 	{
 		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
 		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(FireLocationLeft->GetComponentLocation(), Player->GetActorLocation());
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
 
 		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(RegularProjectileBP, FireLocationLeft->GetComponentLocation(), Rotation, spawnParams);
 		RegularProjectileFireTimer = 0;
@@ -246,7 +214,7 @@ void ABoss::ProjectileAttack()
 
 		if (AmountHasFired >= AmountToFire)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Change"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Change"));
 			AmountHasFired = 0;
 			CurrentAttack = BossAttacks::Waiting;
 		}
@@ -264,7 +232,7 @@ void ABoss::ChangePhase()
 
 void ABoss::Phase2AttackChoice()
 {
-	switch (FMath::RandRange(1,1))
+	switch (FMath::RandRange(0,1))
 	{
 	case 0:
 	{
@@ -310,12 +278,30 @@ void ABoss::HarponSpawn()
 
 		if (!HarponPiece1Spawned)
 		{
-			GetWorld()->SpawnActor<AActor>(HarponPiece1, GetActorLocation(), GetActorRotation(), spawnParams);
+			if (HarponPiece1 != nullptr)
+			{
+				GetWorld()->SpawnActor<AActor>(HarponPiece1, GetActorLocation(), GetActorRotation(), spawnParams);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Harpon 1 not set"));
+			}
 		}
 		else
 		{
-			GetWorld()->SpawnActor<AActor>(HarponPiece2, GetActorLocation(), GetActorRotation(), spawnParams);
+			if (HarponPiece1 != nullptr)
+			{
+				GetWorld()->SpawnActor<AActor>(HarponPiece2, GetActorLocation(), GetActorRotation(), spawnParams);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Harpon 2 not set"));
+			}
 		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Kill more enemies"));
 	}
 }
 	

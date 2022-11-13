@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/StaticMeshActor.h"
 #include "HomingMissile.generated.h"
 
 UCLASS()
@@ -31,6 +32,8 @@ public:
 		UProjectileMovementComponent* ProjectileMoveComp;
 	UPROPERTY()
 		AActor* Player;
+	UPROPERTY(EditAnywhere)
+		float Speed = 5.0f;
 
 protected:
 	// Called when the game starts or when spawned

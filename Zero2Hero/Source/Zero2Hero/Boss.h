@@ -49,6 +49,8 @@ protected:
 		USphereComponent* SummonRangeMin;
 	UPROPERTY()
 		TArray<AEnemy*> SummonedEnemies;
+	UPROPERTY(EditAnywhere, Category = "Summoning General")
+		float ZSummonOffSet = 10.0f;
 
 	//Phase 2 - Summon1
 	UPROPERTY(EditAnywhere, Category = "Summoning Version 1")

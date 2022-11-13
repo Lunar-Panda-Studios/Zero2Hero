@@ -17,7 +17,7 @@ void AHomingMissile::BeginPlay()
 	Super::BeginPlay();
 
 	ProjectileMoveComp = FindComponentByClass<UProjectileMovementComponent>();
-	ProjectileMoveComp->HomingTargetComponent = GetWorld()->GetFirstPlayerController()->GetPawn()->GetRootComponent();
+	//ProjectileMoveComp->HomingTargetComponent = GetWorld()->GetFirstPlayerController()->GetPawn()->GetRootComponent();
 
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn();
 
@@ -28,6 +28,9 @@ void AHomingMissile::BeginPlay()
 void AHomingMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()));
+	AddActorWorldTransform(FTransform(Speed * GetActorForwardVector()), true);
 
 	if (isHoming)
 	{
@@ -40,14 +43,14 @@ void AHomingMissile::Tick(float DeltaTime)
 	}
 	else
 	{
-		ForwardTimer += DeltaTime;
-		if (ForwardTimer >= TimeBeforeLockOn)
-		{
-			ProjectileMoveComp->bIsHomingProjectile = true;
-			isHoming = true;
-			ForwardTimer = 0;
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Homing"));
-		}
+		//ForwardTimer += DeltaTime;
+		//if (ForwardTimer >= TimeBeforeLockOn)
+		//{
+		//	ProjectileMoveComp->bIsHomingProjectile = true;
+		//	isHoming = true;
+		//	ForwardTimer = 0;
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Homing"));
+		//}
 	}
 }
 
