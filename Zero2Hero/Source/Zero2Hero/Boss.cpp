@@ -20,9 +20,36 @@ ABoss::ABoss()
 
 }
 
+void ABoss::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//Will need changing to Skeletal Mesh
+	BodyMesh = FindComponentByClass<UStaticMeshComponent>();
+
+	//Spawn Params
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	if (LeftHandCrystalBP != nullptr)
+	{
+		LeftHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(LeftHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LeftHandCrystalSocket);
+	}
+
+	if (RightHandCrystalBP != nullptr)
+	{
+		RightHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(RightHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandCrystalSocket);
+	}
+}
+
 // Called when the game starts or when spawned
 void ABoss::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	if (CurrentAttack == BossAttacks::Waiting)
 	{
 		if (BBC != nullptr)
@@ -98,6 +125,191 @@ void ABoss::Tick(float DeltaTime)
 	}
 }
 
+FVector ABoss::CalculateSpawnLocation()
+{
+	FVector RandLocation;
+	float Distance;
+
+	do
+	{
+		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+			GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+			SummonRangeMax->GetComponentLocation().Z);
+
+		FVector CompareLocation = SummonRangeMin->GetComponentLocation();
+		CompareLocation.Z = RandLocation.Z;
+
+		Distance = (CompareLocation - RandLocation).Size();
+
+	} while (Distance < SummonRangeMin->GetScaledSphereRadius());
+
+	return RandLocation;
+}
+
+void ABoss::Melee1Right()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1Right, false);
+		HasPlayed = true;
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		switch (PhaseSection)
+		{
+		case 1:
+		{
+			CurrentAttack = BossAttacks::P1Melee2aL;
+			break;
+		}
+		case 2:
+		{
+			CurrentAttack = BossAttacks::P1Melee1L;
+		}
+		default:
+			break;
+		}
+	}
+}
+
+void ABoss::Melee1Left()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1Left, false);
+		HasPlayed = true;
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		switch (PhaseSection)
+		{
+		case 1:
+		{
+			CurrentAttack = BossAttacks::P1Melee1R;
+			break;
+		}
+		case 2:
+		{
+			CurrentAttack = BossAttacks::P1Melee2aR;
+		}
+		default:
+			break;
+		}
+	}
+}
+
+void ABoss::Melee2aRight()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1aLeft, false);
+		HasPlayed = true;
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		switch (PhaseSection)
+		{
+		case 1:
+		{
+			CurrentAttack = BossAttacks::P1Melee1R;
+			break;
+		}
+		case 2:
+		{
+			CurrentAttack = BossAttacks::P1Melee2aL;
+		}
+		default:
+			break;
+		}
+	}
+}
+
+void ABoss::Melee2aLeft()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1Left, false);
+		HasPlayed = true;
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		CurrentAttack = BossAttacks::P1Melee2bR;
+	}
+}
+
+void ABoss::Melee2bRight()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1bRight, false);
+		HasPlayed = true;
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		CurrentAttack = BossAttacks::P1AoE1;
+	}
+}
+
+void ABoss::Melee2bLeft()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GetMesh()->PlayAnimation(MeleeAttack1bLeft, false);
+		HasPlayed = true;
+	}
+}
+
+void ABoss::AoE1()
+{
+	if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
+	{
+		if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+		{
+			PhaseSection = PhaseSection + 1 > 2 ? 1 : PhaseSection + 1;
+
+			switch (PhaseSection)
+			{
+			case 1:
+			{
+				CurrentAttack = BossAttacks::P1Melee1L;
+				break;
+			}
+			case 2:
+			{
+				CurrentAttack = BossAttacks::P1Melee1R;
+			}
+			default:
+				break;
+			}
+		}
+	}
+
+	if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+	{
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+
+		FVector SpawnLocation;
+
+		for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
+		{
+			SpawnLocation = CalculateSpawnLocation();
+			SpawnLocation.Z += AoE1ZOffset;
+
+			FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
+		}
+
+		AoE1TimerBetweenSpawns = 0;
+		AoE1SpawnCounter = AoE1SpawnCounter + 1;
+	}
+}
+
 void ABoss::SummonType1()
 {
 	FActorSpawnParameters spawnParams;
@@ -105,23 +317,15 @@ void ABoss::SummonType1()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	float Distance;
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
+		RandLocation = CalculateSpawnLocation();
+		RandLocation.Z += ZSummonOffSet;
+
 		//I'm about to tank the framerate lmao
 		//Very sad
 		//But if people don't know about it then I can't be asked to fix it
-		do
-		{
-			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
-
-			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
-
-		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
-
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
@@ -135,22 +339,14 @@ void ABoss::SummonType2()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	float Distance;
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
+		RandLocation = CalculateSpawnLocation();
+		RandLocation.Z += ZSummonOffSet;
+
 		//Ah shit here we go again
 		//Plz send help
-		do
-		{
-			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
-
-			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
-
-		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
-
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
@@ -302,6 +498,32 @@ void ABoss::HarponSpawn()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Kill more enemies"));
+	}
+}
+
+void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!ShouldDamage)
+	{
+		return;
+	}
+
+	if (OtherActor == nullptr)
+	{
+		return;
+	}
+
+	if (OtherActor->ActorHasTag("Player"))
+	{
+		if (OtherComp == nullptr)
+		{
+			return;
+		}
+
+		if (OtherComp->ComponentHasTag("Ignore"))
+		{
+			return;
+		}
 	}
 }
 	
