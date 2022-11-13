@@ -45,35 +45,50 @@ void ABuffer::Tick(float DeltaTime)
 			case 0:
 			{
 				CurrentShieldType = ElementType::Fire;
-				PairedEnemy->SetShieldType(ElementType::Fire);
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->SetShieldType(ElementType::Fire);
+				}
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
 				break;
 			}
 			case 1:
 			{
 				CurrentShieldType = ElementType::Electric;
-				PairedEnemy->SetShieldType(ElementType::Electric);
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->SetShieldType(ElementType::Electric);
+				}
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Shock"));
 				break;
 			}
 			case 2:
 			{
 				CurrentShieldType = ElementType::Nature;
-				PairedEnemy->SetShieldType(ElementType::Nature);
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->SetShieldType(ElementType::Nature);
+				}
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Nature"));
 				break;
 			}
 			case 3:
 			{
 				CurrentShieldType = ElementType::Ice;
-				PairedEnemy->SetShieldType(ElementType::Ice);
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->SetShieldType(ElementType::Ice);
+				}
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ice"));
 				break;
 			}
 			default:
 			{
 				CurrentShieldType = ElementType::Fire;
-				PairedEnemy->SetShieldType(ElementType::Fire);
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->SetShieldType(ElementType::Fire);
+				}
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
 				break;
 			}

@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "Turret.h"
 #include "Kismet\KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Damageable.h"
 #include "Enemy.h"
-#include "Turret.h"
 
 // Sets default values
 ATurret::ATurret()
@@ -82,7 +81,7 @@ void ATurret::Tick(float DeltaTime)
 					Bullet->Damage = damage;
 				}
 				fireRateCooldown = 0.0f;
-				--turretAmmo;
+				turretAmmo -= turretChargeUsage;
 				if (turretAmmo < 1)
 				{
 					Destroy();
@@ -92,4 +91,3 @@ void ATurret::Tick(float DeltaTime)
 		}
 	}
 }
-

@@ -156,7 +156,7 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 				if (OtherComp->ComponentHasTag("MainBody"))
 				{
 					InRange = false;
-					/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));*/
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
 				}
 			}
 		}
@@ -213,6 +213,7 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 						else
 						{
 							UnshieldEnemy();
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
 						}
 					}
 				}

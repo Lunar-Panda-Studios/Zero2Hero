@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "SuctionGrenade.h"
 #include "Kismet\KismetSystemLibrary.h"
 #include "Damageable.h"
 #include "Enemy.h"
-#include "SuctionGrenade.h"
 
 // Sets default values
 ASuctionGrenade::ASuctionGrenade()
@@ -18,6 +17,9 @@ void ASuctionGrenade::BeginPlay()
 {
 	Super::BeginPlay();
 	currentSuccTime = 0;
+
+	seekClass = AActor::StaticClass();
+	ignoreActors.Init(this, 1);
 }
 
 // Called every frame
@@ -43,14 +45,8 @@ void ASuctionGrenade::Tick(float DeltaTime)
 	if (isSucking)
 	{
 		currentSuccTime += DeltaTime;
-		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
-		TArray<AActor*> ignoreActors;
-		ignoreActors.Init(this, 1);
-		TArray<AActor*> actors;
-		UClass* seekClass = AActor::StaticClass();
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), succRadius, traceObjectTypes, seekClass, ignoreActors, actors);
 		DrawDebugSphere(GetWorld(), GetActorLocation(), succRadius, 12, FColor::Red, true, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
-		ADamageable* DamageableTarget;
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 		for (AActor* a : actors)
 		{
