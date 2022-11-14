@@ -114,6 +114,9 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 			}
 		}
+
+		HasDestruct = true;
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Destroy Projectil"));
 		Destroy();						
 	}
 	else
@@ -139,7 +142,14 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 			}
+			HasDestruct = true;
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Destroy Projectil"));
 			Destroy();
 		}
 	}
+}
+
+bool AProjectile::GetHasDestruct()
+{
+	return HasDestruct;
 }

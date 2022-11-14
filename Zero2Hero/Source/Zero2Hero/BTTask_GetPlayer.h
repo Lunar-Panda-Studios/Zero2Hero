@@ -10,6 +10,7 @@
 #include "PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "HomingMissile.h"
 #include "BTTask_GetPlayer.generated.h"
 
 /**
