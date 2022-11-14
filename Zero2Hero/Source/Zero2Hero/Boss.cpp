@@ -27,6 +27,8 @@ void ABoss::BeginPlay()
 	//Will need changing to Skeletal Mesh
 	BodyMesh = FindComponentByClass<UStaticMeshComponent>();
 
+	//GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
+
 	//Spawn Params
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
@@ -234,12 +236,13 @@ void ABoss::Melee1Right()
 			{
 			case 1:
 			{
-				CurrentAttack = BossAttacks::P1Melee2aL;
+				
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting? BossAttacks::Waiting: BossAttacks::P1Melee2aL;
 				break;
 			}
 			case 2:
 			{
-				CurrentAttack = BossAttacks::P1Melee1L;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
 			}
 			default:
 				break;
@@ -247,7 +250,7 @@ void ABoss::Melee1Right()
 		}
 		else
 		{
-			CurrentAttack = BossAttacks::P1Melee2aR;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aR;
 		}
 
 		if (BBC != nullptr)
@@ -283,12 +286,12 @@ void ABoss::Melee1Left()
 			{
 			case 1:
 			{
-				CurrentAttack = BossAttacks::P1Melee1R;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
 				break;
 			}
 			case 2:
 			{
-				CurrentAttack = BossAttacks::P1Melee2aR;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aR;
 			}
 			default:
 				break;
@@ -296,7 +299,7 @@ void ABoss::Melee1Left()
 		}
 		else
 		{
-			CurrentAttack = BossAttacks::P1Melee2aL;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aL;
 		}
 
 		if (BBC != nullptr)
@@ -335,11 +338,11 @@ void ABoss::Melee2aRight()
 
 			if (HandsAlive() == 2)
 			{
-				CurrentAttack = BossAttacks::P1Melee2bL;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
 			}
 			else
 			{
-				CurrentAttack = BossAttacks::P1Melee2bR;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
 			}
 
 			if (BBC != nullptr)
@@ -384,11 +387,11 @@ void ABoss::Melee2aLeft()
 			HasPlayed = false;
 			if (HandsAlive() == 2)
 			{
-				CurrentAttack = BossAttacks::P1Melee2bR;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
 			}
 			else
 			{
-				CurrentAttack = BossAttacks::P1Melee2bL;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
 			}
 
 			if (BBC != nullptr)
@@ -403,6 +406,24 @@ void ABoss::CalculateHandLocation()
 {
 	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
 	HandDownLocation = Player->GetActorLocation();
+
+	FVector LineTraceEnd = FVector(Player->GetActorLocation().X, Player->GetActorLocation().Y, Player->GetActorLocation().Z - DistanceTrace);
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+	//DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
+
+	if (Hit.GetActor() != nullptr)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, Hit.GetActor()->GetFName().ToString());
+	}
+
+	if (Hit.IsValidBlockingHit())
+	{
+		HandDownLocation.Z = Hit.GetActor()->GetActorLocation().Z;
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Z Location Change"));
+	}
 }
 
 void ABoss::Melee2bRight()
@@ -430,7 +451,7 @@ void ABoss::Melee2bRight()
 		{
 			MeleeAttack2bRightTimer = 0;
 			HasPlayed = false;
-			CurrentAttack = BossAttacks::P1AoE1;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
 
 			if (BBC != nullptr)
 			{
@@ -465,7 +486,7 @@ void ABoss::Melee2bLeft()
 		{
 			MeleeAttack2bLeftTimer = 0;
 			HasPlayed = false;
-			CurrentAttack = BossAttacks::P1AoE1;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
 
 			if (BBC != nullptr)
 			{
@@ -491,12 +512,12 @@ void ABoss::AoE1()
 				{
 				case 1:
 				{
-					CurrentAttack = BossAttacks::P1Melee1L;
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
 					break;
 				}
 				case 2:
 				{
-					CurrentAttack = BossAttacks::P1Melee1R;
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
 				}
 				default:
 					break;
@@ -506,11 +527,11 @@ void ABoss::AoE1()
 			{
 				if (LeftHandAlive)
 				{
-					CurrentAttack = BossAttacks::P1Melee1L;
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
 				}
 				else if(RightHandAlive)
 				{
-					CurrentAttack = BossAttacks::P1Melee1R;
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
 				}
 			}
 			else
@@ -724,6 +745,7 @@ void ABoss::ProjectileAttack()
 
 void ABoss::ChangePhase()
 {
+	CurrentAttack = BossAttacks::Waiting;
 	Phase += 1;
 	if (BBC != nullptr)
 	{

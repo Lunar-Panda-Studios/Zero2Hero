@@ -89,6 +89,8 @@ protected:
 		AShockWave* ShockWaveInstance;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		TSubclassOf<AShockWave> ShockWaveBP;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
+		float DistanceTrace = 1000.0f;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
