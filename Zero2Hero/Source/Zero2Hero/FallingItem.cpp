@@ -16,6 +16,7 @@ void AFallingItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Mesh = FindComponentByClass<UStaticMeshComponent>();
 	Mesh->OnComponentHit.AddDynamic(this, &AFallingItem::OnHit);
 	
 }

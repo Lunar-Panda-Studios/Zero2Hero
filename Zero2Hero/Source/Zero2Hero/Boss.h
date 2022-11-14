@@ -9,6 +9,7 @@
 #include "HomingMissile.h"
 #include "BossCrystalWeakness.h"
 #include "FallingItem.h"
+#include "ShockWave.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -50,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
-		int Phase = 2;
+		int Phase = 1;
 	UPROPERTY()
 		TEnumAsByte<BossAttacks> CurrentAttack = BossAttacks::Waiting;
 	//Will need changing to Skeletal Mesh later
@@ -75,9 +76,19 @@ protected:
 	UPROPERTY()
 		bool HasPlayed = false;
 	UPROPERTY()
-		int PhaseSection;
+		int PhaseSection = 1;
 	UPROPERTY()
-		int HandsAlive = 2;
+		FVector HandDownLocation;
+	UPROPERTY()
+		bool HasHandHitGround;
+	UPROPERTY()
+		bool LeftHandAlive = true;
+	UPROPERTY()
+		bool RightHandAlive = false;
+	UPROPERTY()
+		AShockWave* ShockWaveInstance;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
+		TSubclassOf<AShockWave> ShockWaveBP;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
@@ -88,37 +99,37 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
 		UAnimSequence* MeleeAttack1Left;
 
-	//Phase 1 - Melee Attack 1a Right Arm
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Right Arm")
-		UAnimSequence* MeleeAttack1aRight;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Right Arm")
-		float MeleeAttack1aRightTimeDown;
+	//Phase 1 - Melee Attack 2a Right Arm
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
+		UAnimSequence* MeleeAttack2aRight;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
+		float MeleeAttack2aRightTimeDown;
 	UPROPERTY()
-		float MeleeAttack1aRightTimer = 0;
+		float MeleeAttack2aRightTimer = 0;
 
-	//Phase 1 - Melee Attack 1a Left Arm
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Left Arm")
-		UAnimSequence* MeleeAttack1aLeft;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Right Arm")
-		float MeleeAttack1aLeftTimeDown;
+	//Phase 1 - Melee Attack 2a Left Arm
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
+		UAnimSequence* MeleeAttack2aLeft;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
+		float MeleeAttack2aLeftTimeDown;
 	UPROPERTY()
-		float MeleeAttack1aLeftTimer = 0;
+		float MeleeAttack2aLeftTimer = 0;
 
-	//Phase 1 - Melee Attack 1b Right Arm
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1b Right Arm")
-		UAnimSequence* MeleeAttack1bRight;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Right Arm")
-		float MeleeAttack1bRightTimeDown;
+	//Phase 1 - Melee Attack 2b Right Arm
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
+		UAnimSequence* MeleeAttack2bRight;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
+		float MeleeAttack2bRightTimeDown;
 	UPROPERTY()
-		float MeleeAttack1bRightTimer = 0;
+		float MeleeAttack2bRightTimer = 0;
 
-	//Phase 1 - Melee Attack 1b Left Arm
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1b Left Arm")
-		UAnimSequence* MeleeAttack1bLeft;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1a Right Arm")
-		float MeleeAttack1bLeftTimeDown;
+	//Phase 1 - Melee Attack 2b Left Arm
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
+		UAnimSequence* MeleeAttack2bLeft;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
+		float MeleeAttack2bLeftTimeDown;
 	UPROPERTY()
-		float MeleeAttack1bLeftTimer = 0;
+		float MeleeAttack2bLeftTimer = 0;
 
 	//Phase 1 - AOE1 
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - AoE 1")
@@ -191,6 +202,14 @@ protected:
 public:
 	UFUNCTION()
 		FVector CalculateSpawnLocation();
+	UFUNCTION()
+		void CalculateHandLocation();
+	UFUNCTION()
+		void ShockWave();
+	UFUNCTION()
+		int HandsAlive();
+	UFUNCTION()
+		void ShouldEndPhase1();
 
 	UFUNCTION(BlueprintCallable)
 		void Melee1Right();
