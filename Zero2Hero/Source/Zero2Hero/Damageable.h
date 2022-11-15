@@ -66,6 +66,8 @@ public:
 
 	UFUNCTION()
 		int GetDamage();
+	UFUNCTION()
+		bool GetIsDead();
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
