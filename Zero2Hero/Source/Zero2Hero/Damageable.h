@@ -57,6 +57,8 @@ protected:
 		bool Allow = true;
 	UPROPERTY()
 		bool DropAmmo = false;
+	UPROPERTY()
+		TSubclassOf<AActor> SpawnOnDeath;
 
 public:	
 	// Called every frame
@@ -64,6 +66,8 @@ public:
 
 	UFUNCTION()
 		int GetDamage();
+	UFUNCTION()
+		bool GetIsDead();
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
@@ -91,6 +95,8 @@ public:
 		void SetShieldType(TEnumAsByte<ElementType> newElement);
 	UFUNCTION()
 		void SetisReflectorShield(bool isReflector);
+	UFUNCTION()
+		void SetSpawnOnDeath(TSubclassOf<AActor> newDropItem);
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void EnemyDamaged();
