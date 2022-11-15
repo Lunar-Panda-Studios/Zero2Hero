@@ -89,7 +89,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Grappling Hook")
 		TSubclassOf<AHookPoint> HookPoints;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USphereComponent* MeleeCollider;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		int MeleeDamage;
