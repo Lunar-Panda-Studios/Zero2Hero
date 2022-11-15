@@ -36,16 +36,14 @@ protected:
 	UPROPERTY()
 		float TimerMax = 1.0f;
 	UPROPERTY(EditAnywhere)
-		float FBlaunchUP = 0.0f;
-	UPROPERTY(EditAnywhere)
-		float FBlaunchForward = 0.0f;
+		float launchSpeed = 500.0f;
 	
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* NiagaraComp;
 	UPROPERTY(EditAnywhere)
 		UNiagaraSystem* NigaraSys;
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<AFireBomb> FireBomb;		
+		TSubclassOf<AFireBomb> FireBomb;	
 
 
 public:	

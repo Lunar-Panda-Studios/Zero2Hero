@@ -19,13 +19,26 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float radius = 0;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float damage = 0;
+
+	UPROPERTY(EditAnywhere)
+		USphereComponent* sphere;
+
+	UPROPERTY()
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	UPROPERTY()
+		TArray<AActor*> ignoreActors;
+	UPROPERTY()
+		TArray<AActor*> actors;
+	UPROPERTY()
+		UClass* seekClass;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 
 };
