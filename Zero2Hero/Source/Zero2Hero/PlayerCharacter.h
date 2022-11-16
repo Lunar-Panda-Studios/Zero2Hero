@@ -122,8 +122,8 @@ protected:
 		float dashTime = 0.3f;
 	UPROPERTY()
 		float currentDashTime = 0.0f;
-	UPROPERTY(BlueprintReadWrite, Category = "Dash Settings")
-		bool isDashing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		bool isDashing = false;
 	UPROPERTY()
 		bool hasDashedInAir = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
