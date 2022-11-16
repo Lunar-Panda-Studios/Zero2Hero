@@ -30,6 +30,8 @@ public:
 		TEnumAsByte<ElementType> ElementType = ElementType::None;
 	UPROPERTY()
 		bool HasDestruct = false;
+	UPROPERTY()
+		bool isHomingMissile = false;
 
 protected:
 	// Called when the game starts or when spawned
