@@ -174,9 +174,9 @@ protected:
 		float wallRunSpeed = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
 		float wallRunGravity = 0.3f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpUpwardsVelocity = 500.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpSidewaysVelocity = 500.0f;
 	UPROPERTY()
 		bool isWallRunning = false;
