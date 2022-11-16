@@ -23,15 +23,26 @@ EBTNodeResult::Type UBTTask_GetRandomLocation::ExecuteTask(UBehaviorTreeComponen
 
 	FVector newLocation;
 
+	int repeated = 0;
+	int MaxRepeated = 50;
+
 	do
 	{
+		repeated += 1;
+
 		newLocation = FVector(FMath::RandRange(Self->GetStartLocation().X - BBC->GetValueAsFloat("XRadius"), Self->GetStartLocation().X + BBC->GetValueAsFloat("XRadius")),
 			FMath::RandRange(Self->GetStartLocation().Y - BBC->GetValueAsFloat("YRadius"), Self->GetStartLocation().Y + BBC->GetValueAsFloat("YRadius")),
 			Self->GetStartLocation().Z);
 
-	} while (!Self->IsPositionReachable(newLocation));
+	} while (!Self->IsPositionReachable(newLocation) || repeated == MaxRepeated);
 	
-	BBC->SetValueAsVector("TargetLocation", newLocation);
-
-	return EBTNodeResult::Succeeded;
+	if (repeated != MaxRepeated)
+	{
+		BBC->SetValueAsVector("TargetLocation", newLocation);
+		return EBTNodeResult::Succeeded;
+	}
+	else
+	{
+		return EBTNodeResult::Failed;
+	}
 }

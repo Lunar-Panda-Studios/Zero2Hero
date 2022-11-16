@@ -68,10 +68,15 @@ protected:
 		ARangedWeapon* CurrentRangedWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		int currentWeapon = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
+		FName RangedSocket;
+
 	UPROPERTY(BlueprintReadWrite)
 		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
+		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
 	UPROPERTY()
@@ -97,6 +102,7 @@ protected:
 		float MeleeAttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		float MeleeAttackCooldown;
+
 	UPROPERTY()
 		float AttackAnimTimer = 0.0f;
 	UPROPERTY()
@@ -122,8 +128,8 @@ protected:
 		float dashTime = 0.3f;
 	UPROPERTY()
 		float currentDashTime = 0.0f;
-	UPROPERTY(BlueprintReadWrite, Category = "Dash Settings")
-		bool isDashing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		bool isDashing = false;
 	UPROPERTY()
 		bool hasDashedInAir = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
@@ -168,9 +174,9 @@ protected:
 		float wallRunSpeed = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
 		float wallRunGravity = 0.3f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpUpwardsVelocity = 500.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpSidewaysVelocity = 500.0f;
 	UPROPERTY()
 		bool isWallRunning = false;
