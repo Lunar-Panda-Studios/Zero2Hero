@@ -20,6 +20,8 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -60,6 +62,8 @@ protected:
 		float AgroRadius;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DeaggroRadius;*/
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* NiagaraComp;
 	UPROPERTY()
 		bool InRange = false;
 	UPROPERTY()
@@ -103,6 +107,8 @@ public:
 		void SetFlameDamage(int amount);
 	UFUNCTION()
 		bool GetInRange();
+	UFUNCTION()
+		UNiagaraComponent* GetNiagaraComp();
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
