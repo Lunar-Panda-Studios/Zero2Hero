@@ -68,10 +68,15 @@ protected:
 		ARangedWeapon* CurrentRangedWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		int currentWeapon = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
+		FName RangedSocket;
+
 	UPROPERTY(BlueprintReadWrite)
 		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
+		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
 	UPROPERTY()
@@ -97,6 +102,7 @@ protected:
 		float MeleeAttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		float MeleeAttackCooldown;
+
 	UPROPERTY()
 		float AttackAnimTimer = 0.0f;
 	UPROPERTY()
