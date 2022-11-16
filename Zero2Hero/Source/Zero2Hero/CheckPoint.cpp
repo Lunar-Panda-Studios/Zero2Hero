@@ -42,11 +42,8 @@ void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AAc
 		{
 			if (Manager != nullptr)
 			{
-				if (Manager->SetCurrentCheckPointNum(CheckPointNum))
-				{
-					Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
-					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("CheckPoint Got"));
-				}
+				Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("CheckPoint Got"));
 			}
 			else
 			{

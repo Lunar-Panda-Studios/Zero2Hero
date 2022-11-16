@@ -42,6 +42,14 @@ void ADamageable::Tick(float DeltaTime)
 			}
 			else
 			{
+				if (SpawnOnDeath != nullptr)
+				{
+					FActorSpawnParameters spawnParams;
+					spawnParams.Owner = this;
+					spawnParams.Instigator = GetInstigator();
+
+					GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GetActorLocation(), GetActorRotation(), spawnParams);
+				}
 				Destroy();
 			}
 		}
@@ -51,6 +59,11 @@ void ADamageable::Tick(float DeltaTime)
 int ADamageable::GetDamage()
 {
 	return Damage;
+}
+
+bool ADamageable::GetIsDead()
+{
+	return isDead;
 }
 
 
@@ -146,5 +159,10 @@ void ADamageable::CheckDeath()
 	void ADamageable::SetisReflectorShield(bool isReflector)
 	{
 		ReflectorShield = isReflector;
+	}
+
+	void ADamageable::SetSpawnOnDeath(TSubclassOf<AActor> newDropItem)
+	{
+		SpawnOnDeath = newDropItem;
 	}
 

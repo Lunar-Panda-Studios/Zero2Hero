@@ -26,12 +26,7 @@ AChargeRifle::AChargeRifle()
 
 void AChargeRifle::PrimaryAttack()
 {
-	shooting = true;
-}
-
-void AChargeRifle::SecondaryAttack()
-{
-	if (secondaryCurrentCooldown > secondaryFireRate && DecreaseCharge(SecondaryChargeUsage))
+	if (currentCooldown > fireRate && DecreaseCharge(ChargeUsage))
 	{
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
@@ -48,22 +43,28 @@ void AChargeRifle::SecondaryAttack()
 			sphereCol->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);/*
 			meshComp->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);*/
 		}
-		secondaryCurrentCooldown = 0.0f;
-		
+		currentCooldown = 0.0f;
+
 	}
+	/*shooting = true;*/
+}
+
+void AChargeRifle::SecondaryAttack()
+{
+	
 }
 
 void AChargeRifle::PrimaryAttackEnd()
 {
-	shooting = false;
+	/*shooting = false;
 	currentFireTime = 0.0f;
 	hasFired = false;
-	StopCharging();
+	StopCharging();*/
 }
 
 void AChargeRifle::Attack(float DeltaTime)
 {
-	if (shooting)
+	/*if (shooting)
 	{
 		currentFireTime += DeltaTime;
 		if (!hasFired && currentCooldown > fireRate - fireTime)
@@ -93,5 +94,5 @@ void AChargeRifle::Attack(float DeltaTime)
 			}
 
 		}
-	}
+	}*/
 }
