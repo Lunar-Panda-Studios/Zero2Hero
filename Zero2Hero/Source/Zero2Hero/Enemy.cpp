@@ -12,8 +12,8 @@ AEnemy::AEnemy()
 	PlayerRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Player Radius"));
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
-	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
-	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Shield VFX Component"));
+	NiagaraComp->SetupAttachment(GetRootComponent());
 
 	//BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
 	//BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
@@ -77,21 +77,40 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OnFire || FlameThrowerDamageTimer != 0)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		OnFire = false;
-		if (FlameThrowerDamageTimer < FlameThrowerDamageTimerMax)
+		if (BBC != nullptr)
 		{
-			FlameThrowerDamageTimer += DeltaTime;
+			BBC->SetValueAsBool("isDead", isDead);
 		}
 
-		if (FlameThrowerDamageTimer >= FlameThrowerDamageTimerMax)
+
+		if (Health <= 0)
 		{
-			FlameThrowerDamageTimer = 0;
-			DecreaseHealth(Damage);
+			if (OnFire || FlameThrowerDamageTimer != 0)
+			{
+				OnFire = false;
+				if (FlameThrowerDamageTimer < FlameThrowerDamageTimerMax)
+				{
+					FlameThrowerDamageTimer += DeltaTime;
+				}
+
+				if (FlameThrowerDamageTimer >= FlameThrowerDamageTimerMax)
+				{
+					FlameThrowerDamageTimer = 0;
+					DecreaseHealth(Damage);
+				}
+			}
 		}
 	}
-
+	else
+	{
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("isDead", true);
+			
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -176,6 +195,11 @@ void AEnemy::SetFlameDamage(int amount)
 bool AEnemy::GetInRange()
 {
 	return InRange;
+}
+
+UNiagaraComponent* AEnemy::GetNiagaraComp()
+{
+	return NiagaraComp;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
