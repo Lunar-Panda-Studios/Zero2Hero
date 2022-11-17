@@ -23,7 +23,7 @@ void AProjectile::BeginPlay()
 	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnComponentOverlap);
 	//MainBody->OnComponentHit.AddDynamic(this, &AProjectile::OnComponentHit);
 
-	SetLifeSpan(10);
+	SetLifeSpan(LifeSpan);
 
 }
 

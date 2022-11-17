@@ -32,6 +32,8 @@ public:
 		bool HasDestruct = false;
 	UPROPERTY()
 		bool isHomingMissile = false;
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+		float LifeSpan = 10;
 
 protected:
 	// Called when the game starts or when spawned
