@@ -26,17 +26,19 @@ void ABombTosser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (InRange)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		AttackSpeedTimer += DeltaTime;
-
-		if (AttackSpeedTimer >= AttackSpeed)
+		if (InRange)
 		{
-			Attack();
-			AttackSpeedTimer = 0;
+			AttackSpeedTimer += DeltaTime;
+
+			if (AttackSpeedTimer >= AttackSpeed)
+			{
+				Attack();
+				AttackSpeedTimer = 0;
+			}
 		}
 	}
-
 }
 
 // Called to bind functionality to input

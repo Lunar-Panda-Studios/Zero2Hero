@@ -91,19 +91,29 @@ protected:
 		TSubclassOf<AShockWave> ShockWaveBP;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		float DistanceTrace = 1000.0f;
+	UPROPERTY()
+		bool FirstAnimFinished = false;
+	UPROPERTY()
+		bool SecondAnimStarted = false;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
-		UAnimSequence* MeleeAttack1Right;
+		UAnimSequence* MeleeAttack1RightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
+		UAnimSequence* MeleeAttack1RightReturn;
 
 	//Phase 1 - Melee Attack 1 Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
-		UAnimSequence* MeleeAttack1Left;
+		UAnimSequence* MeleeAttack1LeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
+		UAnimSequence* MeleeAttack1LeftReturn;
 
 	//Phase 1 - Melee Attack 2a Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
-		UAnimSequence* MeleeAttack2aRight;
+		UAnimSequence* MeleeAttack2aRightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
+		UAnimSequence* MeleeAttack2aRightReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
 		float MeleeAttack2aRightTimeDown;
 	UPROPERTY()
@@ -111,7 +121,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2a Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
-		UAnimSequence* MeleeAttack2aLeft;
+		UAnimSequence* MeleeAttack2aLeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
+		UAnimSequence* MeleeAttack2aLeftReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
 		float MeleeAttack2aLeftTimeDown;
 	UPROPERTY()
@@ -119,7 +131,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2b Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
-		UAnimSequence* MeleeAttack2bRight;
+		UAnimSequence* MeleeAttack2bRightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
+		UAnimSequence* MeleeAttack2bRightReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
 		float MeleeAttack2bRightTimeDown;
 	UPROPERTY()
@@ -127,7 +141,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2b Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
-		UAnimSequence* MeleeAttack2bLeft;
+		UAnimSequence* MeleeAttack2bLeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
+		UAnimSequence* MeleeAttack2bLeftReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
 		float MeleeAttack2bLeftTimeDown;
 	UPROPERTY()

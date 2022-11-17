@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_RunAwayFromPlayer::ExecuteTask(UBehaviorTreeComponen
 	//FVector PlayerLocation = World->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
 	AActor* Player = World->GetFirstPlayerController()->GetPawn();
-	ASummoner* Self = Cast<ASummoner>(BBC->GetValueAsObject("SelfActor"));
+	AReanimator* Self = Cast<AReanimator>(BBC->GetValueAsObject("SelfActor"));
 
 	FVector RandomLocation = Player->GetActorLocation() - Self->GetActorLocation();
 	RandomLocation.Normalize();
