@@ -22,6 +22,7 @@
 #include "NavigationPath.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Enemy.generated.h"
 
 UCLASS()

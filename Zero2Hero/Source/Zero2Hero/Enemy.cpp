@@ -77,7 +77,7 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GetWorld()->GetFirstPlayerController()->InputEnabled())
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 		if (BBC != nullptr)
 		{
@@ -108,6 +108,7 @@ void AEnemy::Tick(float DeltaTime)
 		if (BBC != nullptr)
 		{
 			BBC->SetValueAsBool("isDead", true);
+			
 		}
 	}
 }

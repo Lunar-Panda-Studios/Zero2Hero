@@ -29,21 +29,24 @@ void AReanimator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (isReviving)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		TimerToRevive += DeltaTime;
-
-		if (TimerToRevive >= TimeToRevive)
+		if (isReviving)
 		{
-			TimerToRevive = 0;
-			ReanimateEnemy();
-		}
-	}
-	else
-	{
-		FindNewTarget();
+			TimerToRevive += DeltaTime;
 
-		ReviveRadius->SetSphereRadius(0);
+			if (TimerToRevive >= TimeToRevive)
+			{
+				TimerToRevive = 0;
+				ReanimateEnemy();
+			}
+		}
+		else
+		{
+			FindNewTarget();
+
+			ReviveRadius->SetSphereRadius(0);
+		}
 	}
 
 }
