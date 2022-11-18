@@ -34,87 +34,123 @@ void ABuffer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (isPaired)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		TimerForEachType += DeltaTime;
-
-		if (TimerForEachType >= TimeForEachType)
+		if (isPaired)
 		{
-			switch (CurrentShieldType)
-			{
-			case 0:
-			{
-				CurrentShieldType = ElementType::Fire;
-				if (PairedEnemy != nullptr)
-				{
-					PairedEnemy->SetShieldType(ElementType::Fire);
-				}
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
-				break;
-			}
-			case 1:
-			{
-				CurrentShieldType = ElementType::Electric;
-				if (PairedEnemy != nullptr)
-				{
-					PairedEnemy->SetShieldType(ElementType::Electric);
-				}
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Shock"));
-				break;
-			}
-			case 2:
-			{
-				CurrentShieldType = ElementType::Nature;
-				if (PairedEnemy != nullptr)
-				{
-					PairedEnemy->SetShieldType(ElementType::Nature);
-				}
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Nature"));
-				break;
-			}
-			case 3:
-			{
-				CurrentShieldType = ElementType::Ice;
-				if (PairedEnemy != nullptr)
-				{
-					PairedEnemy->SetShieldType(ElementType::Ice);
-				}
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ice"));
-				break;
-			}
-			default:
-			{
-				CurrentShieldType = ElementType::Fire;
-				if (PairedEnemy != nullptr)
-				{
-					PairedEnemy->SetShieldType(ElementType::Fire);
-				}
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
-				break;
-			}
-			}
+			TimerForEachType += DeltaTime;
 
-			TimerForEachType = 0;
+			if (TimerForEachType >= TimeForEachType)
+			{
+				switch (CurrentShieldType)
+				{
+				case 0:
+				{
+					CurrentShieldType = ElementType::Fire;
+					if (PairedEnemy != nullptr)
+					{
+						PairedEnemy->SetShieldType(ElementType::Fire);
+						if (ShieldVFX.Contains(ElementType::Fire))
+						{
+							Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Fire]);
+						}
+					}
+
+					if (ShieldVFX.Contains(ElementType::Fire))
+					{
+						NiagaraComp->SetAsset(ShieldVFX[ElementType::Fire]);
+					}
+
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
+					break;
+				}
+				case 1:
+				{
+					CurrentShieldType = ElementType::Electric;
+					if (PairedEnemy != nullptr)
+					{
+						PairedEnemy->SetShieldType(ElementType::Electric);
+						if (ShieldVFX.Contains(ElementType::Electric))
+						{
+							Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Electric]);
+						}
+					}
+
+					if (ShieldVFX.Contains(ElementType::Electric))
+					{
+						NiagaraComp->SetAsset(ShieldVFX[ElementType::Electric]);
+					}
+
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Shock"));
+					break;
+				}
+				case 2:
+				{
+					CurrentShieldType = ElementType::Nature;
+					if (PairedEnemy != nullptr)
+					{
+						PairedEnemy->SetShieldType(ElementType::Nature);
+						if (ShieldVFX.Contains(ElementType::Nature))
+						{
+							Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Nature]);
+						}
+					}
+
+					if (ShieldVFX.Contains(ElementType::Nature))
+					{
+						NiagaraComp->SetAsset(ShieldVFX[ElementType::Nature]);
+					}
+
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Nature"));
+					break;
+				}
+				case 3:
+				{
+					CurrentShieldType = ElementType::Ice;
+					if (PairedEnemy != nullptr)
+					{
+						PairedEnemy->SetShieldType(ElementType::Ice);
+						if (ShieldVFX.Contains(ElementType::Ice))
+						{
+							Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Ice]);
+						}
+					}
+
+					if (ShieldVFX.Contains(ElementType::Ice))
+					{
+						NiagaraComp->SetAsset(ShieldVFX[ElementType::Ice]);
+					}
+
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ice"));
+					break;
+				}
+				default:
+				{
+					break;
+				}
+				}
+
+				TimerForEachType = 0;
+			}
 		}
-	}
-	else
-	{
-		if (SeekNewTarget())
+		else
 		{
-			if (CanSee)
+			if (SeekNewTarget())
 			{
-				AttackSpeedTimer += DeltaTime;
-
-				if (AttackSpeedTimer >= AttackSpeed)
+				if (CanSee)
 				{
-					RangedAttack();
-					AttackSpeedTimer = 0;
+					AttackSpeedTimer += DeltaTime;
+
+					if (AttackSpeedTimer >= AttackSpeed)
+					{
+						RangedAttack();
+						AttackSpeedTimer = 0;
+					}
 				}
 			}
 		}
+
 	}
-
-
 }
 
 // Called to bind functionality to input
@@ -139,6 +175,48 @@ bool ABuffer::SeekNewTarget()
 			isShielded = true;
 			CurrentShieldType = ElementType::Fire;
 			PairedEnemy->SetShieldType(ElementType::Fire);
+
+			switch (CurrentShieldType)
+			{
+			case ElementType::Ice:
+			{
+				if (ShieldVFX.Contains(ElementType::Ice))
+				{
+					NiagaraComp->SetAsset(ShieldVFX[ElementType::Ice]);
+					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Ice]);
+				}
+			}
+			case ElementType::Fire:
+			{
+				if (ShieldVFX.Contains(ElementType::Fire))
+				{
+					NiagaraComp->SetAsset(ShieldVFX[ElementType::Fire]);
+					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Fire]);
+				}
+			}
+			case ElementType::Electric:
+			{
+				if (ShieldVFX.Contains(ElementType::Electric))
+				{
+					NiagaraComp->SetAsset(ShieldVFX[ElementType::Electric]);
+					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Electric]);
+				}
+			}
+			case ElementType::Nature:
+			{
+				if (ShieldVFX.Contains(ElementType::Nature))
+				{
+					NiagaraComp->SetAsset(ShieldVFX[ElementType::Nature]);
+					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Nature]);
+				}
+			}
+			default:
+			{
+				NiagaraComp->SetAsset(nullptr);
+				Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(nullptr);
+				break;
+			}
+			}
 
 			if (isReflectorVariant)
 			{
