@@ -61,6 +61,11 @@ int ADamageable::GetDamage()
 	return Damage;
 }
 
+bool ADamageable::GetIsDead()
+{
+	return isDead;
+}
+
 
 float ADamageable::GetHealth()
 {

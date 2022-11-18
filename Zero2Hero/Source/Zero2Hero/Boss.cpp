@@ -20,16 +20,50 @@ ABoss::ABoss()
 
 }
 
+void ABoss::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//Will need changing to Skeletal Mesh
+	BodyMesh = FindComponentByClass<UStaticMeshComponent>();
+
+	//GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
+
+	//Spawn Params
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	if (LeftHandCrystalBP != nullptr)
+	{
+		LeftHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(LeftHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LeftHandCrystalSocket);
+	}
+
+	if (RightHandCrystalBP != nullptr)
+	{
+		RightHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(RightHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandCrystalSocket);
+	}
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("Phase", Phase);
+	}
+}
+
 // Called when the game starts or when spawned
 void ABoss::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("Phase", Phase);
+	}
+
 	if (CurrentAttack == BossAttacks::Waiting)
 	{
-		if (BBC != nullptr)
-		{
-			BBC->SetValueAsInt("Phase", Phase);
-		}
-
 		switch (Phase)
 		{
 		case 0:
@@ -39,6 +73,7 @@ void ABoss::Tick(float DeltaTime)
 		}
 		case 1:
 		{
+			CurrentAttack = BossAttacks::P1Melee1L;
 			break;
 		}
 		case 2:
@@ -47,12 +82,12 @@ void ABoss::Tick(float DeltaTime)
 			{
 				if (!HarponPiece1Spawned)
 				{
-					BossAttacks::P2SummonV1;
+					CurrentAttack = BossAttacks::P2SummonV1;
 					SummonType1();
 				}
 				else
 				{
-					BossAttacks::P2SummonV2;
+					CurrentAttack = BossAttacks::P2SummonV2;
 					SummonType2();
 				}
 			}
@@ -69,6 +104,57 @@ void ABoss::Tick(float DeltaTime)
 
 	switch (CurrentAttack)
 	{
+	//Phase 1 Attacks
+	case BossAttacks::P1Melee1L:
+	{
+
+		Melee1Left();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1Melee1R:
+	{
+		Melee1Right();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1Melee2aL:
+	{
+		MeleeAttack2aLeftTimer += DeltaTime;
+		Melee2aLeft();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1Melee2aR:
+	{
+		MeleeAttack2aRightTimer += DeltaTime;
+		Melee2aRight();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1Melee2bL:
+	{
+		MeleeAttack2bLeftTimer += DeltaTime;
+		Melee2bLeft();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1Melee2bR:
+	{
+		MeleeAttack2bRightTimer += DeltaTime;
+		Melee2bRight();
+		ShouldEndPhase1();
+		break;
+	}
+	case BossAttacks::P1AoE1:
+	{
+		AoE1TimerBetweenSpawns += DeltaTime;
+		AoE1();
+		ShouldEndPhase1();
+		break;
+	}
+
+	//Phase 2 Attacks
 	case BossAttacks::P2RegularProjectile:
 	{
 		RegularProjectileFireTimer += DeltaTime;
@@ -98,6 +184,428 @@ void ABoss::Tick(float DeltaTime)
 	}
 }
 
+FVector ABoss::CalculateSpawnLocation()
+{
+	FVector RandLocation;
+	float Distance;
+
+	//Something better to do 
+	//Just get a point based on the difference between Min and Max (SummonRangeMax->GetScaledSphereRadius() - SummonRangeMin->GetScaledSphereRadius())
+	//Find rand point in that radius (FMath::RandRange(-DiffRadius, DiffRadius))
+	//Add the Radius of the min (SummonRangeMin->GetScaledSphereRadius() + RandPoint)
+	//I am so dumb for not thinking of that first
+	do
+	{
+		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+			GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+			SummonRangeMax->GetComponentLocation().Z);
+
+		FVector CompareLocation = SummonRangeMin->GetComponentLocation();
+		CompareLocation.Z = RandLocation.Z;
+
+		Distance = (CompareLocation - RandLocation).Size();
+
+	} while (Distance < SummonRangeMin->GetScaledSphereRadius());
+
+	return RandLocation;
+}
+
+void ABoss::Melee1Right()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep Begin"));
+		ShouldDamage = true;
+		GetMesh()->PlayAnimation(MeleeAttack1Right, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep End"));
+		HasPlayed = false;
+		ShouldDamage = false;
+		if (HandsAlive() == 2)
+		{
+			switch (PhaseSection)
+			{
+			case 1:
+			{
+				
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting? BossAttacks::Waiting: BossAttacks::P1Melee2aL;
+				break;
+			}
+			case 2:
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
+			}
+			default:
+				break;
+			}
+		}
+		else
+		{
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aR;
+		}
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", false);
+		}
+	}
+}
+
+void ABoss::Melee1Left()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep Begin"));
+		ShouldDamage = true;
+		GetMesh()->PlayAnimation(MeleeAttack1Left, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep End"));
+		HasPlayed = false;
+		ShouldDamage = true;
+		if (HandsAlive() == 2)
+		{
+			switch (PhaseSection)
+			{
+			case 1:
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
+				break;
+			}
+			case 2:
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aR;
+			}
+			default:
+				break;
+			}
+		}
+		else
+		{
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2aL;
+		}
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", false);
+		}
+	}
+}
+
+void ABoss::Melee2aRight()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		ShouldDamage = true;
+		GetMesh()->PlayAnimation(MeleeAttack2aRight, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Start"));
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		HasHandHitGround = true;
+		ShouldDamage = false;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
+
+		if (MeleeAttack2aRightTimeDown <= MeleeAttack2aRightTimer)
+		{
+			MeleeAttack2aRightTimer = 0;
+			HasPlayed = false;
+			HasHandHitGround = false;
+
+			if (HandsAlive() == 2)
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
+			}
+			else
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
+			}
+
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsInt("IsAttacking", false);
+			}
+		}
+	}
+}
+
+void ABoss::ShockWave()
+{
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	ShockWaveInstance = GetWorld()->SpawnActor<AShockWave>(ShockWaveBP, HandDownLocation, GetActorRotation(), spawnParams);
+}
+
+void ABoss::Melee2aLeft()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		ShouldDamage = true;
+		GetMesh()->PlayAnimation(MeleeAttack2aLeft, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist Begin"));
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		ShouldDamage = false;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist End"));
+		if (MeleeAttack2aLeftTimeDown <= MeleeAttack2aLeftTimer)
+		{
+			MeleeAttack2aLeftTimer = 0;
+			HasPlayed = false;
+			if (HandsAlive() == 2)
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
+			}
+			else
+			{
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
+			}
+
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsInt("IsAttacking", false);
+			}
+		}
+	}
+}
+
+void ABoss::CalculateHandLocation()
+{
+	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	HandDownLocation = Player->GetActorLocation();
+
+	FVector LineTraceEnd = FVector(Player->GetActorLocation().X, Player->GetActorLocation().Y, Player->GetActorLocation().Z - DistanceTrace);
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+	//DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
+
+	if (Hit.GetActor() != nullptr)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, Hit.GetActor()->GetFName().ToString());
+	}
+
+	if (Hit.IsValidBlockingHit())
+	{
+		HandDownLocation.Z = Hit.GetActor()->GetActorLocation().Z;
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Z Location Change"));
+	}
+}
+
+void ABoss::Melee2bRight()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap Begin"));
+		ShouldDamage = true;
+		CalculateHandLocation();
+		GetMesh()->PlayAnimation(MeleeAttack2bRight, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap End"));
+		ShockWave();
+		ShouldDamage = false;
+		if (MeleeAttack2bRightTimeDown <= MeleeAttack2bRightTimer)
+		{
+			MeleeAttack2bRightTimer = 0;
+			HasPlayed = false;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
+
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsInt("IsAttacking", false);
+			}
+		}
+	}
+}
+
+void ABoss::Melee2bLeft()
+{
+	if (!GetMesh()->IsPlaying() && !HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap Begin"));
+		ShouldDamage = true;
+		CalculateHandLocation();
+		GetMesh()->PlayAnimation(MeleeAttack2bLeft, false);
+		HasPlayed = true;
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+	}
+
+	if (!GetMesh()->IsPlaying() && HasPlayed)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap End"));
+		ShockWave();
+		ShouldDamage = false;
+		if (MeleeAttack2bLeftTimeDown <= MeleeAttack2bLeftTimer)
+		{
+			MeleeAttack2bLeftTimer = 0;
+			HasPlayed = false;
+			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
+
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsInt("IsAttacking", false);
+			}
+		}
+	}
+
+}
+
+void ABoss::AoE1()
+{
+	if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
+	{
+		if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+		{
+			AoE1TimerBetweenSpawns = 0;
+			if (HandsAlive() == 2)
+			{
+				PhaseSection = PhaseSection + 1 > 2 ? 1 : PhaseSection + 1;
+
+				switch (PhaseSection)
+				{
+				case 1:
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
+					break;
+				}
+				case 2:
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
+				}
+				default:
+					break;
+				}
+			}
+			else if(HandsAlive() == 1)
+			{
+				if (LeftHandAlive)
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1L;
+				}
+				else if(RightHandAlive)
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee1R;
+				}
+			}
+			else
+			{
+				//End;
+			}
+
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsInt("IsAttacking", false);
+			}
+		}
+	}
+
+	if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+	{
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("IsAttacking", true);
+		}
+
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+
+		FVector SpawnLocation;
+
+		for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
+		{
+			SpawnLocation = CalculateSpawnLocation();
+			SpawnLocation.Z += AoE1ZOffset;
+
+			FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
+		}
+
+		AoE1TimerBetweenSpawns = 0;
+		AoE1SpawnCounter = AoE1SpawnCounter + 1;
+	}
+}
+
+int ABoss::HandsAlive()
+{
+	int LivingHands = 2;
+
+	if (LeftHandCrystal == nullptr)
+	{
+		LivingHands -= 1;
+		LeftHandAlive = false;
+	}
+	else
+	{
+		if (LeftHandCrystal->GetIsDead())
+		{
+			LivingHands -= 1;
+			LeftHandAlive = false;
+		}
+	}
+
+	if (RightHandCrystal == nullptr)
+	{
+		LivingHands -= 1;
+		RightHandAlive = false;
+	}
+	else
+	{
+		if (RightHandCrystal->GetIsDead())
+		{
+			LivingHands -= 1;
+			RightHandAlive = false;
+		}
+	}
+	return LivingHands;
+}
+
 void ABoss::SummonType1()
 {
 	FActorSpawnParameters spawnParams;
@@ -105,25 +613,27 @@ void ABoss::SummonType1()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	float Distance;
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("IsSummoning", true);
+	}
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
+		RandLocation = CalculateSpawnLocation();
+		RandLocation.Z += ZSummonOffSet;
+
 		//I'm about to tank the framerate lmao
 		//Very sad
 		//But if people don't know about it then I can't be asked to fix it
-		do
-		{
-			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
-
-			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
-
-		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
-
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+	}
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("IsSummoning", false);
 	}
 
 }
@@ -135,24 +645,26 @@ void ABoss::SummonType2()
 	spawnParams.Instigator = GetInstigator();
 
 	FVector RandLocation;
-	float Distance;
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("IsSummoning", true);
+	}
 
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
+		RandLocation = CalculateSpawnLocation();
+		RandLocation.Z += ZSummonOffSet;
+
 		//Ah shit here we go again
 		//Plz send help
-		do
-		{
-			RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-				SummonRangeMax->GetComponentLocation().Z + ZSummonOffSet);
-
-			Distance = (SummonRangeMin->GetComponentLocation() - RandLocation).Size();
-
-		} while (Distance < SummonRangeMin->GetScaledSphereRadius());
-
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+	}
+
+	if (BBC != nullptr)
+	{
+		BBC->SetValueAsInt("IsSummoning", false);
 	}
 
 }
@@ -196,6 +708,16 @@ void ABoss::MissileAttack()
 	}
 }
 
+void ABoss::ShouldEndPhase1()
+{
+	if (HandsAlive() == 0)
+	{
+		CurrentAttack == BossAttacks::Waiting;
+
+		ChangePhase();
+	}
+}
+
 void ABoss::ProjectileAttack()
 {
 	FActorSpawnParameters spawnParams;
@@ -223,6 +745,7 @@ void ABoss::ProjectileAttack()
 
 void ABoss::ChangePhase()
 {
+	CurrentAttack = BossAttacks::Waiting;
 	Phase += 1;
 	if (BBC != nullptr)
 	{
@@ -302,6 +825,38 @@ void ABoss::HarponSpawn()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Kill more enemies"));
+	}
+}
+
+void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!ShouldDamage)
+	{
+		return;
+	}
+
+	if (OtherActor == nullptr)
+	{
+		return;
+	}
+
+	if (OtherActor->ActorHasTag("Ground"))
+	{
+		HasHandHitGround = true;
+		ShouldDamage = false;
+	}
+
+	if (OtherActor->ActorHasTag("Player"))
+	{
+		if (OtherComp == nullptr)
+		{
+			return;
+		}
+
+		if (OtherComp->ComponentHasTag("Ignore"))
+		{
+			return;
+		}
 	}
 }
 	

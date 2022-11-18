@@ -74,7 +74,7 @@ void APlayerCharacter::BeginPlay()
 
 	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
 
 	//Giving Hook Points Grappling Hook
 	if (HookPoints != nullptr)
@@ -98,8 +98,10 @@ void APlayerCharacter::BeginPlay()
 		{
 			//this may spawn the ice shotgun twice. gotta check this
 			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
 			allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+
+			//FAttachmentTransformRules::LocationRule
 		}
 	}
 	CurrentRangedWeapon = allRangedWeapons[0];
@@ -285,7 +287,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::GroundPound);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Pressed, this, &APlayerCharacter::RangedAttack);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Released, this, &APlayerCharacter::RangedAttackEnd);
-	PlayerInputComponent->BindAction(TEXT("SecondaryAttack"), IE_Pressed, this, &APlayerCharacter::SecondaryAttack);
+	//Removed for now as we are cutting scope on the weapons
+	/*PlayerInputComponent->BindAction(TEXT("SecondaryAttack"), IE_Pressed, this, &APlayerCharacter::SecondaryAttack);*/
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &APlayerCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
@@ -653,13 +656,14 @@ void APlayerCharacter::ComboDamage()
 
 void APlayerCharacter::SecondaryAttack()
 {
-	if (Allow)
+	//removing secondary attack for now as we are cutting scope
+	/*if (Allow)
 	{
 		if (CurrentRangedWeapon != nullptr)
 		{
 			CurrentRangedWeapon->SecondaryAttack();
 		}
-	}
+	}*/
 }
 
 void APlayerCharacter::Dialogue()
