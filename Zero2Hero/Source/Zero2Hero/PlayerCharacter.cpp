@@ -131,6 +131,15 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (CurrentRangedWeapon->GetCamera() == nullptr)
+	{
+		for (int i = 0; i < allRangedWeapons.Num(); i++)
+		{
+			allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+		}
+	}
+
 	if (!hasWallJumped && !isWallJumping)
 	{
 		WalljumpCheck();
