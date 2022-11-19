@@ -27,7 +27,7 @@ void ADamageable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (isDead)
+	if (isDead && !beingRevived)
 	{
 		AnimationTimer += DeltaTime;
 		if (AnimationTime <= AnimationTimer)
@@ -66,6 +66,21 @@ bool ADamageable::GetIsDead()
 	return isDead;
 }
 
+bool ADamageable::GetBeingRevived()
+{
+	return beingRevived;
+}
+
+void ADamageable::SetBeingRevived(bool newRevive)
+{
+	beingRevived = newRevive;
+}
+
+void ADamageable::SetIsDead(bool newDead)
+{
+	isDead = newDead;
+}
+
 
 float ADamageable::GetHealth()
 {
@@ -94,6 +109,11 @@ void ADamageable::DecreaseHealth(int amount)
 		PlayerDamaged();
 	}
 	CheckDeath();
+}
+
+void ADamageable::SetHealth(int amount)
+{
+	Health = amount;
 }
 
 void ADamageable::CheckDeath()
@@ -143,6 +163,11 @@ void ADamageable::CheckDeath()
 	void ADamageable::SetEnemyPair(ADamageable* newPair)
 	{
 		PairedEnemy = newPair;
+	}
+
+	void ADamageable::SetShielded(bool shield)
+	{
+		isShielded = shield;
 	}
 
 	void ADamageable::UnPair()
