@@ -25,11 +25,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ice Shotgun")
 		int IcicleNumber;
-	UPROPERTY(EditAnywhere, Category = "Ice Shotgun")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ice Shotgun")
 		float CanShootDelay = 2;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		float CanShootTimer = 0;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool CanShoot = true;
 public:	
 	// Called every frame
