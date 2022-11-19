@@ -162,10 +162,7 @@ void ABoss::Tick(float DeltaTime)
 		}
 		case BossAttacks::P1AoE1:
 		{
-			if (FirstAnimFinished)
-			{
-				AoE1TimerBetweenSpawns += DeltaTime;
-			}
+			AoE1TimerBetweenSpawns += DeltaTime;
 			AoE1();
 			ShouldEndPhase1();
 			break;
@@ -174,10 +171,7 @@ void ABoss::Tick(float DeltaTime)
 		//Phase 2 Attacks
 		case BossAttacks::P2RegularProjectile:
 		{
-			if (FirstAnimFinished)
-			{
-				RegularProjectileFireTimer += DeltaTime;
-			}
+			RegularProjectileFireTimer += DeltaTime;
 			ProjectileAttack();
 			break;
 		}
@@ -347,28 +341,38 @@ void ABoss::Melee2aRight()
 
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
+		FirstAnimFinished = true;
 		HasHandHitGround = true;
 		ShouldDamage = false;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
 
 		if (MeleeAttack2aRightTimeDown <= MeleeAttack2aRightTimer)
 		{
-			MeleeAttack2aRightTimer = 0;
-			HasPlayed = false;
-			HasHandHitGround = false;
-
-			if (HandsAlive() == 2)
+			if (!GetMesh()->IsPlaying() && FirstAnimFinished && !SecondAnimStarted)
 			{
-				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
-			}
-			else
-			{
-				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
+				GetMesh()->PlayAnimation(MeleeAttack2bRightReturn, false);
+				SecondAnimStarted = true;
 			}
 
-			if (BBC != nullptr)
+			if (!GetMesh()->IsPlaying() && SecondAnimStarted)
 			{
-				BBC->SetValueAsInt("IsAttacking", false);
+				MeleeAttack2aRightTimer = 0;
+				HasPlayed = false;
+				HasHandHitGround = false;
+
+				if (HandsAlive() == 2)
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
+				}
+				else
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
+				}
+
+				if (BBC != nullptr)
+				{
+					BBC->SetValueAsInt("IsAttacking", false);
+				}
 			}
 		}
 	}
@@ -411,7 +415,7 @@ void ABoss::Melee2aLeft()
 				SecondAnimStarted = true;
 			}
 
-			if (GetMesh()->IsPlaying())
+			if (!GetMesh()->IsPlaying() && SecondAnimStarted)
 			{
 				FirstAnimFinished = false;
 				SecondAnimStarted = false;
@@ -441,21 +445,16 @@ void ABoss::CalculateHandLocation()
 	HandDownLocation = Player->GetActorLocation();
 
 	FVector LineTraceEnd = FVector(Player->GetActorLocation().X, Player->GetActorLocation().Y, Player->GetActorLocation().Z - DistanceTrace);
-	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(Player);
 
 	FHitResult Hit;
-	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, Player->GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
 	//DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 5.0f, 0, 5);
-
-	if (Hit.GetActor() != nullptr)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, Hit.GetActor()->GetFName().ToString());
-	}
 
 	if (Hit.IsValidBlockingHit())
 	{
-		HandDownLocation.Z = Hit.GetActor()->GetActorLocation().Z;
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Z Location Change"));
+		HandDownLocation.Z = Hit.ImpactPoint.Z;
 	}
 }
 
@@ -463,7 +462,7 @@ void ABoss::Melee2bRight()
 {
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap Begin"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap Begin"));
 		ShouldDamage = true;
 		CalculateHandLocation();
 		GetMesh()->PlayAnimation(MeleeAttack2bRightTo, false);
@@ -478,7 +477,7 @@ void ABoss::Melee2bRight()
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
 		FirstAnimFinished = true;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap End"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap End"));
 		ShockWave();
 		ShouldDamage = false;
 
@@ -490,7 +489,7 @@ void ABoss::Melee2bRight()
 				SecondAnimStarted = true;
 			}
 
-			if (GetMesh()->IsPlaying())
+			if (!GetMesh()->IsPlaying() && SecondAnimStarted)
 			{
 				FirstAnimFinished = false;
 				SecondAnimStarted = false;

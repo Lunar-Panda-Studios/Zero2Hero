@@ -100,14 +100,10 @@ protected:
 	//Phase 1 - Melee Attack 1 Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
 		UAnimSequence* MeleeAttack1RightTo;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
-		UAnimSequence* MeleeAttack1RightReturn;
 
 	//Phase 1 - Melee Attack 1 Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
 		UAnimSequence* MeleeAttack1LeftTo;
-	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
-		UAnimSequence* MeleeAttack1LeftReturn;
 
 	//Phase 1 - Melee Attack 2a Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")

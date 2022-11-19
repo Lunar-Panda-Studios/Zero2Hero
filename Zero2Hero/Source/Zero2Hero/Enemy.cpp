@@ -202,6 +202,36 @@ UNiagaraComponent* AEnemy::GetNiagaraComp()
 	return NiagaraComp;
 }
 
+float AEnemy::GetMovementSpeed()
+{
+	return MovementSpeed;
+}
+
+bool AEnemy::GetShouldMove()
+{
+	return ShouldMove;
+}
+
+bool AEnemy::GetZMoveToAtStart()
+{
+	return ZMoveAtStart;
+}
+
+float AEnemy::GetDistanceFromGround()
+{
+	return DistanceFromGround;
+}
+
+void AEnemy::SetZMoveAtStart(bool newMoveAtStart)
+{
+	ZMoveAtStart = newMoveAtStart;
+}
+
+void AEnemy::SetStartZ(float newZ)
+{
+	DistanceFromGround = newZ;
+}
+
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr)
@@ -266,12 +296,8 @@ void AEnemy::OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 bool AEnemy::IsPositionReachable(FVector Position) 
 {
 	FVector PathStart = GetActorLocation();
-	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
 
-	if (!NavPath)
-	{
-		return false;
-	}
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
 
 	return !NavPath->IsPartial();
 }
