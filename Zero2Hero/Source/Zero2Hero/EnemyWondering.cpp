@@ -44,6 +44,11 @@ float AEnemyWondering::GetYRadius()
 	return YRadius;
 }
 
+float AEnemyWondering::GetZRadius()
+{
+	return ZRadius;
+}
+
 FVector AEnemyWondering::GetStartLocation()
 {
 	return StartLocation;
