@@ -46,9 +46,9 @@ protected:
 		UBehaviorTreeComponent* BTC;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float MovementSpeed = 600.0f;
-	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float CombatMovementSpeed;
+		float MovementSpeed = 10.0f;
+	//UPROPERTY(EditAnywhere, Category = "Enemy Stats")
+	//	float CombatMovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackCooldown;
 	UPROPERTY()
@@ -77,6 +77,14 @@ protected:
 		bool OnFire = false;
 	UPROPERTY()
 		int FlameDamage;
+	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
+		bool ShouldMove = true;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float DistanceFromGround = 0.0f;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float RaydownLength = 1000.0f;
+	UPROPERTY()
+		bool ZMoveAtStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -110,6 +118,18 @@ public:
 		bool GetInRange();
 	UFUNCTION()
 		UNiagaraComponent* GetNiagaraComp();
+	UFUNCTION()
+		float GetMovementSpeed();
+	UFUNCTION()
+		bool GetShouldMove();
+	UFUNCTION()
+		bool GetZMoveToAtStart();
+	UFUNCTION()
+		float GetDistanceFromGround();
+	UFUNCTION()
+		void SetZMoveAtStart(bool newMoveAtStart);
+	UFUNCTION()
+		void SetStartZ(float newZ);
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);

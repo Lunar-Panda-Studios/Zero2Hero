@@ -81,8 +81,15 @@ void ACannonFodder::Tick(float DeltaTime)
 			}
 			else
 			{
-				if (InRange)
+				if (InRange || shouldExplode)
 				{
+					shouldExplode = true;
+
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", true);
+					}
+
 					Timer += DeltaTime;
 
 					if (Timer >= TimeToExplode)
@@ -92,7 +99,10 @@ void ACannonFodder::Tick(float DeltaTime)
 				}
 				else
 				{
-					Timer = 0;
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", false);
+					}
 				}
 			}
 		}
@@ -110,7 +120,7 @@ void ACannonFodder::Explode()
 {
 	BlastRadius->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//SetLifeSpan(AnimationTimer);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
 	Destroy();
 
 }
