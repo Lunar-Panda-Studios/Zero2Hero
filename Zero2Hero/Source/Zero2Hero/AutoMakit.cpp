@@ -19,6 +19,27 @@ void AAutoMakit::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (DistanceFromGround != 0)
+	{
+		FVector EndPoint = GetActorLocation();
+		EndPoint.Z -= RaydownLength;
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this);
+		FHitResult Hit;
+
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), EndPoint, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
+
+		if (Hit.IsValidBlockingHit())
+		{
+			DistanceFromGround += Hit.ImpactPoint.Z;
+			ZMoveAtStart = true;
+		}
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("FlyToZ", ZMoveAtStart);
+		}
+	}
 }
 
 // Called every frame
@@ -28,6 +49,21 @@ void AAutoMakit::Tick(float DeltaTime)
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		if (ZMoveAtStart)
+		{
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsBool("FlyToZ", ZMoveAtStart);
+			}
+
+		}
+
+		//	if (GetActorLocation().Z == DistanceFromGround)
+		//	{
+		//		ZMoveAtStart = false;
+		//	}
+		//}
+
 		if (InRange)
 		{
 			AttackSpeedTimer += DeltaTime;

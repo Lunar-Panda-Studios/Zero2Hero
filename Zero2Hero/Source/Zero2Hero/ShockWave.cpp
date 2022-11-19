@@ -56,7 +56,7 @@ void AShockWave::OnOverlapInner(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (!OtherComp->ComponentHasTag("Ignore"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("No Damage"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("No Damage"));
 			CanDamage = false;
 		}
 	}
@@ -78,7 +78,7 @@ void AShockWave::OnOverlapInnerEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		if (!OtherComp->ComponentHasTag("Ignore"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Can Damage"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Can Damage"));
 			CanDamage = true;
 		}
 	}
@@ -105,7 +105,7 @@ void AShockWave::OnOverlapOuter(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (!OtherComp->ComponentHasTag("Ignore"))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Take Damage"));
 			Cast<ADamageable>(GetWorld()->GetFirstPlayerController()->GetPawn())->DecreaseHealth(Damage);
 		}
 	}
