@@ -23,7 +23,7 @@ void AProjectile::BeginPlay()
 	MainBody->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnComponentOverlap);
 	//MainBody->OnComponentHit.AddDynamic(this, &AProjectile::OnComponentHit);
 
-	SetLifeSpan(10);
+	SetLifeSpan(LifeSpan);
 
 }
 
@@ -31,6 +31,11 @@ void AProjectile::BeginPlay()
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
+	{
+		Destroy();
+	}
 
 }
 
@@ -85,7 +90,7 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 					if (OtherDamageable->GetShieldType() == ElementType)
 					{
 						OtherDamageable->DecreaseHealth(Damage);
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
+						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through regular shield"));
 					}
 				}
 				else
@@ -93,7 +98,7 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 					if (OtherDamageable->GetShieldType() != ElementType)
 					{
 						OtherDamageable->DecreaseHealth(Damage);
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
+						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Through reflect shield"));
 					}
 					else
 					{
@@ -102,7 +107,7 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 						Player->DecreaseHealth(Damage);
 
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
+						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Recoil Damage"));
 
 					}
 				}
@@ -111,7 +116,7 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 			{
 				OtherDamageable->DecreaseHealth(Damage);
 
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 			}
 		}
 
@@ -121,7 +126,7 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 	else
 	{
-		if (OtherActor->ActorHasTag("Enemy"))
+		if (OtherActor->ActorHasTag("Enemy") && !isHomingMissile)
 		{
 			return;
 		}
@@ -135,12 +140,12 @@ void AProjectile::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, A
 		}
 		if (!OtherComp->ComponentHasTag("Ignore"))
 		{
-			if (OtherActor->ActorHasTag("Player"))
+			if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Enemy"))
 			{
 				ADamageable* OtherDamageable = Cast<ADamageable>(OtherActor);
 				OtherDamageable->DecreaseHealth(Damage);
 
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Enemy Projectile"));
 			}
 			HasDestruct = true;
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Destroy Projectil"));

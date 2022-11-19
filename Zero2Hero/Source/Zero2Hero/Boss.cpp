@@ -57,130 +57,151 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (BBC != nullptr)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		BBC->SetValueAsInt("Phase", Phase);
-	}
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsInt("Phase", Phase);
+		}
 
-	if (CurrentAttack == BossAttacks::Waiting)
-	{
-		switch (Phase)
+		if (CurrentAttack == BossAttacks::Waiting)
 		{
-		case 0:
-		{
-			ChangePhase();
-			break;
-		}
-		case 1:
-		{
-			CurrentAttack = BossAttacks::P1Melee1L;
-			break;
-		}
-		case 2:
-		{
-			if (SummonedEnemies.Num() == 0)
+			switch (Phase)
 			{
-				if (!HarponPiece1Spawned)
-				{
-					CurrentAttack = BossAttacks::P2SummonV1;
-					SummonType1();
-				}
-				else
-				{
-					CurrentAttack = BossAttacks::P2SummonV2;
-					SummonType2();
-				}
+			case 0:
+			{
+				ChangePhase();
+				break;
 			}
-			Phase2AttackChoice();
-			HarponSpawn();
+			case 1:
+			{
+				CurrentAttack = BossAttacks::P1Melee1L;
+				break;
+			}
+			case 2:
+			{
+				if (SummonedEnemies.Num() == 0)
+				{
+					if (!HarponPiece1Spawned)
+					{
+						CurrentAttack = BossAttacks::P2SummonV1;
+						SummonType1();
+					}
+					else
+					{
+						CurrentAttack = BossAttacks::P2SummonV2;
+						SummonType2();
+					}
+				}
+				Phase2AttackChoice();
+				HarponSpawn();
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
+		}
+
+		switch (CurrentAttack)
+		{
+			//Phase 1 Attacks
+		case BossAttacks::P1Melee1L:
+		{
+
+			Melee1Left();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1Melee1R:
+		{
+			Melee1Right();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1Melee2aL:
+		{
+			if (FirstAnimFinished)
+			{
+				MeleeAttack2aLeftTimer += DeltaTime;
+			}
+			Melee2aLeft();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1Melee2aR:
+		{
+			if (FirstAnimFinished)
+			{
+				MeleeAttack2aRightTimer += DeltaTime;
+			}
+			Melee2aRight();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1Melee2bL:
+		{
+			if (FirstAnimFinished)
+			{
+				MeleeAttack2bLeftTimer += DeltaTime;
+			}
+			Melee2bLeft();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1Melee2bR:
+		{
+			if (FirstAnimFinished)
+			{
+				MeleeAttack2bRightTimer += DeltaTime;
+			}
+			Melee2bRight();
+			ShouldEndPhase1();
+			break;
+		}
+		case BossAttacks::P1AoE1:
+		{
+			if (FirstAnimFinished)
+			{
+				AoE1TimerBetweenSpawns += DeltaTime;
+			}
+			AoE1();
+			ShouldEndPhase1();
+			break;
+		}
+
+		//Phase 2 Attacks
+		case BossAttacks::P2RegularProjectile:
+		{
+			if (FirstAnimFinished)
+			{
+				RegularProjectileFireTimer += DeltaTime;
+			}
+			ProjectileAttack();
+			break;
+		}
+		case BossAttacks::P2MissileProjectile:
+		{
+			MissileAttack();
+			break;
+		}
+		case BossAttacks::P2SummonV1:
+		{
+			SummonType1();
+			break;
+		}
+		case BossAttacks::P2SummonV2:
+		{
+			SummonType2();
 			break;
 		}
 		default:
 		{
 			break;
 		}
+
 		}
-	}
-
-	switch (CurrentAttack)
-	{
-	//Phase 1 Attacks
-	case BossAttacks::P1Melee1L:
-	{
-
-		Melee1Left();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1Melee1R:
-	{
-		Melee1Right();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1Melee2aL:
-	{
-		MeleeAttack2aLeftTimer += DeltaTime;
-		Melee2aLeft();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1Melee2aR:
-	{
-		MeleeAttack2aRightTimer += DeltaTime;
-		Melee2aRight();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1Melee2bL:
-	{
-		MeleeAttack2bLeftTimer += DeltaTime;
-		Melee2bLeft();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1Melee2bR:
-	{
-		MeleeAttack2bRightTimer += DeltaTime;
-		Melee2bRight();
-		ShouldEndPhase1();
-		break;
-	}
-	case BossAttacks::P1AoE1:
-	{
-		AoE1TimerBetweenSpawns += DeltaTime;
-		AoE1();
-		ShouldEndPhase1();
-		break;
-	}
-
-	//Phase 2 Attacks
-	case BossAttacks::P2RegularProjectile:
-	{
-		RegularProjectileFireTimer += DeltaTime;
-		ProjectileAttack();
-		break;
-	}
-	case BossAttacks::P2MissileProjectile:
-	{
-		MissileAttack();
-		break;
-	}
-	case BossAttacks::P2SummonV1:
-	{
-		SummonType1();
-		break;
-	}
-	case BossAttacks::P2SummonV2:
-	{
-		SummonType2();
-		break;
-	}
-	default:
-	{
-		break;
-	}
-		
 	}
 }
 
@@ -216,7 +237,7 @@ void ABoss::Melee1Right()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep Begin"));
 		ShouldDamage = true;
-		GetMesh()->PlayAnimation(MeleeAttack1Right, false);
+		GetMesh()->PlayAnimation(MeleeAttack1RightTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -266,7 +287,7 @@ void ABoss::Melee1Left()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep Begin"));
 		ShouldDamage = true;
-		GetMesh()->PlayAnimation(MeleeAttack1Left, false);
+		GetMesh()->PlayAnimation(MeleeAttack1LeftTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -314,7 +335,7 @@ void ABoss::Melee2aRight()
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
 		ShouldDamage = true;
-		GetMesh()->PlayAnimation(MeleeAttack2aRight, false);
+		GetMesh()->PlayAnimation(MeleeAttack2aRightTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -367,7 +388,7 @@ void ABoss::Melee2aLeft()
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
 		ShouldDamage = true;
-		GetMesh()->PlayAnimation(MeleeAttack2aLeft, false);
+		GetMesh()->PlayAnimation(MeleeAttack2aLeftTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -379,24 +400,36 @@ void ABoss::Melee2aLeft()
 
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
+		FirstAnimFinished = true;
 		ShouldDamage = false;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist End"));
 		if (MeleeAttack2aLeftTimeDown <= MeleeAttack2aLeftTimer)
 		{
-			MeleeAttack2aLeftTimer = 0;
-			HasPlayed = false;
-			if (HandsAlive() == 2)
+			if (!GetMesh()->IsPlaying() && FirstAnimFinished && !SecondAnimStarted)
 			{
-				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
-			}
-			else
-			{
-				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
+				GetMesh()->PlayAnimation(MeleeAttack2aLeftReturn, false);
+				SecondAnimStarted = true;
 			}
 
-			if (BBC != nullptr)
+			if (GetMesh()->IsPlaying())
 			{
-				BBC->SetValueAsInt("IsAttacking", false);
+				FirstAnimFinished = false;
+				SecondAnimStarted = false;
+				MeleeAttack2aLeftTimer = 0;
+				HasPlayed = false;
+				if (HandsAlive() == 2)
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bR;
+				}
+				else
+				{
+					CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1Melee2bL;
+				}
+
+				if (BBC != nullptr)
+				{
+					BBC->SetValueAsInt("IsAttacking", false);
+				}
 			}
 		}
 	}
@@ -433,7 +466,7 @@ void ABoss::Melee2bRight()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap Begin"));
 		ShouldDamage = true;
 		CalculateHandLocation();
-		GetMesh()->PlayAnimation(MeleeAttack2bRight, false);
+		GetMesh()->PlayAnimation(MeleeAttack2bRightTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -444,18 +477,31 @@ void ABoss::Melee2bRight()
 
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
+		FirstAnimFinished = true;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Slap End"));
 		ShockWave();
 		ShouldDamage = false;
+
 		if (MeleeAttack2bRightTimeDown <= MeleeAttack2bRightTimer)
 		{
-			MeleeAttack2bRightTimer = 0;
-			HasPlayed = false;
-			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
-
-			if (BBC != nullptr)
+			if (!GetMesh()->IsPlaying() && FirstAnimFinished && !SecondAnimStarted)
 			{
-				BBC->SetValueAsInt("IsAttacking", false);
+				GetMesh()->PlayAnimation(MeleeAttack2bRightReturn, false);
+				SecondAnimStarted = true;
+			}
+
+			if (GetMesh()->IsPlaying())
+			{
+				FirstAnimFinished = false;
+				SecondAnimStarted = false;
+				MeleeAttack2bRightTimer = 0;
+				HasPlayed = false;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
+
+				if (BBC != nullptr)
+				{
+					BBC->SetValueAsInt("IsAttacking", false);
+				}
 			}
 		}
 	}
@@ -468,7 +514,7 @@ void ABoss::Melee2bLeft()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap Begin"));
 		ShouldDamage = true;
 		CalculateHandLocation();
-		GetMesh()->PlayAnimation(MeleeAttack2bLeft, false);
+		GetMesh()->PlayAnimation(MeleeAttack2bLeftTo, false);
 		HasPlayed = true;
 
 		if (BBC != nullptr)
@@ -477,20 +523,33 @@ void ABoss::Melee2bLeft()
 		}
 	}
 
-	if (!GetMesh()->IsPlaying() && HasPlayed)
+	if (!GetMesh()->IsPlaying() && HasPlayed || FirstAnimFinished)
 	{
+		FirstAnimFinished = true;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap End"));
 		ShockWave();
 		ShouldDamage = false;
+
 		if (MeleeAttack2bLeftTimeDown <= MeleeAttack2bLeftTimer)
 		{
-			MeleeAttack2bLeftTimer = 0;
-			HasPlayed = false;
-			CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
-
-			if (BBC != nullptr)
+			if (!GetMesh()->IsPlaying() && FirstAnimFinished && !SecondAnimStarted)
 			{
-				BBC->SetValueAsInt("IsAttacking", false);
+				GetMesh()->PlayAnimation(MeleeAttack2bLeftReturn, false);
+				SecondAnimStarted = true;
+			}
+
+			if (!GetMesh()->IsPlaying() && SecondAnimStarted)
+			{
+				FirstAnimFinished = false;
+				SecondAnimStarted = false;
+				MeleeAttack2bLeftTimer = 0;
+				HasPlayed = false;
+				CurrentAttack = CurrentAttack == BossAttacks::Waiting ? BossAttacks::Waiting : BossAttacks::P1AoE1;
+
+				if (BBC != nullptr)
+				{
+					BBC->SetValueAsInt("IsAttacking", false);
+				}
 			}
 		}
 	}
