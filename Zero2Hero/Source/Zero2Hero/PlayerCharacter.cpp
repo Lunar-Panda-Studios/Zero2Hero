@@ -592,6 +592,7 @@ void APlayerCharacter::RangedAttack()
 		{
 			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
 			SetActorRotation(Rotator);
+			CurrentRangedWeapon->OnFire();
 			CurrentRangedWeapon->PrimaryAttack();
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
 		}
