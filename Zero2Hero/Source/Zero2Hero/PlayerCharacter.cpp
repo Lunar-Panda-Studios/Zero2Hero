@@ -74,7 +74,7 @@ void APlayerCharacter::BeginPlay()
 
 	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
+	//GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
 	//GrapplingHook->SetActorHiddenInGame(true);
 
 	//Giving Hook Points Grappling Hook
