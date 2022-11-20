@@ -4,29 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/SphereComponent.h"
-#include "FireBomb.generated.h"
+#include "Enemy.h"
+#include "EventZoneLink.generated.h"
 
 UCLASS()
-class ZERO2HERO_API AFireBomb : public AActor
+class ZERO2HERO_API AEventZoneLink : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AFireBomb();
+	AEventZoneLink();
+
+	UPROPERTY(BlueprintReadWrite)
+		TArray<AEnemy*> enemies;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float radius = 1000.0f;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float radius = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float damage = 0;
-
-	UPROPERTY(EditAnywhere)
-		USphereComponent* sphere;
 
 	UPROPERTY()
 		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
@@ -36,11 +32,11 @@ protected:
 		TArray<AActor*> actors;
 	UPROPERTY()
 		UClass* seekClass;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	UFUNCTION()
-		void OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector normalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void AllEnemiesKilled();
 
 };
