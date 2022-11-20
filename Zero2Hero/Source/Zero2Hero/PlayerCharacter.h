@@ -301,4 +301,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void GrappleEnd();
+
+	UFUNCTION(BlueprintCallable)
+		void SetPlayerVisability(bool ShouldHide);
 };
