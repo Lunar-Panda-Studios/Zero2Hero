@@ -74,7 +74,7 @@ void APlayerCharacter::BeginPlay()
 
 	//Gives Grapple Hook
 	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
 
 	//Giving Hook Points Grappling Hook
 	if (HookPoints != nullptr)
@@ -98,8 +98,10 @@ void APlayerCharacter::BeginPlay()
 		{
 			//this may spawn the ice shotgun twice. gotta check this
 			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
 			allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+
+			//FAttachmentTransformRules::LocationRule
 		}
 	}
 	CurrentRangedWeapon = allRangedWeapons[0];
