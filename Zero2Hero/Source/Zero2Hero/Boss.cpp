@@ -34,18 +34,6 @@ void ABoss::BeginPlay()
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
 
-	if (LeftHandCrystalBP != nullptr)
-	{
-		LeftHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(LeftHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LeftHandCrystalSocket);
-	}
-
-	if (RightHandCrystalBP != nullptr)
-	{
-		RightHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(RightHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandCrystalSocket);
-	}
-
 	if (BBC != nullptr)
 	{
 		BBC->SetValueAsInt("Phase", Phase);

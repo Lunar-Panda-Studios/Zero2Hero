@@ -69,9 +69,9 @@ protected:
 		FName LeftHandCrystalSocket;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		FName RightHandCrystalSocket;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* LeftHandCrystal;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* RightHandCrystal;
 	UPROPERTY()
 		bool HasPlayed = false;
