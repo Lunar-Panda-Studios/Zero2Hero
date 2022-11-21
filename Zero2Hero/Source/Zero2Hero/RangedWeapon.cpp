@@ -140,6 +140,11 @@ float ARangedWeapon::GetTimeToReload()
 	return TimeToReload;
 }
 
+ACamera* ARangedWeapon::GetCamera()
+{
+	return Camera;
+}
+
 void ARangedWeapon::SetCamera(ACamera* newCamera)
 {
 	Camera = newCamera;
