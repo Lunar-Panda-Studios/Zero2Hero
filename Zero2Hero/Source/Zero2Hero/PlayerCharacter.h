@@ -191,7 +191,7 @@ protected:
 	UPROPERTY()
 		int latestWallRunDir = 0;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isWallJumping = false;
 	UPROPERTY()
 		bool hasWallJumped = false;
