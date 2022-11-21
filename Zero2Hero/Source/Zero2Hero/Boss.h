@@ -46,9 +46,9 @@ protected:
 	void BeginPlay();
 
 	//Misc
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationLeft;
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
 		int Phase = 1;

@@ -27,8 +27,6 @@ void ABoss::BeginPlay()
 	//Will need changing to Skeletal Mesh
 	BodyMesh = FindComponentByClass<UStaticMeshComponent>();
 
-	//GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
-
 	//Spawn Params
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
@@ -197,8 +195,8 @@ FVector ABoss::CalculateSpawnLocation()
 
 	do
 	{
-		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-			GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-MaxRange, MaxRange),
+			GetActorLocation().Y + FMath::RandRange(-MaxRange, MaxRange),
 			SummonRangeMax->GetComponentLocation().Z);
 
 		FVector CompareLocation = SummonRangeMin->GetComponentLocation();
@@ -330,7 +328,7 @@ void ABoss::Melee2aRight()
 		FirstAnimFinished = true;
 		HasHandHitGround = true;
 		ShouldDamage = false;
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
 
 		if (MeleeAttack2aRightTimeDown <= MeleeAttack2aRightTimer)
 		{
