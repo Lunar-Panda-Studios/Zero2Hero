@@ -192,6 +192,9 @@ FVector ABoss::CalculateSpawnLocation()
 	FVector RandLocation;
 	float Distance;
 
+	float MaxRange = SummonRangeMax->GetScaledSphereRadius();
+	float MinRange = SummonRangeMin->GetScaledSphereRadius();
+
 	do
 	{
 		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
@@ -203,7 +206,7 @@ FVector ABoss::CalculateSpawnLocation()
 
 		Distance = (CompareLocation - RandLocation).Size();
 
-	} while (Distance < SummonRangeMin->GetScaledSphereRadius());
+	} while (Distance < MinRange || Distance > MaxRange);
 
 	return RandLocation;
 }
