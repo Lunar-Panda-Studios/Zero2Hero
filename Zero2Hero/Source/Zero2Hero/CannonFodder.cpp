@@ -62,6 +62,7 @@ void ACannonFodder::Tick(float DeltaTime)
 			{
 				if (InRange && AttackSpeedTimer == 0)
 				{
+					OnAttack();
 					MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 				}
 				else
