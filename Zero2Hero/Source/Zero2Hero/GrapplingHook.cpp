@@ -44,6 +44,10 @@ void AGrapplingHook::Tick(float DeltaTime)
 
 bool AGrapplingHook::Fire()
 {
+	if (!isEnabled)
+	{
+		return false;
+	}
 	FVector LineTraceEnd = GrapplePoint->GetActorLocation();
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(this->GetOwner());

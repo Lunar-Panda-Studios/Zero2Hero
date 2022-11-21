@@ -55,7 +55,7 @@ protected:
 		UGameManager* Manager;
 	UPROPERTY()
 		bool Allow = true;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool DropAmmo = false;
 	UPROPERTY()
 		TSubclassOf<AActor> SpawnOnDeath;
