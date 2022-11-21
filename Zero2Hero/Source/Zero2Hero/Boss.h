@@ -172,6 +172,17 @@ protected:
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
+	UPROPERTY()
+		bool SpawnSet = false;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool Harpoon1Launched = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool Harpoon2Launched = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool isActiveMissile = true;
+	UPROPERTY(BlueprintReadWrite)
+		bool isActiveRegProjectile = true;
 
 	//Phase 2 - Summon1
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 1")
