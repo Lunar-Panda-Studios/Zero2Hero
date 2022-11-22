@@ -852,19 +852,6 @@ void APlayerCharacter::GrappleTo()
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 
-void APlayerCharacter::DropExcessAmmo()
-{
-	for(ARangedWeapon* Weapon:allRangedWeapons)
-	{
-		for (int i = 1; i < Weapon->GetAmmo(); i++)
-		{
-			//Drop ammo in random spots in radius
-
-			//GetWorld()->SpawnActor<AActor>(AmmoDrop)
-		}
-	}
-}
-
 void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
 {
 	SetActorHiddenInGame(ShouldHide);
