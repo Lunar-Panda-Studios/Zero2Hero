@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
-		int Phase = 1;
+		int Phase = 2;
 	UPROPERTY()
 		TEnumAsByte<BossAttacks> CurrentAttack = BossAttacks::Waiting;
 	//Will need changing to Skeletal Mesh later
@@ -187,18 +187,20 @@ protected:
 	UPROPERTY()
 		bool SpawnSet = false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher1Fixed = false;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher2Fixed = false;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Harpoon1Launched = false;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Harpoon2Launched = false;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isActiveMissile = true;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isActiveRegProjectile = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool ReadyToSpawn = true;
 
 	//Phase 2 - Summon1
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 1")
@@ -229,6 +231,10 @@ protected:
 		AHomingMissile* Missile;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Missile Projectile")
 		int MissileDamage;
+	UPROPERTY()
+		float TimerToNext = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Missile Projectile")
+		float TimeToNext = 2.0f;
 
 	//Phase 2 - Regular Projectile
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Regular Projectile")
