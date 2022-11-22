@@ -68,7 +68,7 @@ void ABoss::Tick(float DeltaTime)
 			{
 				if (SummonedEnemies.Num() == 0)
 				{
-					if (!HarponPiece1Spawned)
+					if ((!Launcher1Fixed || !Launcher2Fixed) && (!Harpoon1Launched || Harpoon1Launched && !Harpoon2Launched))
 					{
 						CurrentAttack = BossAttacks::P2SummonV1;
 						SummonType1();
@@ -213,7 +213,7 @@ void ABoss::Melee1Right()
 {
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep Begin"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep Begin"));
 		ShouldDamage = true;
 		GetMesh()->PlayAnimation(MeleeAttack1RightTo, false);
 		HasPlayed = true;
@@ -226,7 +226,7 @@ void ABoss::Melee1Right()
 
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep End"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Sweep End"));
 		HasPlayed = false;
 		ShouldDamage = false;
 		if (HandsAlive() == 2)
@@ -263,7 +263,7 @@ void ABoss::Melee1Left()
 {
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep Begin"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep Begin"));
 		ShouldDamage = true;
 		GetMesh()->PlayAnimation(MeleeAttack1LeftTo, false);
 		HasPlayed = true;
@@ -276,7 +276,7 @@ void ABoss::Melee1Left()
 
 	if (!GetMesh()->IsPlaying() && HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep End"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Sweep End"));
 		HasPlayed = false;
 		ShouldDamage = true;
 		if (HandsAlive() == 2)
@@ -318,7 +318,7 @@ void ABoss::Melee2aRight()
 
 		if (BBC != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Start"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Start"));
 			BBC->SetValueAsInt("IsAttacking", true);
 		}
 	}
@@ -328,7 +328,7 @@ void ABoss::Melee2aRight()
 		FirstAnimFinished = true;
 		HasHandHitGround = true;
 		ShouldDamage = false;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
 
 		if (MeleeAttack2aRightTimeDown <= MeleeAttack2aRightTimer)
 		{
@@ -381,7 +381,7 @@ void ABoss::Melee2aLeft()
 
 		if (BBC != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist Begin"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist Begin"));
 			BBC->SetValueAsInt("IsAttacking", true);
 		}
 	}
@@ -390,7 +390,7 @@ void ABoss::Melee2aLeft()
 	{
 		FirstAnimFinished = true;
 		ShouldDamage = false;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist End"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Fist End"));
 		if (MeleeAttack2aLeftTimeDown <= MeleeAttack2aLeftTimer)
 		{
 			if (!GetMesh()->IsPlaying() && FirstAnimFinished && !SecondAnimStarted)
@@ -494,7 +494,7 @@ void ABoss::Melee2bLeft()
 {
 	if (!GetMesh()->IsPlaying() && !HasPlayed)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap Begin"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap Begin"));
 		ShouldDamage = true;
 		CalculateHandLocation();
 		GetMesh()->PlayAnimation(MeleeAttack2bLeftTo, false);
@@ -509,7 +509,7 @@ void ABoss::Melee2bLeft()
 	if (!GetMesh()->IsPlaying() && HasPlayed || FirstAnimFinished)
 	{
 		FirstAnimFinished = true;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap End"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Left Slap End"));
 		ShockWave();
 		ShouldDamage = false;
 
@@ -727,7 +727,10 @@ void ABoss::MissileAttack()
 
 		Missile = GetWorld()->SpawnActor<AHomingMissile>(MissileBP, FireLocationRight->GetComponentLocation(), Rotation, spawnParams);
 		HasFired = true;
-
+		if (Missile != nullptr)
+		{
+			Missile->Damage = MissileDamage;
+		}
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Missile Spawn"));
 	}
 	else
@@ -776,6 +779,11 @@ void ABoss::ProjectileAttack()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire"));
 
 		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(RegularProjectileBP, FireLocationLeft->GetComponentLocation(), Rotation, spawnParams);
+		if (Projectile != nullptr)
+		{
+			Projectile->Damage = RegProjectileDamage;
+		}
+		
 		RegularProjectileFireTimer = 0;
 		AmountHasFired += 1;
 
@@ -917,6 +925,8 @@ void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	{
 		HasHandHitGround = true;
 		ShouldDamage = false;
+
+		return;
 	}
 
 	if (OtherActor->ActorHasTag("Player"))
@@ -929,6 +939,42 @@ void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 		if (OtherComp->ComponentHasTag("Ignore"))
 		{
 			return;
+		}
+
+		switch (CurrentAttack)
+		{
+		case P1Melee1L:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee1LDamage);
+			break;
+		}
+		case P1Melee1R:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee1RDamage);
+			break;
+		}
+		case P1Melee2aL:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee2aLDamage);
+			break;
+		}
+		case P1Melee2aR:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee2aRDamage);
+			break;
+		}
+		case P1Melee2bL:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee2bLDamage);
+			break;
+		}
+		case P1Melee2bR:
+		{
+			Cast<ADamageable>(OtherActor)->DecreaseHealth(P1Melee2bRDamage);
+			break;
+		}
+		default:
+			break;
 		}
 	}
 }
