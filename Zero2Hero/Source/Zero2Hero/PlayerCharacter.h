@@ -79,7 +79,7 @@ protected:
 		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AGrapplingHook* GrapplingHook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		float GrapplingSpeed;
@@ -191,7 +191,7 @@ protected:
 	UPROPERTY()
 		int latestWallRunDir = 0;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isWallJumping = false;
 	UPROPERTY()
 		bool hasWallJumped = false;

@@ -47,7 +47,7 @@ protected:
 		float TimeToReload = 0.0f;
 	UPROPERTY(BlueprintReadWrite)
 		float TimerReload = 0.0f;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ACamera* Camera;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		float CameraAimDifference = 15.0f;
@@ -87,6 +87,8 @@ public:
 	UFUNCTION()
 		float GetTimeToReload();
 	UFUNCTION()
+		ACamera* GetCamera();
+	UFUNCTION(BlueprintCallable)
 		void SetCamera(ACamera* newCamera);
 	UFUNCTION(BlueprintImplementableEvent)
 		void Reloading();

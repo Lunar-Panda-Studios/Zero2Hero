@@ -150,4 +150,7 @@ public:
 		void SetBlackboard(UBlackboardComponent* Blackboard);
 	UFUNCTION()
 		void SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAttack();
 };

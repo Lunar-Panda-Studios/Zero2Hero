@@ -86,6 +86,8 @@ void AAutoMakit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AAutoMakit::Attack()
 {
+	OnAttack();
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
