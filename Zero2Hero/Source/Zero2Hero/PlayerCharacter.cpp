@@ -220,21 +220,44 @@ void APlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
-	}
 
+	
 	if (isDead)
 	{
+		
 		if (DropAmmo)
 		{
+			
+			
 			DropAmmo = false;
 		}
-
 		Allow = false;
 	}
 }
+
+void APlayerCharacter::DropExcessAmmo()
+{
+	
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+	//u cant spawn 2 things on top of eachother??? wtf
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	for (int i = 0; i < RangedWeapons.Num(); i++)
+	{
+		//after the line below, ammo is still a nullptr. Somethings going wrong with the spawning and i dont know why
+		AHealthAmmoDrop* ammo = GetWorld()->SpawnActor<AHealthAmmoDrop>(AmmoDropBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		if (ammo != nullptr)
+		{
+			ammo->SetAmmo(i, Cast<ARangedWeapon>(allRangedWeapons[i])->GetAmmo());
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("fuck"));
+		}
+	}
+}
+
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -828,19 +851,6 @@ void APlayerCharacter::GrappleTo()
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
 
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
-}
-
-void APlayerCharacter::DropExcessAmmo()
-{
-	for(ARangedWeapon* Weapon:allRangedWeapons)
-	{
-		for (int i = 1; i < Weapon->GetAmmo(); i++)
-		{
-			//Drop ammo in random spots in radius
-
-			//GetWorld()->SpawnActor<AActor>(AmmoDrop)
-		}
-	}
 }
 
 void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
