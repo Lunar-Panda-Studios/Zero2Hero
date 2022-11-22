@@ -46,9 +46,9 @@ protected:
 	void BeginPlay();
 
 	//Misc
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationLeft;
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
 		int Phase = 1;
@@ -69,9 +69,9 @@ protected:
 		FName LeftHandCrystalSocket;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		FName RightHandCrystalSocket;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* LeftHandCrystal;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* RightHandCrystal;
 	UPROPERTY()
 		bool HasPlayed = false;
@@ -91,19 +91,25 @@ protected:
 		TSubclassOf<AShockWave> ShockWaveBP;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		float DistanceTrace = 1000.0f;
+	UPROPERTY()
+		bool FirstAnimFinished = false;
+	UPROPERTY()
+		bool SecondAnimStarted = false;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
-		UAnimSequence* MeleeAttack1Right;
+		UAnimSequence* MeleeAttack1RightTo;
 
 	//Phase 1 - Melee Attack 1 Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
-		UAnimSequence* MeleeAttack1Left;
+		UAnimSequence* MeleeAttack1LeftTo;
 
 	//Phase 1 - Melee Attack 2a Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
-		UAnimSequence* MeleeAttack2aRight;
+		UAnimSequence* MeleeAttack2aRightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
+		UAnimSequence* MeleeAttack2aRightReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
 		float MeleeAttack2aRightTimeDown;
 	UPROPERTY()
@@ -111,7 +117,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2a Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
-		UAnimSequence* MeleeAttack2aLeft;
+		UAnimSequence* MeleeAttack2aLeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
+		UAnimSequence* MeleeAttack2aLeftReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
 		float MeleeAttack2aLeftTimeDown;
 	UPROPERTY()
@@ -119,7 +127,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2b Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
-		UAnimSequence* MeleeAttack2bRight;
+		UAnimSequence* MeleeAttack2bRightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
+		UAnimSequence* MeleeAttack2bRightReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
 		float MeleeAttack2bRightTimeDown;
 	UPROPERTY()
@@ -127,7 +137,9 @@ protected:
 
 	//Phase 1 - Melee Attack 2b Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
-		UAnimSequence* MeleeAttack2bLeft;
+		UAnimSequence* MeleeAttack2bLeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
+		UAnimSequence* MeleeAttack2bLeftReturn;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
 		float MeleeAttack2bLeftTimeDown;
 	UPROPERTY()
@@ -160,6 +172,17 @@ protected:
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
+	UPROPERTY()
+		bool SpawnSet = false;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool Harpoon1Launched = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool Harpoon2Launched = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool isActiveMissile = true;
+	UPROPERTY(BlueprintReadWrite)
+		bool isActiveRegProjectile = true;
 
 	//Phase 2 - Summon1
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 1")

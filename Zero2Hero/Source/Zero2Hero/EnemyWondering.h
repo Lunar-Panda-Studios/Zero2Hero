@@ -30,6 +30,8 @@ protected:
 		float XRadius;
 	UPROPERTY(EditAnywhere, Category = "Wondering")
 		float YRadius;
+	UPROPERTY(EditAnywhere, Category = "Wondering")
+		float ZRadius;
 
 public:	
 	// Called every frame
@@ -42,6 +44,8 @@ public:
 		float GetXRadius();
 	UFUNCTION()
 		float GetYRadius();
+	UFUNCTION()
+		float GetZRadius();
 	UFUNCTION()
 		FVector GetStartLocation();
 

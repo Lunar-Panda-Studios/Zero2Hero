@@ -7,5 +7,5 @@ void AIcicle::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//ElementType = ElementType::Ice;
+	ElementType = ElementType::Ice;
 }

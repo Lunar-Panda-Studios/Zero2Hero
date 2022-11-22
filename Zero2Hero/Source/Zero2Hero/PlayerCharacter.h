@@ -80,7 +80,7 @@ protected:
 		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AGrapplingHook* GrapplingHook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		float GrapplingSpeed;
@@ -302,4 +302,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void GrappleEnd();
+
+	UFUNCTION(BlueprintCallable)
+		void SetPlayerVisability(bool ShouldHide);
 };
