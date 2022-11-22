@@ -86,6 +86,8 @@ void ABombTosser::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ABombTosser::Attack()
 {
+	OnAttack();
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();

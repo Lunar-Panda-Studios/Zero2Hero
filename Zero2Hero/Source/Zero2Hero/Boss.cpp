@@ -27,24 +27,10 @@ void ABoss::BeginPlay()
 	//Will need changing to Skeletal Mesh
 	BodyMesh = FindComponentByClass<UStaticMeshComponent>();
 
-	//GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
-
 	//Spawn Params
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
-
-	if (LeftHandCrystalBP != nullptr)
-	{
-		LeftHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(LeftHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, LeftHandCrystalSocket);
-	}
-
-	if (RightHandCrystalBP != nullptr)
-	{
-		RightHandCrystal = GetWorld()->SpawnActor<ABossCrystalWeakness>(RightHandCrystalBP, GetActorLocation(), GetActorRotation(), spawnParams);
-		//AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandCrystalSocket);
-	}
 
 	if (BBC != nullptr)
 	{
@@ -204,15 +190,13 @@ FVector ABoss::CalculateSpawnLocation()
 	FVector RandLocation;
 	float Distance;
 
-	//Something better to do 
-	//Just get a point based on the difference between Min and Max (SummonRangeMax->GetScaledSphereRadius() - SummonRangeMin->GetScaledSphereRadius())
-	//Find rand point in that radius (FMath::RandRange(-DiffRadius, DiffRadius))
-	//Add the Radius of the min (SummonRangeMin->GetScaledSphereRadius() + RandPoint)
-	//I am so dumb for not thinking of that first
+	float MaxRange = SummonRangeMax->GetScaledSphereRadius();
+	float MinRange = SummonRangeMin->GetScaledSphereRadius();
+
 	do
 	{
-		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
-			GetActorLocation().Y + FMath::RandRange(-SummonRangeMax->GetScaledSphereRadius(), SummonRangeMax->GetScaledSphereRadius()),
+		RandLocation = FVector(GetActorLocation().X + FMath::RandRange(-MaxRange, MaxRange),
+			GetActorLocation().Y + FMath::RandRange(-MaxRange, MaxRange),
 			SummonRangeMax->GetComponentLocation().Z);
 
 		FVector CompareLocation = SummonRangeMin->GetComponentLocation();
@@ -220,7 +204,7 @@ FVector ABoss::CalculateSpawnLocation()
 
 		Distance = (CompareLocation - RandLocation).Size();
 
-	} while (Distance < SummonRangeMin->GetScaledSphereRadius());
+	} while (Distance < MinRange || Distance > MaxRange);
 
 	return RandLocation;
 }
@@ -344,7 +328,7 @@ void ABoss::Melee2aRight()
 		FirstAnimFinished = true;
 		HasHandHitGround = true;
 		ShouldDamage = false;
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Right Fist Ground"));
 
 		if (MeleeAttack2aRightTimeDown <= MeleeAttack2aRightTimer)
 		{
@@ -686,13 +670,15 @@ void ABoss::SummonType1()
 		//Very sad
 		//But if people don't know about it then I can't be asked to fix it
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
 	if (BBC != nullptr)
 	{
 		BBC->SetValueAsInt("IsSummoning", false);
 	}
+
+	SpawnSet = false;
 
 }
 
@@ -717,7 +703,7 @@ void ABoss::SummonType2()
 		//Ah shit here we go again
 		//Plz send help
 		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
 	if (BBC != nullptr)
@@ -725,6 +711,7 @@ void ABoss::SummonType2()
 		BBC->SetValueAsInt("IsSummoning", false);
 	}
 
+	SpawnSet = false;
 }
 
 void ABoss::MissileAttack()
@@ -813,20 +800,31 @@ void ABoss::ChangePhase()
 
 void ABoss::Phase2AttackChoice()
 {
-	switch (FMath::RandRange(0,1))
+	if (isActiveMissile && isActiveRegProjectile)
 	{
-	case 0:
-	{
-		CurrentAttack = BossAttacks::P2RegularProjectile;
-		break;
+		switch (FMath::RandRange(0, 1))
+		{
+		case 0:
+		{
+			CurrentAttack = BossAttacks::P2RegularProjectile;
+			break;
+		}
+		case 1:
+		{
+			CurrentAttack = BossAttacks::P2MissileProjectile;
+			break;
+		}
+		default:
+			break;
+		}
 	}
-	case 1:
+	else if(isActiveMissile)
 	{
 		CurrentAttack = BossAttacks::P2MissileProjectile;
-		break;
 	}
-	default:
-		break;
+	else
+	{
+		CurrentAttack = BossAttacks::P2RegularProjectile;
 	}
 }
 
@@ -838,21 +836,33 @@ void ABoss::HarponSpawn()
 		{
 			SummonedEnemies.RemoveAt(i);
 		}
+
+		if (SummonedEnemies[i] != nullptr)
+		{
+			if (SummonedEnemies[i]->GetIsDead())
+			{
+				SummonedEnemies.RemoveAt(i);
+			}
+		}
 	}
 
 	if (SummonedEnemies.Num() == 1)
 	{
 		if (!HarponPiece1Spawned)
 		{
+			SpawnSet = true;
 			SummonedEnemies[0]->SetSpawnOnDeath(HarponPiece1);
 		}
 		else
 		{
+			SpawnSet = true;
 			SummonedEnemies[0]->SetSpawnOnDeath(HarponPiece2);
 		}
 	}
-	else if (SummonedEnemies.Num() <= 0)
+	else if (SummonedEnemies.Num() <= 0 && !SpawnSet)
 	{
+		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
@@ -861,7 +871,8 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				GetWorld()->SpawnActor<AActor>(HarponPiece1, GetActorLocation(), GetActorRotation(), spawnParams);
+				HarponPiece1Spawned = true;
+				GetWorld()->SpawnActor<AActor>(HarponPiece1, Player->GetActorLocation(), GetActorRotation(), spawnParams);
 			}
 			else
 			{
@@ -872,7 +883,11 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				GetWorld()->SpawnActor<AActor>(HarponPiece2, GetActorLocation(), GetActorRotation(), spawnParams);
+				if (!HarponPiece2Spawned)
+				{
+					HarponPiece2Spawned = true;
+					GetWorld()->SpawnActor<AActor>(HarponPiece2, Player->GetActorLocation(), GetActorRotation(), spawnParams);
+				}
 			}
 			else
 			{
