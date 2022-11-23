@@ -36,6 +36,7 @@ protected:
 		TArray<AActor*> actors;
 	UPROPERTY()
 		UClass* seekClass;
+	
 
 public:	
 	// Called every frame

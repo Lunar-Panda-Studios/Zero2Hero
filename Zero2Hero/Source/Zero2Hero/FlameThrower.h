@@ -45,6 +45,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<AFireBomb> FireBomb;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float timeToThrow = 0.1f;
+	UPROPERTY()
+		float currentTimeToThrow = 0.0f;
+	UPROPERTY()
+		bool shoot = false;
 
 public:	
 	// Called every frame
@@ -60,5 +66,8 @@ public:
 
 	UFUNCTION()
 		void SecondaryAttack() override;
+
+	UFUNCTION()
+		void Fire();
 
 };

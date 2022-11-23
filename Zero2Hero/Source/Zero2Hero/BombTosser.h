@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "EnemyPatrol.h"
+#include "EnemyWondering.h"
 #include "BombTosser.generated.h"
 
 UCLASS()
-class ZERO2HERO_API ABombTosser : public AEnemyPatrol
+class ZERO2HERO_API ABombTosser : public AEnemyWondering
 {
 	GENERATED_BODY()
 

@@ -16,6 +16,7 @@
 #include "Projectile.h"
 #include "DialogueSystem.h"
 #include "Camera.h"
+#include "HealthAmmoDrop.h"
 #include "Math/UnrealMathUtility.h"
 #include "PlayerCharacter.generated.h"
 
@@ -79,7 +80,7 @@ protected:
 		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AGrapplingHook* GrapplingHook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		float GrapplingSpeed;
@@ -191,7 +192,7 @@ protected:
 	UPROPERTY()
 		int latestWallRunDir = 0;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isWallJumping = false;
 	UPROPERTY()
 		bool hasWallJumped = false;
@@ -208,7 +209,7 @@ protected:
 	UPROPERTY()
 		float currentWallJumpTime = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
-		TSubclassOf<AActor> AmmoDropBP;
+		TSubclassOf<AHealthAmmoDrop> AmmoDropBP;
 
 public:	
 	// Called every frame
@@ -296,9 +297,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartWallJump();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void DropExcessAmmo();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void GrappleEnd();
+
+	UFUNCTION(BlueprintCallable)
+		void SetPlayerVisability(bool ShouldHide);
 };

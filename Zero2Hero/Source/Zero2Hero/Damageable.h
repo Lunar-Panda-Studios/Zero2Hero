@@ -39,6 +39,8 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
+	UPROPERTY()
+		bool beingRevived = false;
 	UPROPERTY(EditAnywhere, Category = "Character Stats")
 		float AnimationTime;
 	UPROPERTY()
@@ -55,7 +57,7 @@ protected:
 		UGameManager* Manager;
 	UPROPERTY()
 		bool Allow = true;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool DropAmmo = false;
 	UPROPERTY()
 		TSubclassOf<AActor> SpawnOnDeath;
@@ -68,6 +70,12 @@ public:
 		int GetDamage();
 	UFUNCTION()
 		bool GetIsDead();
+	UFUNCTION()
+		bool GetBeingRevived();
+	UFUNCTION()
+		void SetBeingRevived(bool newRevive);
+	UFUNCTION()
+		void SetIsDead(bool newDead);
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
@@ -77,6 +85,8 @@ public:
 		void IncreaseHealth(int amount);
 	UFUNCTION(BlueprintCallable)
 		void DecreaseHealth(int amount);
+	UFUNCTION()
+		void SetHealth(int amount);
 	UFUNCTION()
 		void CheckDeath();
 	UFUNCTION()
@@ -89,6 +99,8 @@ public:
 		void UnshieldEnemy();
 	UFUNCTION()
 		void SetEnemyPair(ADamageable* newPair);
+	UFUNCTION()
+		void SetShielded(bool shield);
 	UFUNCTION()
 		void UnPair();
 	UFUNCTION()
