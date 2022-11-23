@@ -1,6 +1,7 @@
 
 #include "FireBomb.h"
 #include "Kismet\KismetSystemLibrary.h"
+#include "Enemy.h"
 
 // Sets default values
 AFireBomb::AFireBomb()
@@ -15,7 +16,8 @@ void AFireBomb::BeginPlay()
 {
 	Super::BeginPlay();
 	sphere = FindComponentByClass<USphereComponent>();
-	sphere->OnComponentBeginOverlap.AddDynamic(this, &AFireBomb::OnHit);
+	sphere->OnComponentHit.AddDynamic(this, &AFireBomb::OnHit);
+	
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 	ignoreActors.Init(this, 1);
 	seekClass = UStaticMesh::StaticClass();
@@ -28,9 +30,12 @@ void AFireBomb::Tick(float DeltaTime)
 
 }
 
-void AFireBomb::OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+void AFireBomb::OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector normalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("thing"));
+	if (OtherActor == NULL)
+	{
+		return;
+	}
 	if (!OtherActor->ActorHasTag("Player"))
 	{
 		if (UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), radius, traceObjectTypes, AActor::StaticClass(), ignoreActors, actors))
@@ -39,6 +44,7 @@ void AFireBomb::OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UP
 			{
 				if (Cast<AEnemy>(a))
 				{
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, a->GetName());
 					Cast<AEnemy>(a)->DecreaseHealth(damage);
 				}
 			}

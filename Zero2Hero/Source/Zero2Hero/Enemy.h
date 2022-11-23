@@ -20,6 +20,9 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -43,9 +46,9 @@ protected:
 		UBehaviorTreeComponent* BTC;
 
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float MovementSpeed = 600.0f;
-	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
-		float CombatMovementSpeed;
+		float MovementSpeed = 10.0f;
+	//UPROPERTY(EditAnywhere, Category = "Enemy Stats")
+	//	float CombatMovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float AttackCooldown;
 	UPROPERTY()
@@ -60,6 +63,8 @@ protected:
 		float AgroRadius;
 	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
 		float DeaggroRadius;*/
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* NiagaraComp;
 	UPROPERTY()
 		bool InRange = false;
 	UPROPERTY()
@@ -72,6 +77,14 @@ protected:
 		bool OnFire = false;
 	UPROPERTY()
 		int FlameDamage;
+	UPROPERTY(EditAnywhere, Category = "Enemy Stats")
+		bool ShouldMove = true;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float DistanceFromGround = 0.0f;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float RaydownLength = 1000.0f;
+	UPROPERTY()
+		bool ZMoveAtStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
@@ -85,6 +98,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		UCharacterMovementComponent* MovementComp;
+	UPROPERTY()
+		bool isRunning = false;
+	UPROPERTY()
+		bool HasSetStartLocation = false;
 
 public:	
 	// Called every frame
@@ -103,6 +120,20 @@ public:
 		void SetFlameDamage(int amount);
 	UFUNCTION()
 		bool GetInRange();
+	UFUNCTION()
+		UNiagaraComponent* GetNiagaraComp();
+	UFUNCTION()
+		float GetMovementSpeed();
+	UFUNCTION()
+		bool GetShouldMove();
+	UFUNCTION()
+		bool GetZMoveToAtStart();
+	UFUNCTION()
+		float GetDistanceFromGround();
+	UFUNCTION()
+		void SetZMoveAtStart(bool newMoveAtStart);
+	UFUNCTION()
+		void SetStartZ(float newZ);
 
 	UFUNCTION()
 	void OnTargetDetected(AActor* actor, FAIStimulus stimulus);
@@ -123,4 +154,7 @@ public:
 		void SetBlackboard(UBlackboardComponent* Blackboard);
 	UFUNCTION()
 		void SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAttack();
 };
