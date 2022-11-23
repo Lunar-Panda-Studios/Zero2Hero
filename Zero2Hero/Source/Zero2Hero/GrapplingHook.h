@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 		bool isGrappling = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling")
+		bool isEnabled = true;
+
 	UPROPERTY()
 		AActor* GrapplePoint = nullptr;
 	UPROPERTY(EditAnywhere)

@@ -39,6 +39,8 @@ protected:
 		USphereComponent* FireLocation;
 	UPROPERTY(EditAnywhere)
 		bool isReflectorVariant = false;
+	UPROPERTY(EditAnywhere)
+		TMap<TEnumAsByte<ElementType>, UNiagaraSystem*> ShieldVFX;
 
 
 
