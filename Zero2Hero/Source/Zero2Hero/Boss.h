@@ -210,8 +210,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 1")
 		TSubclassOf<AActor> HarponPiece1;
 	UPROPERTY()
-		bool HarponPiece1Spawned = false;
-	UPROPERTY()
 		int CurrentSummon = 1;
 
 	//Phase 2 - Summon2
@@ -221,8 +219,6 @@ protected:
 		int AmountToSummonV2 = 0;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 2")
 		TSubclassOf<AActor> HarponPiece2;
-	UPROPERTY()
-		bool HarponPiece2Spawned = false;
 
 	//Phase 2 - Missile
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Missile Projectile")
