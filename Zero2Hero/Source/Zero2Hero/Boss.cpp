@@ -69,7 +69,9 @@ void ABoss::Tick(float DeltaTime)
 				if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
 				{
 					ReadyToSpawn = false;
-					if ((!Launcher1Fixed || !Launcher2Fixed) && (!Harpoon1Launched || (Harpoon1Launched && !Harpoon2Launched)))
+					if ((!Launcher1Fixed || !Launcher2Fixed) ||
+						((Launcher1Fixed && Harpoon1Launched) && !Launcher2Fixed) ||
+						(Launcher2Fixed && Harpoon2Launched) && !Launcher1Fixed)
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 1"));
 						CurrentAttack = BossAttacks::P2SummonV1;
