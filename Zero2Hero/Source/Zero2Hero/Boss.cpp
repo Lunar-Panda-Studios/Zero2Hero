@@ -66,15 +66,18 @@ void ABoss::Tick(float DeltaTime)
 			}
 			case 2:
 			{
-				if (SummonedEnemies.Num() == 0)
+				if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
 				{
-					if ((!Launcher1Fixed || !Launcher2Fixed) && (!Harpoon1Launched || Harpoon1Launched && !Harpoon2Launched))
+					ReadyToSpawn = false;
+					if ((!Launcher1Fixed || !Launcher2Fixed) && (!Harpoon1Launched || (Harpoon1Launched && !Harpoon2Launched)))
 					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 1"));
 						CurrentAttack = BossAttacks::P2SummonV1;
 						SummonType1();
 					}
 					else
 					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 2"));
 						CurrentAttack = BossAttacks::P2SummonV2;
 						SummonType2();
 					}
@@ -163,6 +166,10 @@ void ABoss::Tick(float DeltaTime)
 		}
 		case BossAttacks::P2MissileProjectile:
 		{
+			if (HasFired)
+			{
+				TimerToNext += DeltaTime;
+			}
 			MissileAttack();
 			break;
 		}
@@ -735,23 +742,31 @@ void ABoss::MissileAttack()
 	}
 	else
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Fired"));
-		if (Missile == nullptr)
+		////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Fired"));
+		//if (Missile == nullptr)
+		//{
+		//	HasFired = false;
+		//	CurrentAttack = BossAttacks::Waiting;
+
+		//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Pointer"));
+		//}
+		//else
+		//{
+		//	if (Missile->GetHasDestruct())
+		//	{
+		//		HasFired = false;
+		//		CurrentAttack = BossAttacks::Waiting;
+
+		//		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Fuction"));
+		//	}
+		//}
+
+
+		if (TimeToNext <= TimerToNext)
 		{
 			HasFired = false;
+			TimerToNext = 0;
 			CurrentAttack = BossAttacks::Waiting;
-
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Pointer"));
-		}
-		else
-		{
-			if (Missile->GetHasDestruct())
-			{
-				HasFired = false;
-				CurrentAttack = BossAttacks::Waiting;
-
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Destroy Fuction"));
-			}
 		}
 	}
 }

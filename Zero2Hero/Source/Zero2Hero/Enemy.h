@@ -98,6 +98,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		UCharacterMovementComponent* MovementComp;
+	UPROPERTY()
+		bool isRunning = false;
+	UPROPERTY()
+		bool HasSetStartLocation = false;
 
 public:	
 	// Called every frame
