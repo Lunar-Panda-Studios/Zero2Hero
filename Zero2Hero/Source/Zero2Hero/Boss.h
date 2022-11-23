@@ -211,6 +211,8 @@ protected:
 		TSubclassOf<AActor> HarponPiece1;
 	UPROPERTY()
 		bool HarponPiece1Spawned = false;
+	UPROPERTY()
+		int CurrentSummon = 1;
 
 	//Phase 2 - Summon2
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 2")

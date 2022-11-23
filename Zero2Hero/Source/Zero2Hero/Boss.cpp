@@ -69,7 +69,7 @@ void ABoss::Tick(float DeltaTime)
 				if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
 				{
 					ReadyToSpawn = false;
-					if ((!Launcher1Fixed || !Launcher2Fixed) ||
+					if ((!Launcher1Fixed || !Launcher2Fixed) /*&& (Harpoon2Launched && Harpoon1Launched)*/ ||
 						((Launcher1Fixed && Harpoon1Launched) && !Launcher2Fixed) ||
 						(Launcher2Fixed && Harpoon2Launched) && !Launcher1Fixed)
 					{
@@ -688,6 +688,7 @@ void ABoss::SummonType1()
 	}
 
 	SpawnSet = false;
+	CurrentSummon = 1;
 
 }
 
@@ -721,6 +722,7 @@ void ABoss::SummonType2()
 	}
 
 	SpawnSet = false;
+	CurrentSummon = 2;
 }
 
 void ABoss::MissileAttack()
@@ -859,6 +861,7 @@ void ABoss::HarponSpawn()
 	{
 		if (SummonedEnemies[i] == nullptr)
 		{
+			if(SummonedEnemies[i] )
 			SummonedEnemies.RemoveAt(i);
 		}
 
@@ -873,7 +876,7 @@ void ABoss::HarponSpawn()
 
 	if (SummonedEnemies.Num() == 1)
 	{
-		if (!HarponPiece1Spawned)
+		if (CurrentSummon == 1)
 		{
 			SpawnSet = true;
 			SummonedEnemies[0]->SetSpawnOnDeath(HarponPiece1);
@@ -892,7 +895,7 @@ void ABoss::HarponSpawn()
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
 
-		if (!HarponPiece1Spawned)
+		if (CurrentSummon == 1)
 		{
 			if (HarponPiece1 != nullptr)
 			{
@@ -908,7 +911,7 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				if (!HarponPiece2Spawned)
+				if (CurrentSummon == 2)
 				{
 					HarponPiece2Spawned = true;
 					GetWorld()->SpawnActor<AActor>(HarponPiece2, Player->GetActorLocation(), GetActorRotation(), spawnParams);
