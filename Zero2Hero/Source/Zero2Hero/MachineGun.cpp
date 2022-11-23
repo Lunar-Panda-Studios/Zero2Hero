@@ -55,23 +55,27 @@ void AMachineGun::Attack()
 {
 	if (shooting)
 	{
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
-		if (currentCooldown > fireRate)
+		if (Camera != nullptr)
 		{
-			if (DecreaseCharge(ChargeUsage))
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;
+			spawnParams.Instigator = GetInstigator();
+			if (currentCooldown > fireRate)
 			{
-				FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-				rotation.Pitch += CameraAimDifference;
-				AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
-				if (Bullet != nullptr)
+				if (DecreaseCharge(ChargeUsage))
 				{
-					Bullet->Damage = Damage;
+					FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+
+					rotation.Pitch += CameraAimDifference;
+					AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+					if (Bullet != nullptr)
+					{
+						Bullet->Damage = Damage;
+					}
+					currentCooldown = 0.0f;
 				}
-				currentCooldown = 0.0f;
+
 			}
-			
 		}
 	}
 }

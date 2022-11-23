@@ -32,7 +32,6 @@ void AFireBomb::Tick(float DeltaTime)
 
 void AFireBomb::OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector normalImpulse, const FHitResult& Hit)
 {
-	
 	if (OtherActor == NULL)
 	{
 		return;

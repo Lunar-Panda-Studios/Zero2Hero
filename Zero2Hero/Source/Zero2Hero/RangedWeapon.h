@@ -52,6 +52,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		float CameraAimDifference = 15.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		bool isEnabled = true;
+
 
 public:	
 	// Called every frame

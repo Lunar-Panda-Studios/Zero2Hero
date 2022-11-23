@@ -95,6 +95,7 @@ void ACannonFodder::Tick(float DeltaTime)
 
 					if (Timer >= TimeToExplode)
 					{
+						OnAttack();
 						Explode();
 					}
 				}

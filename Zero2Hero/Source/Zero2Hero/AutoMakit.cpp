@@ -99,7 +99,10 @@ void AAutoMakit::Attack()
 	{
 		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation());
 		AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileBP, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		if (Projectile != nullptr)
+		{
+			Projectile->Damage = Damage;
+		}
 	}
 	else
 	{

@@ -16,6 +16,7 @@
 #include "Projectile.h"
 #include "DialogueSystem.h"
 #include "Camera.h"
+#include "HealthAmmoDrop.h"
 #include "Math/UnrealMathUtility.h"
 #include "PlayerCharacter.generated.h"
 
@@ -208,7 +209,7 @@ protected:
 	UPROPERTY()
 		float currentWallJumpTime = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
-		TSubclassOf<AActor> AmmoDropBP;
+		TSubclassOf<AHealthAmmoDrop> AmmoDropBP;
 
 public:	
 	// Called every frame
@@ -296,7 +297,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartWallJump();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void DropExcessAmmo();
 
 	UFUNCTION(BlueprintImplementableEvent)

@@ -73,7 +73,7 @@ float AReanimator::GetRunAwayDistance()
 
 void AReanimator::ReanimateEnemy()
 {
-	ToRevive->SetHealth(GetMaxHealth());
+	ToRevive->SetHealth(ToRevive->GetMaxHealth());
 	ToRevive->SetIsDead(false);
 	ToRevive->SetBeingRevived(false);
 	isReviving = false;
@@ -95,21 +95,29 @@ void AReanimator::FindNewTarget()
 	{
 		for (AEnemy* enemy : InRangeEnemies)
 		{
-			if (enemy->GetIsDead())
+			if (enemy == this)
 			{
-				ToRevive = enemy;
-				enemy->SetBeingRevived(true);
-				isReviving = true;
+				continue;
+			}
 
-				if (BBC != nullptr)
+			if (enemy != nullptr)
+			{
+				if (enemy->GetIsDead())
 				{
-					BBC->SetValueAsBool("IsReviving", true);
-					BBC->SetValueAsVector("ToRevive", enemy->GetActorLocation());
+					ToRevive = enemy;
+					enemy->SetBeingRevived(true);
+					isReviving = true;
+
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("IsReviving", true);
+						BBC->SetValueAsVector("ToRevive", enemy->GetActorLocation());
+					}
+
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("New Target Selected"));
+
+					break;
 				}
-
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("New Target Selected"));
-
-				break;
 			}
 		}
 	}
@@ -118,6 +126,12 @@ void AReanimator::FindNewTarget()
 void AReanimator::OnOverlapInRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Overlap"));
+
+	if (OtherActor == this)
+	{
+		return;
+	}
+
 	if (OtherActor == nullptr)
 	{
 		return;

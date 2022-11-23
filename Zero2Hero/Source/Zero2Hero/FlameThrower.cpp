@@ -43,6 +43,17 @@ void AFlameThrower::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	Timer += DeltaTime;
 
+	if (shoot)
+	{
+		currentTimeToThrow += DeltaTime;
+		if (currentTimeToThrow > timeToThrow)
+		{
+			shoot = false;
+			currentTimeToThrow = 0.0f;
+			Fire();
+		}
+	}
+
 	//if (InUse)
 	//{
 	//	Timer += DeltaTime;
@@ -74,21 +85,7 @@ void AFlameThrower::PrimaryAttack()
 	}*/
 	if (Timer > TimerMax && DecreaseCharge(ChargeUsage))
 	{
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
-		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-		rotation.Pitch += CameraAimDifference;
-
-		AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
-
-		/*FVector Dir = FVector(GetActorRotation().Vector() * launchSpeed) + FVector(0, 0, launchSpeed);*/
-		USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
-		if (sphereCol)
-		{
-			sphereCol->AddImpulse(GetActorForwardVector() * launchSpeed);
-		}
-		Timer = 0;
+		shoot = true;
 	}
 }
 
@@ -119,5 +116,24 @@ void AFlameThrower::PrimaryAttackEnd()
 void AFlameThrower::SecondaryAttack()
 {
 	
+}
+
+void AFlameThrower::Fire()
+{
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+	rotation.Pitch += CameraAimDifference;
+
+	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
+
+	/*FVector Dir = FVector(GetActorRotation().Vector() * launchSpeed) + FVector(0, 0, launchSpeed);*/
+	USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
+	if (sphereCol)
+	{
+		sphereCol->AddImpulse(GetActorForwardVector() * launchSpeed);
+	}
+	Timer = 0;
 }
 
