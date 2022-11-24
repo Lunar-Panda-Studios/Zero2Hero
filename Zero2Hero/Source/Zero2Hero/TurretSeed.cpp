@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "TurretSeed.h"
 #include "Turret.h"
 #include "Kismet\KismetSystemLibrary.h"
-#include "TurretSeed.h"
 
 ATurretSeed::ATurretSeed()
 {
@@ -43,6 +42,10 @@ void ATurretSeed::Tick(float DeltaTime)
 			FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
 			FVector v = FVector(aTurret->GetActorLocation().X, aTurret->GetActorLocation().Y, aTurret->GetActorLocation().Z - turretHeight /*(bounds.GetBox().GetSize().Z)*/ - seedRadius / 2);
 			aTurret->SetActorLocation(v);
+			ATurret* t = Cast<ATurret>(aTurret);
+			t->turretAmmo = ammo;
+			t->turretChargeUsage = chargeUsage;
+			
 		}
 	}
 	if (spawned)

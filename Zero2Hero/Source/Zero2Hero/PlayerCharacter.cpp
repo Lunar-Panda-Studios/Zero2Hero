@@ -14,11 +14,11 @@ APlayerCharacter::APlayerCharacter()
 
 	CapCollider = FindComponentByClass<UCapsuleComponent>();
 
-	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	springArm->SetupAttachment(GetRootComponent());
+	//springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	//springArm->SetupAttachment(GetRootComponent());
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
+	//Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//Camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
 
 	MeleeCollider = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeZone"));
 	MeleeCollider->SetupAttachment(GetRootComponent());
@@ -35,10 +35,18 @@ void APlayerCharacter::BeginPlay()
 	startingAirControl = GetCharacterMovement()->AirControl;
 	initialRotSpeed = GetCharacterMovement()->RotationRate;
 
+	//Spawn Params
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+
+	CameraFollowPoint = GetWorld()->SpawnActor<ACamera>(CameraClass, GetActorLocation(), GetActorRotation(), spawnParams);
+	CameraFollowPoint->SetPlayer(this);
+
 	MeleePressMax = MeleeAttackSpeed + 0.2;
 	this->GetCharacterMovement();
-	TArray<UActorComponent*> Comps = GetComponentsByTag(UStaticMeshComponent::StaticClass(), TEXT("PlayerView"));
-	ConeSight = Cast<UStaticMeshComponent>(Comps[0]);
+
+	ConeSight = CameraFollowPoint->GetConeSight();
 	
 	characterMovementComp = this->GetCharacterMovement();
 	normalFriction = characterMovementComp->GroundFriction;
@@ -64,14 +72,10 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Capsule Collider"));
 	}
 
-	//Spawn Params
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = this;
-	spawnParams.Instigator = GetInstigator();
-
 	//Gives Grapple Hook
-	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
+	////GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
+	////GrapplingHook->SetActorHiddenInGame(true);
 
 	//Giving Hook Points Grappling Hook
 	if (HookPoints != nullptr)
@@ -89,16 +93,18 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
 
-	for (int i = 0; i < RangedWeapons.Num(); i++)
-	{
-		if (RangedWeapons[i] != nullptr)
-		{
-			//this may spawn the ice shotgun twice. gotta check this
-			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-			allRangedWeapons[i]->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		}
-	}
-	CurrentRangedWeapon = allRangedWeapons[0];
+	//for (int i = 0; i < RangedWeapons.Num(); i++)
+	//{
+		//if (RangedWeapons[i] != nullptr)
+		//{
+		//	//this may spawn the ice shotgun twice. gotta check this
+		//	allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
+		//	//allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
+		//	allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+		//	//allRangedWeapons[i]->SetActorHiddenInGame(true);
+		//}
+	//}
+	//CurrentRangedWeapon = allRangedWeapons[0];
 
 	if (DialogueSystemClass != nullptr)
 	{
@@ -115,12 +121,25 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+	if (Manager != nullptr)
+	{
+		Manager->SetCurrentCheckPoint(GetActorLocation());
+	}
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//if (CurrentRangedWeapon->GetCamera() == nullptr)
+	//{
+	//	for (int i = 0; i < allRangedWeapons.Num(); i++)
+	//	{
+	//		allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+	//	}
+	//}
+
 	if (!hasWallJumped && !isWallJumping)
 	{
 		WalljumpCheck();
@@ -154,37 +173,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 		characterMovementComp->GroundFriction = normalFriction;
 	}
 	currentDashCooldown += DeltaTime;
-	
-
-	if (IsAttacking)
-	{
-
-		//Pressing Timer for combo
-		MeleePressTimer += DeltaTime;
-
-		if (MeleePressTimer >= MeleePressMax)
-		{
-			MeleeAttackNum = 0;
-			MeleePressTimer = 0;
-			IsAttacking = false;
-		}
-	}
 
 	if (MeleeCollider->IsCollisionEnabled())
 	{
-		//Damage Enemy for Combo Attack
-		// Might be needed as the attacks won't line up with animation right now 
-		// But idk might be able to put events into the animation for the damage
-		// Yet the animations need to be here to do it
-		// 
-		//AttackAnimTimer += DeltaTime;
-
-		//if (MeleeAttackSpeed <= AttackAnimTimer)
-		//{
-		//	ComboDamage();
-		//	AttackAnimTimer = 0;
-		//}
-
 		//Turns off Collisions after attack end
 		MeleeTimer += DeltaTime;
 
@@ -195,21 +186,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			EnemiesInRange.Empty();
 			//AttackAnimTimer = 0;
-		}
-	}
-
-	//Puts Attack on cooldown
-	if (MeleeAttackNum >= 3)
-	{
-		CanAttack = false;
-		IsAttacking = false;
-		MeleeCooldownTimer += DeltaTime;
-		if (MeleeCooldownTimer >= MeleeAttackCooldown)
-		{
-			MeleeCooldownTimer = 0;
-			MeleeTimer = 0;
-			CanAttack = true;
-			MeleeAttackNum = 0;
 		}
 	}
 
@@ -225,27 +201,63 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (DialogueSystem != nullptr)
 	{
-		if (DialogueSystem->GetDialogueWidget()->IsVisible())
+		if (DialogueSystem->GetUsingDialogue())
 		{
-			if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+			if (DialogueSystem->GetDialogueWidget()->IsVisible())
 			{
-				Allow = false;
+				if (DialogueSystem->GetCurrentDialogue().DisableEverything)
+				{
+					Allow = false;
+				}
+				else
+				{
+					Allow = true;
+				}
 			}
 			else
 			{
 				Allow = true;
 			}
 		}
-		else
-		{
-			Allow = true;
-		}
 	}
-	else
+
+	
+	if (isDead)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
+		
+		if (DropAmmo)
+		{
+			
+			
+			DropAmmo = false;
+		}
+		Allow = false;
 	}
 }
+
+void APlayerCharacter::DropExcessAmmo()
+{
+	
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+	//u cant spawn 2 things on top of eachother??? wtf
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	for (int i = 0; i < RangedWeapons.Num(); i++)
+	{
+		//after the line below, ammo is still a nullptr. Somethings going wrong with the spawning and i dont know why
+		AHealthAmmoDrop* ammo = GetWorld()->SpawnActor<AHealthAmmoDrop>(AmmoDropBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		if (ammo != nullptr)
+		{
+			ammo->SetAmmo(i, Cast<ARangedWeapon>(allRangedWeapons[i])->GetAmmo());
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("fuck"));
+		}
+	}
+}
+
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -264,7 +276,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("MeleeAttack"), IE_Pressed, this, &APlayerCharacter::GroundPound);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Pressed, this, &APlayerCharacter::RangedAttack);
 	PlayerInputComponent->BindAction(TEXT("RangedAttack"), IE_Released, this, &APlayerCharacter::RangedAttackEnd);
-	PlayerInputComponent->BindAction(TEXT("SecondaryAttack"), IE_Pressed, this, &APlayerCharacter::SecondaryAttack);
+	//Removed for now as we are cutting scope on the weapons
+	/*PlayerInputComponent->BindAction(TEXT("SecondaryAttack"), IE_Pressed, this, &APlayerCharacter::SecondaryAttack);*/
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &APlayerCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &APlayerCharacter::EndCrouch);
 	PlayerInputComponent->BindAction(TEXT("Dash"), IE_Pressed, this, &APlayerCharacter::Dash);
@@ -300,6 +313,7 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 				GrapplingHook->GetCable()->SetVisibility(false);
 				GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
 				GrapplingHook->GetInUseHook()->Destroy();
+				GrappleEnd();
 			}
 		}
 	}
@@ -309,21 +323,24 @@ void APlayerCharacter::cameraVertical(float amount)
 {
 	AddControllerPitchInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
 
-	//springArm->AddLocalRotation(FRotator(amount, 0, 0));
+	if (CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1) < ClampVerticalDown &&
+		CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1) > ClampVerticalUp)
+	{
+		CameraFollowPoint->GetSpringArm()->SetWorldRotation(FRotator(CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch + (amount * CameraSensitivity * -1), CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Roll));
+	}
 }
 
 void APlayerCharacter::cameraHorizontal(float amount)
 {
 	AddControllerYawInput(amount * CameraSensitivity * GetWorld()->GetDeltaSeconds());
-
-	//springArm->AddLocalRotation(FRotator(0, amount, 0));
+	CameraFollowPoint->GetSpringArm()->SetWorldRotation(FRotator(CameraFollowPoint->GetSpringArm()->GetComponentRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw + (amount * CameraSensitivity), CameraFollowPoint->GetSpringArm()->GetComponentRotation().Roll));
 }
 
 void APlayerCharacter::MoveLeftRight(float speed)
 {
 	if (Allow)
 	{
-		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+		FRotator Rotation(0, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, 0);
 
 		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
 
@@ -335,7 +352,7 @@ void APlayerCharacter::MoveUpDown(float speed)
 {
 	if (Allow)
 	{
-		FRotator Rotation(0, Controller->GetControlRotation().Yaw, 0);
+		FRotator Rotation(0, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, 0);
 
 		FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X);
 
@@ -385,13 +402,23 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		for (AActor* overlappedActor : actors) 
 		{
+
 			DamageableTarget = Cast<ADamageable>(overlappedActor);
-			DamageableTarget->DecreaseHealth(GroundPoundDamage);
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
+			if (DamageableTarget->GetShieldType() != ElementType::None)
+			{
+				DamageableTarget->DecreaseHealth(GroundPoundDamage);
 
-			//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Damage Ground Pound"));
+
+				//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, *overlappedActor->GetName());
+			}
+			else
+			{
+				UnshieldEnemy();
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
+			}
 		}
 	}
 }
@@ -548,33 +575,33 @@ void APlayerCharacter::MeleeAttack()
 		{
 			MeleeTimer = 0;
 			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			MeleeAttackNum += 1;
+			//MeleeAttackNum += 1;
 			MeleePressTimer = 0;
 			IsAttacking = true;
 
 
-			switch (MeleeAttackNum)
-			{
-			case 1:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
-				break;
-			}
-			case 2:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
-				ComboDamage();
-				break;
-			}
-			case 3:
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
-				ComboDamage();
-				break;
-			}
-			default:
-				break;
-			}
+			//switch (MeleeAttackNum)
+			//{
+			//case 1:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
+			//	break;
+			//}
+			//case 2:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
+			//	ComboDamage();
+			//	break;
+			//}
+			//case 3:
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
+			//	ComboDamage();
+			//	break;
+			//}
+			//default:
+			//	break;
+			//}
 		}
 	}
 
@@ -586,8 +613,12 @@ void APlayerCharacter::RangedAttack()
 	{
 		if (CurrentRangedWeapon != nullptr)
 		{
+			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
+			SetActorRotation(Rotator);
+			CurrentRangedWeapon->OnFire();
 			CurrentRangedWeapon->PrimaryAttack();
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+			CurrentRangedWeapon->OnFire();
 		}
 	}
 }
@@ -616,13 +647,14 @@ void APlayerCharacter::ComboDamage()
 
 void APlayerCharacter::SecondaryAttack()
 {
-	if (Allow)
+	//removing secondary attack for now as we are cutting scope
+	/*if (Allow)
 	{
 		if (CurrentRangedWeapon != nullptr)
 		{
 			CurrentRangedWeapon->SecondaryAttack();
 		}
-	}
+	}*/
 }
 
 void APlayerCharacter::Dialogue()
@@ -819,5 +851,20 @@ void APlayerCharacter::GrappleTo()
 	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
 
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+}
+
+void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
+{
+	SetActorHiddenInGame(ShouldHide);
+	for (ARangedWeapon* Ranged : allRangedWeapons)
+	{
+		Ranged->SetActorHiddenInGame(ShouldHide);
+	}
+
+	if (GrapplingHook != nullptr)
+	{
+		GrapplingHook->SetActorHiddenInGame(ShouldHide);
+	}
+
 }
 

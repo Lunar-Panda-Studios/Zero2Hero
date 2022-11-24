@@ -15,15 +15,18 @@ AEnemyWondering::AEnemyWondering()
 void AEnemyWondering::BeginPlay()
 {
 	Super::BeginPlay();
-
-	StartLocation = GetActorLocation();
-	
 }
 
 // Called every frame
 void AEnemyWondering::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!HasSetStartLocation)
+	{
+		StartLocation = GetActorLocation();
+		HasSetStartLocation = true;
+	}
 
 }
 
@@ -42,6 +45,11 @@ float AEnemyWondering::GetXRadius()
 float AEnemyWondering::GetYRadius()
 {
 	return YRadius;
+}
+
+float AEnemyWondering::GetZRadius()
+{
+	return ZRadius;
 }
 
 FVector AEnemyWondering::GetStartLocation()

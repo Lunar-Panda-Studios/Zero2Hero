@@ -37,5 +37,10 @@ public:
 	ATurretSeed();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	void OnHit(AActor* OverlappedActor, AActor* OtherActor) override;
+	void OnHit(AActor* OverlappedActor, AActor* OtherActor);
+
+	UPROPERTY()
+		int ammo;
+	UPROPERTY()
+		int chargeUsage;
 };

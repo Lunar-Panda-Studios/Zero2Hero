@@ -25,7 +25,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ice Shotgun")
 		int IcicleNumber;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ice Shotgun")
+		float CanShootDelay = 2;
+	UPROPERTY(BlueprintReadWrite)
+		float CanShootTimer = 0;
+	UPROPERTY(BlueprintReadWrite)
+		bool CanShoot = true;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

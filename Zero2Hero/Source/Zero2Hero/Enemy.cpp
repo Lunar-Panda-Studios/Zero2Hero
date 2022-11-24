@@ -12,8 +12,8 @@ AEnemy::AEnemy()
 	PlayerRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Player Radius"));
 	PlayerRadius->SetupAttachment(GetRootComponent());
 
-	//AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
-	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Shield VFX Component"));
+	NiagaraComp->SetupAttachment(GetRootComponent());
 
 	//BBC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard Component"));
 	//BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behaviour Component"));
@@ -68,8 +68,11 @@ void AEnemy::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Movement Component - Enemy"));
 	}
 
-	Cast<AAIController>(GetController())->RunBehaviorTree(BT);
-
+	if (GetController())
+	{
+		Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+		isRunning = true;
+	}
 }
 
 // Called every frame
@@ -77,21 +80,49 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OnFire || FlameThrowerDamageTimer != 0)
+	if (!isRunning)
 	{
-		OnFire = false;
-		if (FlameThrowerDamageTimer < FlameThrowerDamageTimerMax)
+		if (GetController())
 		{
-			FlameThrowerDamageTimer += DeltaTime;
-		}
-
-		if (FlameThrowerDamageTimer >= FlameThrowerDamageTimerMax)
-		{
-			FlameThrowerDamageTimer = 0;
-			DecreaseHealth(Damage);
+			Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+			isRunning = true;
 		}
 	}
 
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
+	{
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("isDead", isDead);
+		}
+
+
+		if (Health <= 0)
+		{
+			if (OnFire || FlameThrowerDamageTimer != 0)
+			{
+				OnFire = false;
+				if (FlameThrowerDamageTimer < FlameThrowerDamageTimerMax)
+				{
+					FlameThrowerDamageTimer += DeltaTime;
+				}
+
+				if (FlameThrowerDamageTimer >= FlameThrowerDamageTimerMax)
+				{
+					FlameThrowerDamageTimer = 0;
+					DecreaseHealth(Damage);
+				}
+			}
+		}
+	}
+	else
+	{
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("isDead", true);
+			
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -156,7 +187,7 @@ void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 				if (OtherComp->ComponentHasTag("MainBody"))
 				{
 					InRange = false;
-					/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));*/
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out Range"));
 				}
 			}
 		}
@@ -176,6 +207,41 @@ void AEnemy::SetFlameDamage(int amount)
 bool AEnemy::GetInRange()
 {
 	return InRange;
+}
+
+UNiagaraComponent* AEnemy::GetNiagaraComp()
+{
+	return NiagaraComp;
+}
+
+float AEnemy::GetMovementSpeed()
+{
+	return MovementSpeed;
+}
+
+bool AEnemy::GetShouldMove()
+{
+	return ShouldMove;
+}
+
+bool AEnemy::GetZMoveToAtStart()
+{
+	return ZMoveAtStart;
+}
+
+float AEnemy::GetDistanceFromGround()
+{
+	return DistanceFromGround;
+}
+
+void AEnemy::SetZMoveAtStart(bool newMoveAtStart)
+{
+	ZMoveAtStart = newMoveAtStart;
+}
+
+void AEnemy::SetStartZ(float newZ)
+{
+	DistanceFromGround = newZ;
 }
 
 void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -213,6 +279,7 @@ void AEnemy::OnMainBodyHit(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 						else
 						{
 							UnshieldEnemy();
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Unshield Enemy"));
 						}
 					}
 				}
@@ -241,12 +308,8 @@ void AEnemy::OnMainBodyEndOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 bool AEnemy::IsPositionReachable(FVector Position) 
 {
 	FVector PathStart = GetActorLocation();
-	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
 
-	if (!NavPath)
-	{
-		return false;
-	}
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), PathStart, Position, NULL);
 
 	return !NavPath->IsPartial();
 }

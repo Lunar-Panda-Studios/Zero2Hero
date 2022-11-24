@@ -18,10 +18,12 @@ AFlameThrower::AFlameThrower()
 void AFlameThrower::BeginPlay()
 {
 	Super::BeginPlay();
+	FireLocation = FindComponentByClass<USphereComponent>();
 
-	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
-	NiagaraComp->SetAsset(NigaraSys);
+	/*NiagaraComp = FindComponentByClass<UNiagaraComponent>();
+	NiagaraComp->SetAsset(NigaraSys);*/
 	WeaponType = 0;
+	Timer = TimerMax;
 
 	//if (NiagaraComp != nullptr)
 	//{
@@ -39,28 +41,40 @@ void AFlameThrower::BeginPlay()
 void AFlameThrower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Timer += DeltaTime;
 
-	if (InUse)
+	if (shoot)
 	{
-		Timer += DeltaTime;
-		if (TimerMax < Timer)
+		currentTimeToThrow += DeltaTime;
+		if (currentTimeToThrow > timeToThrow)
 		{
-			Timer = 0.0f;
-			if (!DecreaseCharge(ChargeUsage))
-			{
-				PrimaryAttackEnd();
-			}
+			shoot = false;
+			currentTimeToThrow = 0.0f;
+			Fire();
 		}
-
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(Charge));
 	}
+
+	//if (InUse)
+	//{
+	//	Timer += DeltaTime;
+	//	if (TimerMax < Timer)
+	//	{
+	//		Timer = 0.0f;
+	//		if (!DecreaseCharge(ChargeUsage))
+	//		{
+	//			PrimaryAttackEnd();
+	//		}
+	//	}
+
+	//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(Charge));
+	//}
 
 }
 
 void AFlameThrower::PrimaryAttack()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Active Flamethrower"));
-	InUse = true;
+	/*InUse = true;
 
 	if (NiagaraComp != nullptr)
 	{
@@ -68,22 +82,26 @@ void AFlameThrower::PrimaryAttack()
 		{
 			NiagaraComp->ActivateSystem();
 		}
+	}*/
+	if (Timer > TimerMax && DecreaseCharge(ChargeUsage))
+	{
+		shoot = true;
 	}
 }
 
 void AFlameThrower::OnParticleHit(AEnemy* Enemy)
 {
-	if (Enemy != nullptr)
+	/*if (Enemy != nullptr)
 	{
 		Enemy->SetOnFire(true);
 		Enemy->SetFlameDamage(Damage);
 		Enemy->DecreaseHealth(Damage);
-	}
+	}*/
 }
 
 void AFlameThrower::PrimaryAttackEnd()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Deactive Flamethrower"));
+	/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Deactive Flamethrower"));
 
 	InUse = false;
 
@@ -92,11 +110,30 @@ void AFlameThrower::PrimaryAttackEnd()
 		NiagaraComp->Deactivate();
 	}
 
-	Timer = 0.0f;
+	Timer = 0.0f;*/
 }
 
 void AFlameThrower::SecondaryAttack()
 {
+	
+}
 
+void AFlameThrower::Fire()
+{
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+	rotation.Pitch += CameraAimDifference;
+
+	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
+
+	/*FVector Dir = FVector(GetActorRotation().Vector() * launchSpeed) + FVector(0, 0, launchSpeed);*/
+	USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
+	if (sphereCol)
+	{
+		sphereCol->AddImpulse(GetActorForwardVector() * launchSpeed);
+	}
+	Timer = 0;
 }
 

@@ -31,7 +31,7 @@ protected:
 public:
 	AChargeBolt();
 	virtual void BeginPlay() override;
-	void OnHit(AActor* OverlappedActor, AActor* OtherActor) override;
+	void OnHit(AActor* OverlappedActor, AActor* OtherActor);
 
 	UFUNCTION()
 		void CheckArea(FVector pos);
