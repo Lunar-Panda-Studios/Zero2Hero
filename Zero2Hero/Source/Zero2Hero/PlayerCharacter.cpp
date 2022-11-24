@@ -292,6 +292,7 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 		if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
 		{
 			EndingGrapple();
+			characterMovementComp->Velocity = FVector(0, 0, 0);
 		}
 	}
 }

@@ -46,8 +46,11 @@ void AGrapplingHook::Tick(float DeltaTime)
 
 		if (CurrentMag > PreviousMag + 10)
 		{
-			EndGrapple = true;
-			canGrapple = false;
+			if (!canGrapple)
+			{
+				EndGrapple = true;
+				canGrapple = false;
+			}
 		}
 
 		PreviousMag = CurrentMag;
