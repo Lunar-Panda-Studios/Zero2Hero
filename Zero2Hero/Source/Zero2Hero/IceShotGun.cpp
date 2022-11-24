@@ -15,6 +15,7 @@ void AIceShotGun::BeginPlay()
 {
 	Super::BeginPlay();
 
+	WeaponTypeName = "Ice";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 1;
 	

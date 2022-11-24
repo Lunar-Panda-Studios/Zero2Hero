@@ -21,6 +21,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY()
+		FName WeaponTypeName;
 	UPROPERTY(BlueprintReadWrite)
 		int WeaponType;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
@@ -98,5 +100,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnFire();
+
+	UFUNCTION()
+		FName GetWeaponName();
 
 };

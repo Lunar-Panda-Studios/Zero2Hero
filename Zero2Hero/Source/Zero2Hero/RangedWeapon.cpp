@@ -154,3 +154,8 @@ void ARangedWeapon::SetCamera(ACamera* newCamera)
 	Camera = newCamera;
 }
 
+FName ARangedWeapon::GetWeaponName()
+{
+	return WeaponTypeName;
+}
+

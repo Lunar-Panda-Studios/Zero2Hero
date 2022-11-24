@@ -5,6 +5,7 @@
 void AChargeRifle::BeginPlay()
 {
 	Super::BeginPlay();
+	WeaponTypeName = "Electric";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 3;
 	secondaryCurrentCooldown = secondaryFireRate;
