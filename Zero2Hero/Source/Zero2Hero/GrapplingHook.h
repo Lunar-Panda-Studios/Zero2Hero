@@ -52,6 +52,10 @@ protected:
 		UCableComponent* CableComp;
 	UPROPERTY()
 		AHook* InUseHook;
+	UPROPERTY()
+		float PreviousMag;
+	UPROPERTY()
+		bool EndGrapple = false;
 
 
 public:	
@@ -81,6 +85,10 @@ public:
 		AActor* GetGrapplePoint();
 	UFUNCTION()
 		AHook* GetInUseHook();
+	UFUNCTION()
+		bool GetEndGrapple();
+	UFUNCTION()
+		void SetEndGrapple(bool newGrapple);
 
 	UFUNCTION()
 		void OnHit(AActor* OverlappedActor, AActor* OtherActor);

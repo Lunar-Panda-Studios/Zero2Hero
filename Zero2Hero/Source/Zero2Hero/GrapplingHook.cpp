@@ -36,6 +36,22 @@ void AGrapplingHook::Tick(float DeltaTime)
 			isGrappling = false;
 		}
 	}
+
+	if (!canGrapple)
+	{
+		//mag current location -> Hookpoint
+		//if mag increases detach and 0 velocity
+
+		float CurrentMag = (HookHit.GetActor()->GetActorLocation() - GetActorLocation()).Size();
+
+		if (CurrentMag > PreviousMag + 10)
+		{
+			EndGrapple = true;
+			canGrapple = false;
+		}
+
+		PreviousMag = CurrentMag;
+	}
 }
 
 bool AGrapplingHook::Fire()
@@ -74,7 +90,8 @@ bool AGrapplingHook::Fire()
 
 				InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
 				isGrappling = true;
-
+				PreviousMag = (GetActorLocation() - HookHit.GetActor()->GetActorLocation()).Size();
+				EndGrapple = false;
 				canGrapple = false;
 
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("True"));
@@ -170,5 +187,15 @@ void AGrapplingHook::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 AHook* AGrapplingHook::GetInUseHook()
 {
 	return InUseHook;
+}
+
+bool AGrapplingHook::GetEndGrapple()
+{
+	return EndGrapple;
+}
+
+void AGrapplingHook::SetEndGrapple(bool newGrapple)
+{
+	EndGrapple = newGrapple;
 }
 
