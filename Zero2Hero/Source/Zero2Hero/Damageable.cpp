@@ -54,6 +54,8 @@ void ADamageable::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	CheckDeath();
 }
 
 int ADamageable::GetDamage()
