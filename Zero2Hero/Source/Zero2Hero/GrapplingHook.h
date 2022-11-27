@@ -40,6 +40,8 @@ protected:
 		TSubclassOf<AHook> Hook;
 	UPROPERTY(BlueprintReadWrite)
 		bool isGrappling = false;
+	UPROPERTY()
+		bool canGrapple = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling")
 		bool isEnabled = true;
@@ -50,6 +52,10 @@ protected:
 		UCableComponent* CableComp;
 	UPROPERTY()
 		AHook* InUseHook;
+	UPROPERTY()
+		float PreviousMag;
+	UPROPERTY()
+		bool EndGrapple = false;
 
 
 public:	
@@ -67,6 +73,8 @@ public:
 	UFUNCTION()
 		bool GetIsGrappling();
 	UFUNCTION()
+		void SetIsGrappling(bool newGrappling);
+	UFUNCTION()
 		UCableComponent* GetCable();
 	UFUNCTION()
 		USphereComponent* GetFireLocation();
@@ -77,12 +85,16 @@ public:
 		AActor* GetGrapplePoint();
 	UFUNCTION()
 		AHook* GetInUseHook();
+	UFUNCTION()
+		bool GetEndGrapple();
+	UFUNCTION()
+		void SetEndGrapple(bool newGrapple);
 
 	UFUNCTION()
 		void OnHit(AActor* OverlappedActor, AActor* OtherActor);
 
-	UFUNCTION()
-		void CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	//UFUNCTION()
+	//	void CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void GrappleShoot();
