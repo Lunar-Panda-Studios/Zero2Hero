@@ -58,6 +58,11 @@ void ACannonFodder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (isDead)
+	{
+		return;
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 
