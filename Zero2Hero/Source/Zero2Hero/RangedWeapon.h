@@ -53,6 +53,8 @@ protected:
 		ACamera* Camera;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		float CameraAimDifference = 15.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CameraAimDifferenceYaw = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		bool isEnabled = true;
@@ -103,5 +105,7 @@ public:
 
 	UFUNCTION()
 		FName GetWeaponName();
+	UFUNCTION()
+		void SetAmmo(float ammo);
 
 };
