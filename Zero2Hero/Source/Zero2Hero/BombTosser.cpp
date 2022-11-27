@@ -18,6 +18,28 @@ ABombTosser::ABombTosser()
 void ABombTosser::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (DistanceFromGround != 0)
+	{
+		FVector EndPoint = GetActorLocation();
+		EndPoint.Z -= RaydownLength;
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this);
+		FHitResult Hit;
+
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), EndPoint, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
+	
+		if (Hit.IsValidBlockingHit())
+		{
+			DistanceFromGround += Hit.ImpactPoint.Z;
+			ZMoveAtStart = true;
+		}
+
+		if (BBC != nullptr)
+		{
+			BBC->SetValueAsBool("FlyToZ", ZMoveAtStart);
+		}
+	}
 	
 }
 
@@ -26,17 +48,33 @@ void ABombTosser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (InRange)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		AttackSpeedTimer += DeltaTime;
-
-		if (AttackSpeedTimer >= AttackSpeed)
+		if (ZMoveAtStart)
 		{
-			Attack();
-			AttackSpeedTimer = 0;
+			if (BBC != nullptr)
+			{
+				BBC->SetValueAsBool("FlyToZ", ZMoveAtStart);
+			}
+		}
+
+		//	if (BBC != nullptr)
+		//	{
+		//		BBC->SetValueAsBool("FlyToZ", ZMoveAtStart);
+		//	}
+		//}
+
+		if (InRange)
+		{
+			AttackSpeedTimer += DeltaTime;
+
+			if (AttackSpeedTimer >= AttackSpeed)
+			{
+				Attack();
+				AttackSpeedTimer = 0;
+			}
 		}
 	}
-
 }
 
 // Called to bind functionality to input
@@ -48,6 +86,8 @@ void ABombTosser::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ABombTosser::Attack()
 {
+	OnAttack();
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
@@ -59,7 +99,10 @@ void ABombTosser::Attack()
 	{
 		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Player->GetActorLocation());
 		AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileBP, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		if (Projectile != nullptr)
+		{
+			Projectile->Damage = Damage;
+		}
 	}
 	else
 	{

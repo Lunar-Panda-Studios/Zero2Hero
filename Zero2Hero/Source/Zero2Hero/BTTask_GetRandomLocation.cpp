@@ -15,26 +15,44 @@ EBTNodeResult::Type UBTTask_GetRandomLocation::ExecuteTask(UBehaviorTreeComponen
 
 	AEnemyWondering* Self = Cast<AEnemyWondering>(BBC->GetValueAsObject("SelfActor"));
 
-	if (BBC->GetValueAsFloat("XRadius") == 0 && BBC->GetValueAsFloat("YRadius") == 0)
-	{
-		BBC->SetValueAsFloat("XRadius", Self->GetXRadius());
-		BBC->SetValueAsFloat("YRadius", Self->GetYRadius());
-	}
-
 	FVector newLocation;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(Self);
+
+	FHitResult Hit;
 
 	int repeated = 0;
-	int MaxRepeated = 50;
+	int MaxRepeated = 10;
+
+	bool Valid = false;
 
 	do
 	{
+		Valid = false;
+
 		repeated += 1;
 
-		newLocation = FVector(FMath::RandRange(Self->GetStartLocation().X - BBC->GetValueAsFloat("XRadius"), Self->GetStartLocation().X + BBC->GetValueAsFloat("XRadius")),
-			FMath::RandRange(Self->GetStartLocation().Y - BBC->GetValueAsFloat("YRadius"), Self->GetStartLocation().Y + BBC->GetValueAsFloat("YRadius")),
-			Self->GetStartLocation().Z);
+		float ZPosition = Self->GetDistanceFromGround() != 0 ? Self->GetDistanceFromGround() + FMath::RandRange(-Self->GetZRadius(), Self->GetZRadius()) : Self->GetStartLocation().Z;
 
-	} while (!Self->IsPositionReachable(newLocation) || repeated == MaxRepeated);
+		newLocation = FVector(FMath::RandRange(Self->GetStartLocation().X - Self->GetXRadius(), Self->GetStartLocation().X + Self->GetXRadius()),
+			FMath::RandRange(Self->GetStartLocation().Y - Self->GetYRadius(), Self->GetStartLocation().Y + Self->GetYRadius()),
+			ZPosition);
+
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, Self->GetActorLocation(), newLocation, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
+		//DrawDebugLine(GetWorld(), Self->GetActorLocation(), newLocation, FColor::Black, false, 1.0f, 0, 5);
+
+		if (Hit.IsValidBlockingHit())
+		{
+			Valid = false;
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Hit.GetActor()->GetFName().ToString());
+		}
+		else
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Valid"));
+			Valid = true;
+		}
+
+	} while ((!Self->IsPositionReachable(newLocation) || repeated < MaxRepeated) && !Valid);
 	
 	if (repeated != MaxRepeated)
 	{

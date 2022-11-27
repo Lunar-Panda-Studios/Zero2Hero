@@ -36,6 +36,8 @@ protected:
 		float TimeToExplode;
 	UPROPERTY()
 		float GroundLimit = 100.0f;
+	UPROPERTY()
+		bool shouldExplode = false;
 
 public:	
 	// Called every frame

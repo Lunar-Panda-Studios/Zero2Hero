@@ -73,8 +73,9 @@ void APlayerCharacter::BeginPlay()
 	}
 
 	//Gives Grapple Hook
-	GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
+	//GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
+	////GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
+	////GrapplingHook->SetActorHiddenInGame(true);
 
 	//Giving Hook Points Grappling Hook
 	if (HookPoints != nullptr)
@@ -92,19 +93,18 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
 
-	for (int i = 0; i < RangedWeapons.Num(); i++)
-	{
-		if (RangedWeapons[i] != nullptr)
-		{
-			//this may spawn the ice shotgun twice. gotta check this
-			allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-			allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
-			allRangedWeapons[i]->SetCamera(CameraFollowPoint);
-
-			//FAttachmentTransformRules::LocationRule
-		}
-	}
-	CurrentRangedWeapon = allRangedWeapons[0];
+	//for (int i = 0; i < RangedWeapons.Num(); i++)
+	//{
+		//if (RangedWeapons[i] != nullptr)
+		//{
+		//	//this may spawn the ice shotgun twice. gotta check this
+		//	allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
+		//	//allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
+		//	allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+		//	//allRangedWeapons[i]->SetActorHiddenInGame(true);
+		//}
+	//}
+	//CurrentRangedWeapon = allRangedWeapons[0];
 
 	if (DialogueSystemClass != nullptr)
 	{
@@ -131,6 +131,15 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//if (CurrentRangedWeapon->GetCamera() == nullptr)
+	//{
+	//	for (int i = 0; i < allRangedWeapons.Num(); i++)
+	//	{
+	//		allRangedWeapons[i]->SetCamera(CameraFollowPoint);
+	//	}
+	//}
+
 	if (!hasWallJumped && !isWallJumping)
 	{
 		WalljumpCheck();
@@ -164,37 +173,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 		characterMovementComp->GroundFriction = normalFriction;
 	}
 	currentDashCooldown += DeltaTime;
-	
-
-	//if (IsAttacking)
-	//{
-
-	//	//Pressing Timer for combo
-	//	MeleePressTimer += DeltaTime;
-
-	//	if (MeleePressTimer >= MeleePressMax)
-	//	{
-	//		MeleeAttackNum = 0;
-	//		MeleePressTimer = 0;
-	//		IsAttacking = false;
-	//	}
-	//}
 
 	if (MeleeCollider->IsCollisionEnabled())
 	{
-		//Damage Enemy for Combo Attack
-		// Might be needed as the attacks won't line up with animation right now 
-		// But idk might be able to put events into the animation for the damage
-		// Yet the animations need to be here to do it
-		// 
-		//AttackAnimTimer += DeltaTime;
-
-		//if (MeleeAttackSpeed <= AttackAnimTimer)
-		//{
-		//	ComboDamage();
-		//	AttackAnimTimer = 0;
-		//}
-
 		//Turns off Collisions after attack end
 		MeleeTimer += DeltaTime;
 
@@ -207,21 +188,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 			//AttackAnimTimer = 0;
 		}
 	}
-
-	//Puts Attack on cooldown
-	//if (MeleeAttackNum >= 3)
-	//{
-	//	CanAttack = false;
-	//	IsAttacking = false;
-	//	MeleeCooldownTimer += DeltaTime;
-	//	if (MeleeCooldownTimer >= MeleeAttackCooldown)
-	//	{
-	//		MeleeCooldownTimer = 0;
-	//		MeleeTimer = 0;
-	//		CanAttack = true;
-	//		MeleeAttackNum = 0;
-	//	}
-	//}
 
 	//Grapples to the hook point
 	if (Hooked)
@@ -254,21 +220,44 @@ void APlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Dialogue System"));
-	}
 
+	
 	if (isDead)
 	{
+		
 		if (DropAmmo)
 		{
+			
+			
 			DropAmmo = false;
 		}
-
 		Allow = false;
 	}
 }
+
+void APlayerCharacter::DropExcessAmmo()
+{
+	
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+	spawnParams.Instigator = GetInstigator();
+	//u cant spawn 2 things on top of eachother??? wtf
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	for (int i = 0; i < RangedWeapons.Num(); i++)
+	{
+		//after the line below, ammo is still a nullptr. Somethings going wrong with the spawning and i dont know why
+		AHealthAmmoDrop* ammo = GetWorld()->SpawnActor<AHealthAmmoDrop>(AmmoDropBP, GetActorLocation(), GetActorRotation(), spawnParams);
+		if (ammo != nullptr)
+		{
+			ammo->SetAmmo(i, Cast<ARangedWeapon>(allRangedWeapons[i])->GetAmmo());
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("fuck"));
+		}
+	}
+}
+
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -626,8 +615,10 @@ void APlayerCharacter::RangedAttack()
 		{
 			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
 			SetActorRotation(Rotator);
+			CurrentRangedWeapon->OnFire();
 			CurrentRangedWeapon->PrimaryAttack();
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ranged Attack"));
+			CurrentRangedWeapon->OnFire();
 		}
 	}
 }
@@ -862,16 +853,18 @@ void APlayerCharacter::GrappleTo()
 	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
 }
 
-void APlayerCharacter::DropExcessAmmo()
+void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
 {
-	for(ARangedWeapon* Weapon:allRangedWeapons)
+	SetActorHiddenInGame(ShouldHide);
+	for (ARangedWeapon* Ranged : allRangedWeapons)
 	{
-		for (int i = 1; i < Weapon->GetAmmo(); i++)
-		{
-			//Drop ammo in random spots in radius
-
-			//GetWorld()->SpawnActor<AActor>(AmmoDrop)
-		}
+		Ranged->SetActorHiddenInGame(ShouldHide);
 	}
+
+	if (GrapplingHook != nullptr)
+	{
+		GrapplingHook->SetActorHiddenInGame(ShouldHide);
+	}
+
 }
 
