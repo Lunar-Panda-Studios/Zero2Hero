@@ -34,6 +34,11 @@ void ABuffer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
+	{
+		return;
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 		TimerForEachType += DeltaTime;
