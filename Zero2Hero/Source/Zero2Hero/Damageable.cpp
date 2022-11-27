@@ -123,7 +123,7 @@ void ADamageable::SetHealth(int amount)
 
 void ADamageable::CheckDeath()
 {
-	if (Health <= 0)
+	if (Health <= 0 && !isDead)
 	{
 		if (ActorHasTag("Enemy"))
 		{

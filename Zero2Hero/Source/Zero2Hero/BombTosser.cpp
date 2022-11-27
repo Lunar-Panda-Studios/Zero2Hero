@@ -53,6 +53,11 @@ void ABombTosser::Tick(float DeltaTime)
 		return;
 	}
 
+	if (isDead)
+	{
+		return;
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 		if (ZMoveAtStart)
