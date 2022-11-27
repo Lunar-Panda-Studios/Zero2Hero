@@ -21,6 +21,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY()
+		FName WeaponTypeName;
 	UPROPERTY(BlueprintReadWrite)
 		int WeaponType;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
@@ -51,6 +53,8 @@ protected:
 		ACamera* Camera;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		float CameraAimDifference = 15.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CameraAimDifferenceYaw = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		bool isEnabled = true;
@@ -98,5 +102,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnFire();
+
+	UFUNCTION()
+		FName GetWeaponName();
+	UFUNCTION()
+		void SetAmmo(float ammo);
 
 };
