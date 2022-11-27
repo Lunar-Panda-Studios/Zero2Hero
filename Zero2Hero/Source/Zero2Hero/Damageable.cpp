@@ -101,16 +101,19 @@ void ADamageable::IncreaseHealth(int amount)
 
 void ADamageable::DecreaseHealth(int amount)
 {
-	Health -= amount;
-	if (ActorHasTag("Enemy"))
+	if (!isDead)
 	{
-		EnemyDamaged();
+		Health -= amount;
+		if (ActorHasTag("Enemy"))
+		{
+			EnemyDamaged();
+		}
+		else if (ActorHasTag("Player"))
+		{
+			PlayerDamaged();
+		}
+		CheckDeath();
 	}
-	else if (ActorHasTag("Player"))
-	{
-		PlayerDamaged();
-	}
-	CheckDeath();
 }
 
 void ADamageable::SetHealth(int amount)

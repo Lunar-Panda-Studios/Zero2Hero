@@ -125,6 +125,7 @@ void AFlameThrower::Fire()
 	spawnParams.Instigator = GetInstigator();
 	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
 	rotation.Pitch += CameraAimDifference;
+	rotation.Yaw += CameraAimDifferenceYaw;
 
 	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
 

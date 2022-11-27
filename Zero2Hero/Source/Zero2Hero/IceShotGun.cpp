@@ -57,6 +57,7 @@ void AIceShotGun::PrimaryAttack()
 
 				FRotator Temp = Camera->GetSpringArm()->GetComponentRotation();
 				Temp.Pitch += CameraAimDifference;
+				Temp.Yaw += CameraAimDifferenceYaw;
 
 				FRotator Max = FRotator(Temp.Pitch + DegreesAroundCentre / 2, Temp.Roll + DegreesAroundCentre / 2, Temp.Roll);
 				FRotator Min = FRotator(Temp.Pitch - DegreesAroundCentre / 2, Temp.Roll - DegreesAroundCentre / 2, Temp.Roll);
