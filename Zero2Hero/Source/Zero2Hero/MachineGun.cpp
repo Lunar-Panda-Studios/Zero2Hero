@@ -8,7 +8,7 @@ AMachineGun::AMachineGun()
 void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
-
+	WeaponTypeName = "Nature";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	currentSecondaryCooldown = secondaryCooldown;
 	WeaponType = 2;

@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "DialogueBox.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
+#include "SaveSystem.h"
 #include "GameManager.generated.h"
 
 /**
@@ -20,6 +22,14 @@ protected:
 		FVector CurrentCheckPoint;
 	UPROPERTY()
 		int CheckPointNum = -1;
+	UPROPERTY(BlueprintReadWrite)
+		TArray<FPowerCoreLocation> PowerCores;
+	UPROPERTY()
+		bool BridgeStatus;
+	UPROPERTY()
+		TMap<FName, float> Ammo;
+	UPROPERTY(BlueprintReadWrite)
+		bool LoadingSave = false;
 
 public:
 	UFUNCTION()
@@ -31,6 +41,12 @@ public:
 	UFUNCTION()
 		FVector GetCurrentCP();
 	UFUNCTION(BlueprintCallable)
+		void addPowerCore(FName Colour, bool InInventory, bool Placed);
+	UFUNCTION(BlueprintCallable)
 		void Respawn(AActor* Player);
+	UFUNCTION(BlueprintCallable)
+		void SaveGame(TSubclassOf<USaveSystem> Save, TMap<FName,float> AmmoTypes);
+	UFUNCTION(BlueprintCallable)
+		void LoadGame();
 	
 };
