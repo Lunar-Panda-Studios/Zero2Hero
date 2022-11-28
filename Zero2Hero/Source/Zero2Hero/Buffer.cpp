@@ -140,7 +140,10 @@ void ABuffer::Tick(float DeltaTime)
 			default:
 			{
 				NiagaraComp->SetAsset(nullptr);
-				Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(nullptr);
+				if (PairedEnemy != nullptr)
+				{
+					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(nullptr);
+				}
 				break;
 			}
 			}
