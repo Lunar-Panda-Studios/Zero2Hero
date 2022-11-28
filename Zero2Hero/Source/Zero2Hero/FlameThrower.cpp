@@ -123,16 +123,13 @@ void AFlameThrower::Fire()
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
-	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-	rotation.Pitch += CameraAimDifference;
-
-	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
+	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), GetActorRotation(), spawnParams);
 
 	/*FVector Dir = FVector(GetActorRotation().Vector() * launchSpeed) + FVector(0, 0, launchSpeed);*/
 	USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
 	if (sphereCol)
 	{
-		sphereCol->AddImpulse(GetActorForwardVector() * launchSpeed);
+		sphereCol->AddImpulse(FireLocation->GetForwardVector() * launchSpeed);
 	}
 	Timer = 0;
 }
