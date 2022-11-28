@@ -25,15 +25,15 @@ void AFlameThrower::BeginPlay()
 	WeaponType = 0;
 	Timer = TimerMax;
 
-	//if (NiagaraComp != nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Reference"));
-	//	NiagaraComp->Deactivate();
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Reference"));
-	//}
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetFireAmmo();
+		}
+	}
 	
 }
 
@@ -123,17 +123,13 @@ void AFlameThrower::Fire()
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
-	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-	rotation.Pitch += CameraAimDifference;
-	rotation.Yaw += CameraAimDifferenceYaw;
-
-	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
+	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), GetActorRotation(), spawnParams);
 
 	/*FVector Dir = FVector(GetActorRotation().Vector() * launchSpeed) + FVector(0, 0, launchSpeed);*/
 	USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
 	if (sphereCol)
 	{
-		sphereCol->AddImpulse(GetActorForwardVector() * launchSpeed);
+		sphereCol->AddImpulse(FireLocation->GetForwardVector() * launchSpeed);
 	}
 	Timer = 0;
 }

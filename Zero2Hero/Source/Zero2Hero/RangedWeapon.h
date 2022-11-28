@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "Components/SphereComponent.h"
 #include "Camera.h"
+#include "GameManager.h"
 #include "RangedWeapon.generated.h"
 
 UCLASS()
@@ -58,6 +59,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
 		bool isEnabled = true;
+	UPROPERTY()
+		UGameManager* Manager;
 
 
 public:	

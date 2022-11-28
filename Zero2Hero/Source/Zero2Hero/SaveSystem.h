@@ -14,9 +14,9 @@ struct FPowerCoreLocation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power Core")
 		FName PowerCoreColour;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power Core")
-		bool InInventory;
+		bool InInventory = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power Core")
-		bool BeenPlaced;
+		bool BeenPlaced = false;
 };
 
 UCLASS()
@@ -32,6 +32,14 @@ class ZERO2HERO_API USaveSystem : public USaveGame
 		bool IsBridgeCompleted;
 	UPROPERTY()
 		TMap<FName, float> Ammos;
+	UPROPERTY()
+		float IceAmmo;
+	UPROPERTY()
+		float FireAmmo;
+	UPROPERTY()
+		float NatureAmmo;
+	UPROPERTY()
+		float ElectricAmmo;
 
 public:
 	UFUNCTION()
@@ -41,7 +49,7 @@ public:
 	UFUNCTION()
 		void SetBridgeComplete(bool bridgeStatus);
 	UFUNCTION()
-		void SetRangedWeapons(TMap<FName, float> Ammo);
+		void SetRangedWeapons(float ice, float fire, float nature, float electric);
 
 	UFUNCTION()
 		FVector GetCPSpawn();
@@ -51,4 +59,13 @@ public:
 		bool GetBridgeStatus();
 	UFUNCTION()
 		TMap<FName, float> GetAmmos();
+
+	UFUNCTION()
+		float GetIceAmmo();
+	UFUNCTION()
+		float GetFireAmmo();
+	UFUNCTION()
+		float GetNatureAmmo();
+	UFUNCTION()
+		float GetElectricAmmo();
 };

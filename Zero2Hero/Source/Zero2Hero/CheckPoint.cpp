@@ -46,14 +46,27 @@ void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AAc
 			{
 				Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
 
-				TMap<FName, float> newMapAmmo;
-
 				for (ARangedWeapon* Weapon : Player->GetRangedWeapons())
 				{
-					newMapAmmo.Add(Weapon->GetWeaponName(), Weapon->GetAmmo());
+					if (Weapon->GetWeaponName() == "Ice")
+					{
+						Manager->SetIceAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Fire")
+					{
+						Manager->SetFireAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Electric")
+					{
+						Manager->SetElectricAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Nature")
+					{
+						Manager->SetNatureAmmo(Weapon->GetAmmo());
+					}
 				}
 
-				Manager->SaveGame(SaveClass, newMapAmmo);
+				Manager->SaveGame(SaveClass);
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("CheckPoint Got"));
 			}
 			else
