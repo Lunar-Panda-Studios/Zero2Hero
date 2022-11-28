@@ -24,6 +24,8 @@ void ACheckPoint::BeginPlay()
 	Mesh = FindComponentByClass<UStaticMeshComponent>();
 
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ACheckPoint::ActiveCheckPoint);
+
+	Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
 // Called every frame
@@ -43,6 +45,28 @@ void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AAc
 			if (Manager != nullptr)
 			{
 				Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
+
+				for (ARangedWeapon* Weapon : Player->GetRangedWeapons())
+				{
+					if (Weapon->GetWeaponName() == "Ice")
+					{
+						Manager->SetIceAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Fire")
+					{
+						Manager->SetFireAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Electric")
+					{
+						Manager->SetElectricAmmo(Weapon->GetAmmo());
+					}
+					else if (Weapon->GetWeaponName() == "Nature")
+					{
+						Manager->SetNatureAmmo(Weapon->GetAmmo());
+					}
+				}
+
+				Manager->SaveGame(SaveClass);
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("CheckPoint Got"));
 			}
 			else

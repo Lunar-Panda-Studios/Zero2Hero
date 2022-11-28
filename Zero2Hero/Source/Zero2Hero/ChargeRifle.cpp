@@ -5,9 +5,20 @@
 void AChargeRifle::BeginPlay()
 {
 	Super::BeginPlay();
+	WeaponTypeName = "Electric";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 3;
 	secondaryCurrentCooldown = secondaryFireRate;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetElectricAmmo();
+		}
+	}
 }
 
 void AChargeRifle::Tick(float DeltaTime)
@@ -34,6 +45,7 @@ void AChargeRifle::PrimaryAttack()
 
 		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
 		rotation.Pitch += CameraAimDifference;
+		rotation.Yaw += CameraAimDifferenceYaw;
 
 		ASuctionGrenade* succ = GetWorld()->SpawnActor<ASuctionGrenade>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 		/*UStaticMeshComponent* meshComp = succ->FindComponentByClass<UStaticMeshComponent>();*/

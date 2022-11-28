@@ -89,6 +89,11 @@ void AEnemy::Tick(float DeltaTime)
 		}
 	}
 
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
+	{
+		return;
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 		if (BBC != nullptr)

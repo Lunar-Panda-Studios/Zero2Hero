@@ -93,8 +93,8 @@ protected:
 
 	UPROPERTY()
 		UAIPerceptionComponent* AIPC;
-	UPROPERTY(EditAnywhere)
-		UAISenseConfig* SightConfig;
+	//UPROPERTY(EditAnywhere)
+	//	UAISenseConfig* SightConfig;
 
 	UPROPERTY(EditAnywhere)
 		UCharacterMovementComponent* MovementComp;

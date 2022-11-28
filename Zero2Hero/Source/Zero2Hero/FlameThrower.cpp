@@ -8,7 +8,7 @@ AFlameThrower::AFlameThrower()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	WeaponTypeName = "Fire";
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara Component"));
 	NiagaraComp->SetupAttachment(GetRootComponent());
 
@@ -25,15 +25,15 @@ void AFlameThrower::BeginPlay()
 	WeaponType = 0;
 	Timer = TimerMax;
 
-	//if (NiagaraComp != nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Reference"));
-	//	NiagaraComp->Deactivate();
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Reference"));
-	//}
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetFireAmmo();
+		}
+	}
 	
 }
 
