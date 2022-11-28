@@ -29,6 +29,11 @@ void ADamageable::Tick(float DeltaTime)
 
 	if (isDead && !beingRevived)
 	{
+		if (isShielded)
+		{
+			UnshieldEnemy();
+		}
+
 		AnimationTimer += DeltaTime;
 		if (AnimationTime <= AnimationTimer)
 		{
