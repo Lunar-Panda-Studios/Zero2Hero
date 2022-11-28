@@ -8,7 +8,7 @@ AFlameThrower::AFlameThrower()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	WeaponTypeName = "Fire";
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara Component"));
 	NiagaraComp->SetupAttachment(GetRootComponent());
 
@@ -125,6 +125,7 @@ void AFlameThrower::Fire()
 	spawnParams.Instigator = GetInstigator();
 	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
 	rotation.Pitch += CameraAimDifference;
+	rotation.Yaw += CameraAimDifferenceYaw;
 
 	AFireBomb* fb = GetWorld()->SpawnActor<AFireBomb>(FireBomb, FireLocation->GetComponentLocation(), rotation, spawnParams);
 
