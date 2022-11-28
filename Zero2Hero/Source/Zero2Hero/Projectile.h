@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 		int Damage;
 	UPROPERTY(EditAnywhere)
 		UProjectileMovementComponent* ProjectMovementComp;

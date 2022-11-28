@@ -68,6 +68,10 @@ void ARangedWeapon::IncreaseCharge(int amount)
 
 bool ARangedWeapon::DecreaseCharge(int amount)
 {
+	if (!isEnabled)
+	{
+		return false;
+	}
 	if (Charge - amount < 0)
 	{
 		return false;
@@ -138,6 +142,11 @@ void ARangedWeapon::SetTimerReload(float amount)
 float ARangedWeapon::GetTimeToReload()
 {
 	return TimeToReload;
+}
+
+ACamera* ARangedWeapon::GetCamera()
+{
+	return Camera;
 }
 
 void ARangedWeapon::SetCamera(ACamera* newCamera)

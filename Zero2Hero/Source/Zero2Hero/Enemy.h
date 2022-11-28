@@ -98,6 +98,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		UCharacterMovementComponent* MovementComp;
+	UPROPERTY()
+		bool isRunning = false;
+	UPROPERTY()
+		bool HasSetStartLocation = false;
 
 public:	
 	// Called every frame
@@ -150,4 +154,7 @@ public:
 		void SetBlackboard(UBlackboardComponent* Blackboard);
 	UFUNCTION()
 		void SetBehaviourTree(UBehaviorTreeComponent* BehaviourTree);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAttack();
 };

@@ -86,6 +86,8 @@ void ABombTosser::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ABombTosser::Attack()
 {
+	OnAttack();
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
@@ -97,7 +99,10 @@ void ABombTosser::Attack()
 	{
 		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Player->GetActorLocation());
 		AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileBP, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		if (Projectile != nullptr)
+		{
+			Projectile->Damage = Damage;
+		}
 	}
 	else
 	{

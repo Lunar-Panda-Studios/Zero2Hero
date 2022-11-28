@@ -68,14 +68,26 @@ void AEnemy::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Movement Component - Enemy"));
 	}
 
-	Cast<AAIController>(GetController())->RunBehaviorTree(BT);
-
+	if (GetController())
+	{
+		Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+		isRunning = true;
+	}
 }
 
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!isRunning)
+	{
+		if (GetController())
+		{
+			Cast<AAIController>(GetController())->RunBehaviorTree(BT);
+			isRunning = true;
+		}
+	}
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{

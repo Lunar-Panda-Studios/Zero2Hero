@@ -46,12 +46,12 @@ protected:
 	void BeginPlay();
 
 	//Misc
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationLeft;
-	UPROPERTY(EditAnywhere, Category = "Misc")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
-		int Phase = 1;
+		int Phase = 2;
 	UPROPERTY()
 		TEnumAsByte<BossAttacks> CurrentAttack = BossAttacks::Waiting;
 	//Will need changing to Skeletal Mesh later
@@ -69,9 +69,9 @@ protected:
 		FName LeftHandCrystalSocket;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
 		FName RightHandCrystalSocket;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* LeftHandCrystal;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		ABossCrystalWeakness* RightHandCrystal;
 	UPROPERTY()
 		bool HasPlayed = false;
@@ -100,10 +100,14 @@ protected:
 	//Phase 1 - Melee Attack 1 Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
 		UAnimSequence* MeleeAttack1RightTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Right Arm")
+		int P1Melee1RDamage;
 
 	//Phase 1 - Melee Attack 1 Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
 		UAnimSequence* MeleeAttack1LeftTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 1 Left Arm")
+		int P1Melee1LDamage;
 
 	//Phase 1 - Melee Attack 2a Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
@@ -114,6 +118,8 @@ protected:
 		float MeleeAttack2aRightTimeDown;
 	UPROPERTY()
 		float MeleeAttack2aRightTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Right Arm")
+		int P1Melee2aRDamage;
 
 	//Phase 1 - Melee Attack 2a Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
@@ -124,6 +130,8 @@ protected:
 		float MeleeAttack2aLeftTimeDown;
 	UPROPERTY()
 		float MeleeAttack2aLeftTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2a Left Arm")
+		int P1Melee2aLDamage;
 
 	//Phase 1 - Melee Attack 2b Right Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
@@ -134,6 +142,8 @@ protected:
 		float MeleeAttack2bRightTimeDown;
 	UPROPERTY()
 		float MeleeAttack2bRightTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Right Arm")
+		int P1Melee2bRDamage;
 
 	//Phase 1 - Melee Attack 2b Left Arm
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
@@ -144,6 +154,8 @@ protected:
 		float MeleeAttack2bLeftTimeDown;
 	UPROPERTY()
 		float MeleeAttack2bLeftTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Melee Attack 2b Left Arm")
+		int P1Melee2bLDamage;
 
 	//Phase 1 - AOE1 
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - AoE 1")
@@ -172,6 +184,23 @@ protected:
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
+	UPROPERTY()
+		bool SpawnSet = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Launcher1Fixed = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Launcher2Fixed = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Harpoon1Launched = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Harpoon2Launched = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isActiveMissile = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isActiveRegProjectile = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool ReadyToSpawn = true;
 
 	//Phase 2 - Summon1
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 1")
@@ -182,6 +211,8 @@ protected:
 		TSubclassOf<AActor> HarponPiece1;
 	UPROPERTY()
 		bool HarponPiece1Spawned = false;
+	UPROPERTY()
+		int CurrentSummon = 1;
 
 	//Phase 2 - Summon2
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning Version 2")
@@ -200,6 +231,12 @@ protected:
 		bool HasFired = false;
 	UPROPERTY()
 		AHomingMissile* Missile;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Missile Projectile")
+		int MissileDamage;
+	UPROPERTY()
+		float TimerToNext = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Missile Projectile")
+		float TimeToNext = 2.0f;
 
 	//Phase 2 - Regular Projectile
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Regular Projectile")
@@ -212,6 +249,8 @@ protected:
 		int AmountToFire = 0;
 	UPROPERTY()
 		int AmountHasFired = 0;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Regular Projectile")
+		int RegProjectileDamage;
 
 public:
 	UFUNCTION()
