@@ -53,41 +53,60 @@ void ACannonFodder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!CanExplode)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
-		if (InRange && AttackSpeedTimer == 0)
-		{
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		}
-		else
-		{
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
 
-		if (InRange)
+		if (Health > 0)
 		{
-			AttackSpeedTimer += DeltaTime;
-
-			if (AttackSpeedTimer >= AttackSpeed)
+			if (!CanExplode)
 			{
-				AttackSpeedTimer = 0;
-			}
-		}
-	}
-	else
-	{
-		if (InRange)
-		{
-			Timer += DeltaTime;
+				if (InRange && AttackSpeedTimer == 0)
+				{
+					OnAttack();
+					MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				}
+				else
+				{
+					MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				}
 
-			if (Timer >= TimeToExplode)
-			{
-				Explode();
+				if (InRange)
+				{
+					AttackSpeedTimer += DeltaTime;
+
+					if (AttackSpeedTimer >= AttackSpeed)
+					{
+						AttackSpeedTimer = 0;
+					}
+				}
 			}
-		}
-		else
-		{
-			Timer = 0;
+			else
+			{
+				if (InRange || shouldExplode)
+				{
+					shouldExplode = true;
+
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", true);
+					}
+
+					Timer += DeltaTime;
+
+					if (Timer >= TimeToExplode)
+					{
+						OnAttack();
+						Explode();
+					}
+				}
+				else
+				{
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", false);
+					}
+				}
+			}
 		}
 	}
 }
@@ -103,7 +122,7 @@ void ACannonFodder::Explode()
 {
 	BlastRadius->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//SetLifeSpan(AnimationTimer);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
 	Destroy();
 
 }
