@@ -12,6 +12,16 @@ void AMachineGun::BeginPlay()
 	FireLocation = FindComponentByClass<USphereComponent>();
 	currentSecondaryCooldown = secondaryCooldown;
 	WeaponType = 2;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetNatureAmmo();
+		}
+	}
 }
 
 void AMachineGun::Tick(float DeltaTime)

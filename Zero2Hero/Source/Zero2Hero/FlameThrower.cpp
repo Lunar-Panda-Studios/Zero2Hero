@@ -25,15 +25,15 @@ void AFlameThrower::BeginPlay()
 	WeaponType = 0;
 	Timer = TimerMax;
 
-	//if (NiagaraComp != nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Has Reference"));
-	//	NiagaraComp->Deactivate();
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No Reference"));
-	//}
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetFireAmmo();
+		}
+	}
 	
 }
 

@@ -24,6 +24,16 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			Manager->Respawn(this);
+		}
+	}
+
 	startingGravityScale = GetCharacterMovement()->GravityScale;
 	startingTurnSpeed = GetCharacterMovement()->RotationRate.Vector().Z;
 	startingAirControl = GetCharacterMovement()->AirControl;

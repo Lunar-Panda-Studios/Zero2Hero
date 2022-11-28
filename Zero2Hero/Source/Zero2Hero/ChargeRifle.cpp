@@ -9,6 +9,16 @@ void AChargeRifle::BeginPlay()
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 3;
 	secondaryCurrentCooldown = secondaryFireRate;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetElectricAmmo();
+		}
+	}
 }
 
 void AChargeRifle::Tick(float DeltaTime)
