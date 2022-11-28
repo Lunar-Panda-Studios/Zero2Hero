@@ -33,6 +33,8 @@ protected:
 		float RunAwayDistance;
 	UPROPERTY()
 		float Radius;
+	UPROPERTY(EditAnywhere)
+		UNiagaraSystem* ReanimationVFX;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

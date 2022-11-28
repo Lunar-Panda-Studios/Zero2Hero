@@ -51,7 +51,7 @@ protected:
 		float FireAmmo;
 
 	UPROPERTY(BlueprintReadWrite)
-		bool LoadingSave = true;
+		bool LoadingSave = false;
 
 public:
 	UFUNCTION()
