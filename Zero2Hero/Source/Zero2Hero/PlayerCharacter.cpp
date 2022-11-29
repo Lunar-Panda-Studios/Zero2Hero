@@ -384,8 +384,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 		UClass* seekClass = ACharacter::StaticClass();
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), GroundPoundRadius, traceObjectTypes, seekClass, ignoreActors, actors);
 		hasGroundPounded = false;
-		DrawDebugSphere(GetWorld(), GetActorLocation(), GroundPoundRadius, 12, FColor::Red, false, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
-
+		
 		ADamageable* DamageableTarget;
 
 		for (AActor* overlappedActor : actors) 
@@ -503,7 +502,6 @@ void APlayerCharacter::Dash()
 
 			FHitResult Hit;
 			GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
-			DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
 			FVector dir;
 			if (!Hit.IsValidBlockingHit())
 			{
@@ -512,7 +510,6 @@ void APlayerCharacter::Dash()
 					return;
 				}
 				dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
 				hasDashedInAir = true;
 			}
 			else
