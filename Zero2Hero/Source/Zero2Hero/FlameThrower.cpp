@@ -120,6 +120,10 @@ void AFlameThrower::SecondaryAttack()
 
 void AFlameThrower::Fire()
 {
+	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+	rotation.Pitch += CameraAimDifference;
+	rotation.Yaw += CameraAimDifferenceYaw;
+
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = this;
 	spawnParams.Instigator = GetInstigator();
@@ -129,7 +133,7 @@ void AFlameThrower::Fire()
 	USphereComponent* sphereCol = fb->FindComponentByClass<USphereComponent>();
 	if (sphereCol)
 	{
-		sphereCol->AddImpulse(FireLocation->GetForwardVector() * launchSpeed);
+		sphereCol->AddImpulse(rotation.Vector() * launchSpeed);
 	}
 	Timer = 0;
 }

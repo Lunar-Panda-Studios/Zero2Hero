@@ -52,7 +52,7 @@ void AChargeRifle::PrimaryAttack()
 		USphereComponent* sphereCol = succ->FindComponentByClass<USphereComponent>();
 		if (sphereCol && succ)
 		{
-			sphereCol->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);/*
+			sphereCol->AddImpulse(rotation.Vector() * secondaryLaunchSpeed);/*
 			meshComp->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);*/
 		}
 		currentCooldown = 0.0f;
