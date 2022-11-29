@@ -92,6 +92,8 @@ bool AGrapplingHook::Fire()
 				GrappleShoot();
 
 				InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
+				InUseHook->SetHookPointLocation(HookHit.ImpactPoint);
+
 				isGrappling = true;
 				PreviousMag = (GetActorLocation() - HookHit.GetActor()->GetActorLocation()).Size();
 				EndGrapple = false;
