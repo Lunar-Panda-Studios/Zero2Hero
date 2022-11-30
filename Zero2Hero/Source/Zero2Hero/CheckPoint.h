@@ -7,6 +7,8 @@
 #include "GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
+#include "PlayerCharacter.h"
+#include "SaveSystem.h"
 #include "CheckPoint.generated.h"
 
 UCLASS()
@@ -30,6 +32,10 @@ protected:
 		int CheckPointNum = 0;
 	UPROPERTY()
 		UStaticMeshComponent* Mesh;
+	UPROPERTY()
+		APlayerCharacter* Player;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<USaveSystem> SaveClass;
 
 public:	
 	// Called every frame

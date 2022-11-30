@@ -8,10 +8,20 @@ AMachineGun::AMachineGun()
 void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
-
+	WeaponTypeName = "Nature";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	currentSecondaryCooldown = secondaryCooldown;
 	WeaponType = 2;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetNatureAmmo();
+		}
+	}
 }
 
 void AMachineGun::Tick(float DeltaTime)
@@ -36,6 +46,7 @@ void AMachineGun::SecondaryAttack()
 		spawnParams.Instigator = GetInstigator();
 		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
 		rotation.Pitch += CameraAimDifference;
+		rotation.Yaw += CameraAimDifferenceYaw;
 		AActor* turretSeed = GetWorld()->SpawnActor<AActor>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 		ATurretSeed* seed = Cast<ATurretSeed>(turretSeed);
 		seed->ammo = Charge;

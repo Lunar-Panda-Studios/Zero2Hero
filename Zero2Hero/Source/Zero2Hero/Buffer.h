@@ -41,6 +41,8 @@ protected:
 		bool isReflectorVariant = false;
 	UPROPERTY(EditAnywhere)
 		TMap<TEnumAsByte<ElementType>, UNiagaraSystem*> ShieldVFX;
+	UPROPERTY()
+		float SphereRadius;
 
 
 
