@@ -44,7 +44,6 @@ void AFireBomb::OnHit(UPrimitiveComponent* HitComp, class AActor* OtherActor, UP
 			{
 				if (Cast<AEnemy>(a))
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, a->GetName());
 					Cast<AEnemy>(a)->DecreaseHealth(damage);
 				}
 			}

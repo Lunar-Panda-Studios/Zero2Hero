@@ -14,12 +14,6 @@ APlayerCharacter::APlayerCharacter()
 
 	CapCollider = FindComponentByClass<UCapsuleComponent>();
 
-	//springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	//springArm->SetupAttachment(GetRootComponent());
-
-	//Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	//Camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
-
 	MeleeCollider = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeZone"));
 	MeleeCollider->SetupAttachment(GetRootComponent());
 
@@ -29,6 +23,16 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			Manager->Respawn(this);
+		}
+	}
 
 	startingGravityScale = GetCharacterMovement()->GravityScale;
 	startingTurnSpeed = GetCharacterMovement()->RotationRate.Vector().Z;
@@ -72,11 +76,6 @@ void APlayerCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Capsule Collider"));
 	}
 
-	//Gives Grapple Hook
-	//GrapplingHook = GetWorld()->SpawnActor<AGrapplingHook>(Grappling, GetActorLocation(), GetActorRotation(), spawnParams);
-	////GrapplingHook->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, GrapplingHookSocket);
-	////GrapplingHook->SetActorHiddenInGame(true);
-
 	//Giving Hook Points Grappling Hook
 	if (HookPoints != nullptr)
 	{
@@ -92,19 +91,6 @@ void APlayerCharacter::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("No Hook Point set please check blueprint"));
 	}
-
-	//for (int i = 0; i < RangedWeapons.Num(); i++)
-	//{
-		//if (RangedWeapons[i] != nullptr)
-		//{
-		//	//this may spawn the ice shotgun twice. gotta check this
-		//	allRangedWeapons.Add(GetWorld()->SpawnActor<ARangedWeapon>(RangedWeapons[i], GetActorLocation(), GetActorRotation(), spawnParams));
-		//	//allRangedWeapons[i]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, RangedSocket);
-		//	allRangedWeapons[i]->SetCamera(CameraFollowPoint);
-		//	//allRangedWeapons[i]->SetActorHiddenInGame(true);
-		//}
-	//}
-	//CurrentRangedWeapon = allRangedWeapons[0];
 
 	if (DialogueSystemClass != nullptr)
 	{
@@ -197,6 +183,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 			GrappleTo();
 			Hooked = false;
 		}
+	}
+
+	if (GrapplingHook->GetEndGrapple())
+	{
+		GrapplingHook->SetEndGrapple(false);
+		EndingGrapple();
+		characterMovementComp->Velocity = FVector(0, 0, 0);
 	}
 
 	if (DialogueSystem != nullptr)
@@ -308,13 +301,8 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor*
 	{
 		if (OtherActor->ActorHasTag("GrapplePoint") || OtherActor->ActorHasTag("Hook"))
 		{
-			if (GrapplingHook->GetInUseHook() != nullptr)
-			{
-				GrapplingHook->GetCable()->SetVisibility(false);
-				GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
-				GrapplingHook->GetInUseHook()->Destroy();
-				GrappleEnd();
-			}
+			EndingGrapple();
+			characterMovementComp->Velocity = FVector(0, 0, 0);
 		}
 	}
 }
@@ -396,8 +384,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 		UClass* seekClass = ACharacter::StaticClass();
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), GroundPoundRadius, traceObjectTypes, seekClass, ignoreActors, actors);
 		hasGroundPounded = false;
-		DrawDebugSphere(GetWorld(), GetActorLocation(), GroundPoundRadius, 12, FColor::Red, false, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
-
+		
 		ADamageable* DamageableTarget;
 
 		for (AActor* overlappedActor : actors) 
@@ -515,7 +502,6 @@ void APlayerCharacter::Dash()
 
 			FHitResult Hit;
 			GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_GameTraceChannel1, TraceParams, FCollisionResponseParams());
-			DrawDebugLine(GetWorld(), GetActorLocation(), LineTraceEnd, FColor::Blue, false, 1.0f, 0, 5);
 			FVector dir;
 			if (!Hit.IsValidBlockingHit())
 			{
@@ -524,7 +510,6 @@ void APlayerCharacter::Dash()
 					return;
 				}
 				dir = forwardDir * dashVelocity / 2 + FVector(0, 0, -dashPushDown);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Hit"));
 				hasDashedInAir = true;
 			}
 			else
@@ -578,30 +563,6 @@ void APlayerCharacter::MeleeAttack()
 			//MeleeAttackNum += 1;
 			MeleePressTimer = 0;
 			IsAttacking = true;
-
-
-			//switch (MeleeAttackNum)
-			//{
-			//case 1:
-			//{
-			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 1"));
-			//	break;
-			//}
-			//case 2:
-			//{
-			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 2"));
-			//	ComboDamage();
-			//	break;
-			//}
-			//case 3:
-			//{
-			//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack 3"));
-			//	ComboDamage();
-			//	break;
-			//}
-			//default:
-			//	break;
-			//}
 		}
 	}
 
@@ -628,6 +589,18 @@ void APlayerCharacter::RangedAttackEnd()
 	if (CurrentRangedWeapon != nullptr)
 	{
 		CurrentRangedWeapon->PrimaryAttackEnd();
+	}
+}
+
+void APlayerCharacter::EndingGrapple()
+{
+	if (GrapplingHook->GetInUseHook() != nullptr)
+	{
+		GrapplingHook->SetIsGrappling(true);
+		GrapplingHook->GetCable()->SetVisibility(false);
+		GrapplingHook->GetInUseHook()->SetActorLocation(GrapplingHook->GetFireLocation()->GetComponentLocation());
+		GrapplingHook->GetInUseHook()->Destroy();
+		GrappleEnd();
 	}
 }
 
@@ -866,5 +839,10 @@ void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
 		GrapplingHook->SetActorHiddenInGame(ShouldHide);
 	}
 
+}
+
+TArray<ARangedWeapon*> APlayerCharacter::GetRangedWeapons()
+{
+	return allRangedWeapons;
 }
 

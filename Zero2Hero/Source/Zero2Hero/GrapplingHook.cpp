@@ -8,11 +8,7 @@ AGrapplingHook::AGrapplingHook()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	//CameraComponent = FindComponentByClass<UCameraComponent>();
-
 	FireLocation = CreateDefaultSubobject<USphereComponent>(TEXT("Fire Location"));
-	//FireLocation->SetupAttachment(RootComponent);
 
 	CableComp = CreateDefaultSubobject<UCableComponent>(TEXT("Cable Component"));
 
@@ -40,6 +36,25 @@ void AGrapplingHook::Tick(float DeltaTime)
 			isGrappling = false;
 		}
 	}
+
+	if (!canGrapple)
+	{
+		//mag current location -> Hookpoint
+		//if mag increases detach and 0 velocity
+
+		float CurrentMag = (HookHit.GetActor()->GetActorLocation() - GetActorLocation()).Size();
+
+		if (CurrentMag > PreviousMag + MagCheck)
+		{
+			if (!canGrapple)
+			{
+				EndGrapple = true;
+				canGrapple = false;
+			}
+		}
+
+		PreviousMag = CurrentMag;
+	}
 }
 
 bool AGrapplingHook::Fire()
@@ -48,6 +63,12 @@ bool AGrapplingHook::Fire()
 	{
 		return false;
 	}
+
+	if (!canGrapple)
+	{
+		return false;
+	}
+
 	FVector LineTraceEnd = GrapplePoint->GetActorLocation();
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(this->GetOwner());
@@ -57,22 +78,30 @@ bool AGrapplingHook::Fire()
 	FVector dir;
 	if (HookHit.IsValidBlockingHit())
 	{
-		if (HookHit.GetActor()->ActorHasTag("GrapplePoint"))
+		if (HookHit.GetActor() != nullptr)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Correct Tag"));
-			FActorSpawnParameters spawnParams;
-			spawnParams.Owner = this;
-			spawnParams.Instigator = GetInstigator();
+			if (HookHit.GetActor()->ActorHasTag("GrapplePoint"))
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Correct Tag"));
+				FActorSpawnParameters spawnParams;
+				spawnParams.Owner = this;
+				spawnParams.Instigator = GetInstigator();
 
-			FRotator rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), HookHit.GetActor()->GetActorLocation());;
+				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), HookHit.GetActor()->GetActorLocation());;
 
-			GrappleShoot();
+				GrappleShoot();
 
-			InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
-			isGrappling = true;
+				InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
+				InUseHook->SetHookPointLocation(HookHit.ImpactPoint);
 
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("True"));
-			return true;
+				isGrappling = true;
+				PreviousMag = (GetActorLocation() - HookHit.GetActor()->GetActorLocation()).Size();
+				EndGrapple = false;
+				canGrapple = false;
+
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("True"));
+				return true;
+			}
 		}
 	}
 	if (HookHit.GetActor() != NULL)
@@ -132,17 +161,22 @@ USphereComponent* AGrapplingHook::GetFireLocation()
 	return FireLocation;
 }
 
-void AGrapplingHook::CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->ActorHasTag("GrapplePoint"))
-	{
-		isGrappling = false;
-	}
-}
+//void AGrapplingHook::CableOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (OtherActor->ActorHasTag("GrapplePoint"))
+//	{
+//		//isGrappling = false;
+//	}
+//}
 
 bool AGrapplingHook::GetIsGrappling()
 {
 	return isGrappling;
+}
+
+void AGrapplingHook::SetIsGrappling(bool newGrappling)
+{
+	canGrapple = newGrappling;
 }
 
 UCableComponent* AGrapplingHook::GetCable()
@@ -158,5 +192,15 @@ void AGrapplingHook::OnHit(AActor* OverlappedActor, AActor* OtherActor)
 AHook* AGrapplingHook::GetInUseHook()
 {
 	return InUseHook;
+}
+
+bool AGrapplingHook::GetEndGrapple()
+{
+	return EndGrapple;
+}
+
+void AGrapplingHook::SetEndGrapple(bool newGrapple)
+{
+	EndGrapple = newGrapple;
 }
 

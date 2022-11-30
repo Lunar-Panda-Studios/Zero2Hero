@@ -29,6 +29,11 @@ void ADamageable::Tick(float DeltaTime)
 
 	if (isDead && !beingRevived)
 	{
+		if (isShielded)
+		{
+			UnshieldEnemy();
+		}
+
 		AnimationTimer += DeltaTime;
 		if (AnimationTime <= AnimationTimer)
 		{
@@ -54,6 +59,8 @@ void ADamageable::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	CheckDeath();
 }
 
 int ADamageable::GetDamage()
@@ -99,16 +106,19 @@ void ADamageable::IncreaseHealth(int amount)
 
 void ADamageable::DecreaseHealth(int amount)
 {
-	Health -= amount;
-	if (ActorHasTag("Enemy"))
+	if (!isDead)
 	{
-		EnemyDamaged();
+		Health -= amount;
+		if (ActorHasTag("Enemy"))
+		{
+			EnemyDamaged();
+		}
+		else if (ActorHasTag("Player"))
+		{
+			PlayerDamaged();
+		}
+		CheckDeath();
 	}
-	else if (ActorHasTag("Player"))
-	{
-		PlayerDamaged();
-	}
-	CheckDeath();
 }
 
 void ADamageable::SetHealth(int amount)
@@ -118,7 +128,7 @@ void ADamageable::SetHealth(int amount)
 
 void ADamageable::CheckDeath()
 {
-	if (Health <= 0)
+	if (Health <= 0 && !isDead)
 	{
 		if (ActorHasTag("Enemy"))
 		{

@@ -24,6 +24,8 @@ void ACheckPoint::BeginPlay()
 	Mesh = FindComponentByClass<UStaticMeshComponent>();
 
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ACheckPoint::ActiveCheckPoint);
+
+	Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
 // Called every frame
@@ -35,20 +37,37 @@ void ACheckPoint::Tick(float DeltaTime)
 
 void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("Overlap Checkpoint"));
 	if (OtherActor->ActorHasTag("Player"))
 	{
 		if (!OtherComp->ComponentHasTag("PlayerView"))
 		{
-			if (Manager != nullptr)
+			if (Manager == nullptr)
 			{
-				Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("CheckPoint Got"));
+				Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
 			}
-			else
+			
+			Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
+
+			for (ARangedWeapon* Weapon : Player->GetRangedWeapons())
 			{
-				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("No GameManger"));
+				if (Weapon->GetWeaponName() == "Ice")
+				{
+					Manager->SetIceAmmo(Weapon->GetAmmo());
+				}
+				else if (Weapon->GetWeaponName() == "Fire")
+				{
+					Manager->SetFireAmmo(Weapon->GetAmmo());
+				}
+				else if (Weapon->GetWeaponName() == "Electric")
+				{
+					Manager->SetElectricAmmo(Weapon->GetAmmo());
+				}
+				else if (Weapon->GetWeaponName() == "Nature")
+				{
+					Manager->SetNatureAmmo(Weapon->GetAmmo());
+				}
 			}
+			Manager->SaveGame(SaveClass);
 		}
 	}
 }
