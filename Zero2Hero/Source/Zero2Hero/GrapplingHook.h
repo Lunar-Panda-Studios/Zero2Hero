@@ -56,6 +56,8 @@ protected:
 		float PreviousMag;
 	UPROPERTY()
 		bool EndGrapple = false;
+	UPROPERTY(EditAnywhere, Category = "Grappling")
+		float MagCheck = 50;
 
 
 public:	

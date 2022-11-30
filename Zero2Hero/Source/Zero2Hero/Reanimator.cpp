@@ -76,6 +76,12 @@ void AReanimator::ReanimateEnemy()
 	ToRevive->SetHealth(ToRevive->GetMaxHealth());
 	ToRevive->SetIsDead(false);
 	ToRevive->SetBeingRevived(false);
+
+	if (ReanimationVFX != nullptr)
+	{
+		ToRevive->GetNiagaraComp()->SetAsset(nullptr);
+	}
+
 	isReviving = false;
 	ToRevive = nullptr;
 
@@ -112,6 +118,11 @@ void AReanimator::FindNewTarget()
 					{
 						BBC->SetValueAsBool("IsReviving", true);
 						BBC->SetValueAsVector("ToRevive", enemy->GetActorLocation());
+					}
+
+					if (ReanimationVFX != nullptr)
+					{
+						enemy->GetNiagaraComp()->SetAsset(ReanimationVFX);
 					}
 
 					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("New Target Selected"));

@@ -18,6 +18,16 @@ void AIceShotGun::BeginPlay()
 	WeaponTypeName = "Ice";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 1;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetIceAmmo();
+		}
+	}
 	
 }
 

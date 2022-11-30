@@ -46,8 +46,6 @@ void ASuctionGrenade::Tick(float DeltaTime)
 	{
 		currentSuccTime += DeltaTime;
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), succRadius, traceObjectTypes, seekClass, ignoreActors, actors);
-		DrawDebugSphere(GetWorld(), GetActorLocation(), succRadius, 12, FColor::Red, true, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 		for (AActor* a : actors)
 		{
 			if (Cast<AEnemy>(a))
@@ -59,7 +57,6 @@ void ASuctionGrenade::Tick(float DeltaTime)
 				dir = dir * succSpeed;
 				DamageableTarget = Cast<ADamageable>(a);
 				DamageableTarget->LaunchCharacter(dir, false, false);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 				/*DamageableTarget = a->FindComponentByClass<UStaticMeshComponent>();
 				DamageableTarget->AddForce(dir);*/
 			}

@@ -44,7 +44,7 @@ void AGrapplingHook::Tick(float DeltaTime)
 
 		float CurrentMag = (HookHit.GetActor()->GetActorLocation() - GetActorLocation()).Size();
 
-		if (CurrentMag > PreviousMag + 10)
+		if (CurrentMag > PreviousMag + MagCheck)
 		{
 			if (!canGrapple)
 			{
@@ -92,6 +92,8 @@ bool AGrapplingHook::Fire()
 				GrappleShoot();
 
 				InUseHook = GetWorld()->SpawnActor<AHook>(Hook, FireLocation->GetComponentLocation(), rotation, spawnParams);
+				InUseHook->SetHookPointLocation(HookHit.ImpactPoint);
+
 				isGrappling = true;
 				PreviousMag = (GetActorLocation() - HookHit.GetActor()->GetActorLocation()).Size();
 				EndGrapple = false;
