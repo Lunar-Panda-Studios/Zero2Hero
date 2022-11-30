@@ -43,6 +43,11 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
+	{
+		return;
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
 		if (BBC != nullptr)
@@ -857,24 +862,34 @@ void ABoss::Phase2AttackChoice()
 
 void ABoss::HarponSpawn()
 {
-	for (int i = 0; i < SummonedEnemies.Num(); i++)
+	if (SummonedEnemies.Num() != 0)
 	{
-		if (SummonedEnemies[i] == nullptr)
+		for (AEnemy* enemy : SummonedEnemies)
 		{
-			if(SummonedEnemies[i] )
-			SummonedEnemies.RemoveAt(i);
-		}
-
-		if (SummonedEnemies[i] != nullptr)
-		{
-			if (SummonedEnemies[i]->GetIsDead())
+			if (enemy != nullptr)
 			{
-				SummonedEnemies.RemoveAt(i);
+				if (enemy->GetIsDead())
+				{
+					SummonedEnemies.Remove(enemy);
+				}
+			}
+			else
+			{
+				SummonedEnemies.Remove(enemy);
 			}
 		}
+
+		if (SummonedEnemies.Num() == 0 && SpawnSet)
+		{
+			return;
+		}
+	}
+	else if (SummonedEnemies.Num() == 0 && SpawnSet)
+	{
+		return;
 	}
 
-	if (SummonedEnemies.Num() == 1)
+	if (SummonedEnemies.Num() == 1 && !SpawnSet)
 	{
 		if (CurrentSummon == 1)
 		{
@@ -899,33 +914,19 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				HarponPiece1Spawned = true;
 				GetWorld()->SpawnActor<AActor>(HarponPiece1, Player->GetActorLocation(), GetActorRotation(), spawnParams);
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Harpon 1 not set"));
 			}
 		}
 		else
 		{
-			if (HarponPiece1 != nullptr)
+			if (HarponPiece2 != nullptr)
 			{
 				if (CurrentSummon == 2)
 				{
-					HarponPiece2Spawned = true;
 					GetWorld()->SpawnActor<AActor>(HarponPiece2, Player->GetActorLocation(), GetActorRotation(), spawnParams);
 				}
 			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Harpon 2 not set"));
-			}
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Kill more enemies"));
 	}
 }
 

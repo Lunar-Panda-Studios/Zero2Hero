@@ -233,6 +233,7 @@ public:
 	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
 	void RangedAttackEnd();
+	void EndingGrapple();
 
 	void HookShot();
 	void GrappleTo();
@@ -305,4 +306,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetPlayerVisability(bool ShouldHide);
+	UFUNCTION()
+		TArray<ARangedWeapon*> GetRangedWeapons();
 };
