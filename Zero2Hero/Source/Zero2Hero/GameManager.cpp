@@ -21,10 +21,10 @@ void UGameManager::OnStart()
 	PowerCore.PowerCoreColour = "Red";
 	PowerCoresRed = PowerCore;
 
-	if (LoadingSave)
-	{
-		LoadGame();
-	}
+	//if (LoadingSave)
+	//{
+	//	LoadGame();
+	//}
 }
 
 bool UGameManager::GetLoadingSave()
@@ -175,9 +175,14 @@ void UGameManager::SaveGame(TSubclassOf<USaveSystem> Save)
 	UGameplayStatics::SaveGameToSlot(Saved, "EQUI&AcaData", 0);
 }
 
-void UGameManager::LoadGame()
+bool UGameManager::LoadGame()
 {
 	USaveSystem* Save = Cast<USaveSystem>(UGameplayStatics::LoadGameFromSlot("EQUI&AcaData", 0));
+
+	if (Save == nullptr)
+	{
+		return false;
+	}
 
 	CurrentCheckPoint = Save->GetCPSpawn();
 	BridgeStatus = Save->GetBridgeStatus();
@@ -186,4 +191,6 @@ void UGameManager::LoadGame()
 	ElectricAmmo = Save->GetElectricAmmo();
 	NatureAmmo = Save->GetNatureAmmo();
 	FireAmmo = Save->GetFireAmmo();
+
+	return true;
 }
