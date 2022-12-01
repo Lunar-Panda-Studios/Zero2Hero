@@ -159,3 +159,8 @@ FName ARangedWeapon::GetWeaponName()
 	return WeaponTypeName;
 }
 
+void ARangedWeapon::SetAmmo(float ammo)
+{
+	CurrentAmmo = ammo;
+}
+

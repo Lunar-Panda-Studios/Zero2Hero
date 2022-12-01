@@ -18,9 +18,12 @@ void USaveSystem::SetBridgeComplete(bool bridgeStatus)
 	IsBridgeCompleted = bridgeStatus;
 }
 
-void USaveSystem::SetRangedWeapons(TMap<FName,float> Ammo)
+void USaveSystem::SetRangedWeapons(float ice, float fire, float nature, float electric)
 {
-	Ammos = Ammo;
+	IceAmmo = ice;
+	FireAmmo = fire;
+	NatureAmmo = nature;
+	ElectricAmmo = electric;
 }
 
 FVector USaveSystem::GetCPSpawn()
@@ -41,4 +44,24 @@ bool USaveSystem::GetBridgeStatus()
 TMap<FName, float> USaveSystem::GetAmmos()
 {
 	return Ammos;
+}
+
+float USaveSystem::GetIceAmmo()
+{
+	return IceAmmo;
+}
+
+float USaveSystem::GetFireAmmo()
+{
+	return FireAmmo;
+}
+
+float USaveSystem::GetNatureAmmo()
+{
+	return NatureAmmo;
+}
+
+float USaveSystem::GetElectricAmmo()
+{
+	return ElectricAmmo;
 }

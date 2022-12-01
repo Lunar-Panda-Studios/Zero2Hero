@@ -21,11 +21,6 @@ void ACannonFodder::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
-	{
-		return;
-	}
-
 	if (BlastRadius != nullptr)
 	{
 		BlastRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -57,6 +52,16 @@ void ACannonFodder::BeginPlay()
 void ACannonFodder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
+	{
+		return;
+	}
+
+	if (isDead)
+	{
+		return;
+	}
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
