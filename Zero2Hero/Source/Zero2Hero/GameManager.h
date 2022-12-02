@@ -97,6 +97,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SaveGame(TSubclassOf<USaveSystem> Save);
 	UFUNCTION(BlueprintCallable)
-		void LoadGame();
+		bool LoadGame();
 	
 };
