@@ -85,6 +85,12 @@ bool ADamageable::GetBeingRevived()
 void ADamageable::SetBeingRevived(bool newRevive)
 {
 	beingRevived = newRevive;
+
+	if(!beingRevived)
+	{
+		AnimationTimer = 0;
+		EnemyDies();
+	}
 }
 
 void ADamageable::SetIsDead(bool newDead)
@@ -95,6 +101,11 @@ void ADamageable::SetIsDead(bool newDead)
 void ADamageable::SetIsCrystal(bool NewIsCrystal)
 {
 	IsCrystal = NewIsCrystal;
+}
+
+void ADamageable::OnDeath()
+{
+
 }
 
 
@@ -142,6 +153,7 @@ void ADamageable::CheckDeath()
 {
 	if (Health <= 0 && !isDead)
 	{
+		OnDeath();
 		if (ActorHasTag("Enemy"))
 		{
 			EnemyDies();
@@ -154,8 +166,6 @@ void ADamageable::CheckDeath()
 		//SetLifeSpan(AnimationTimer);
 		AnimationTimer = 0;
 		Allow = false;
-
-
 	}
 }
 

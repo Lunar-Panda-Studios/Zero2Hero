@@ -82,6 +82,8 @@ public:
 		void SetIsDead(bool newDead);
 	UFUNCTION()
 		void SetIsCrystal(bool NewIsCrystal);
+	UFUNCTION()
+		virtual void OnDeath();
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
