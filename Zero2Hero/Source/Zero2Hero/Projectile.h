@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 		int Damage;
 	UPROPERTY(EditAnywhere)
 		UProjectileMovementComponent* ProjectMovementComp;
@@ -28,6 +28,12 @@ public:
 		bool isEnemyProjectile = false;
 	UPROPERTY()
 		TEnumAsByte<ElementType> ElementType = ElementType::None;
+	UPROPERTY()
+		bool HasDestruct = false;
+	UPROPERTY()
+		bool isHomingMissile = false;
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+		float LifeSpan = 10;
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,14 +42,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+		bool GetHasDestruct();
 
 	UFUNCTION()
-	virtual void OnHit(AActor* OverlappedActor, AActor* OtherActor);
-
-	UFUNCTION()
-	virtual void OnComponentHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+		virtual void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

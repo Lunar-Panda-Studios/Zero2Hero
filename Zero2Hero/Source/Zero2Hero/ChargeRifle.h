@@ -26,12 +26,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void PrimaryAttackEnd() override;
 	UFUNCTION()
-		void Attack();
+		void Attack(float DeltaTime);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void StopCharging();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float fireRate = 5.0f;
 	UPROPERTY()
 		float currentCooldown = 5.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float fireTime = 2.0f;
+	UPROPERTY()
+		float currentFireTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float secondaryFireRate = 2.0f;
@@ -43,4 +51,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool shooting = false;
+
+	UPROPERTY()
+		bool hasFired = false;
+
+	
+
 };

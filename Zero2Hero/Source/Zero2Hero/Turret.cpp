@@ -81,7 +81,7 @@ void ATurret::Tick(float DeltaTime)
 					Bullet->Damage = damage;
 				}
 				fireRateCooldown = 0.0f;
-				--turretAmmo;
+				turretAmmo -= turretChargeUsage;
 				if (turretAmmo < 1)
 				{
 					Destroy();
@@ -91,4 +91,3 @@ void ATurret::Tick(float DeltaTime)
 		}
 	}
 }
-

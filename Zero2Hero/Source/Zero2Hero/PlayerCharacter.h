@@ -15,6 +15,9 @@
 #include "Damageable.h"
 #include "Projectile.h"
 #include "DialogueSystem.h"
+#include "Camera.h"
+#include "HealthAmmoDrop.h"
+#include "Math/UnrealMathUtility.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -43,15 +46,22 @@ protected:
 		int MeleeAttackNum = 0;
 	UPROPERTY()
 		bool IsAttacking = false;
-
+	UPROPERTY()
+		ACamera* CameraFollowPoint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 		float CameraSensitivity = 0.2;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		TSubclassOf<ACamera> CameraClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		float ClampVerticalUp = 80.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+		float ClampVerticalDown = -80.0f;
+	UPROPERTY(BlueprintReadWrite)
 		UCapsuleComponent* CapCollider;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
-		USpringArmComponent* springArm;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
-		UCameraComponent* Camera;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	//	USpringArmComponent* springArm;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	//	UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		TArray<TSubclassOf<ARangedWeapon>> RangedWeapons;
@@ -59,13 +69,18 @@ protected:
 		ARangedWeapon* CurrentRangedWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
 		int currentWeapon = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Weapons")
+		FName RangedSocket;
+
 	UPROPERTY(BlueprintReadWrite)
 		TArray<ARangedWeapon*> allRangedWeapons;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		TSubclassOf<AGrapplingHook> Grappling;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
+		FName GrapplingHookSocket;
 	UPROPERTY()
 		bool HasHookShot = true;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AGrapplingHook* GrapplingHook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grappling Hook")
 		float GrapplingSpeed;
@@ -80,7 +95,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Grappling Hook")
 		TSubclassOf<AHookPoint> HookPoints;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USphereComponent* MeleeCollider;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		int MeleeDamage;
@@ -88,6 +103,7 @@ protected:
 		float MeleeAttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Settings")
 		float MeleeAttackCooldown;
+
 	UPROPERTY()
 		float AttackAnimTimer = 0.0f;
 	UPROPERTY()
@@ -113,8 +129,8 @@ protected:
 		float dashTime = 0.3f;
 	UPROPERTY()
 		float currentDashTime = 0.0f;
-	UPROPERTY(BlueprintReadWrite, Category = "Dash Settings")
-		bool isDashing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+		bool isDashing = false;
 	UPROPERTY()
 		bool hasDashedInAir = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
@@ -148,8 +164,6 @@ protected:
 		ADialogueSystem* DialogueSystem;
 	UPROPERTY(EditAnywhere, Category = "Dialogue Settings")
 		TSubclassOf<ADialogueSystem> DialogueSystemClass;
-	UPROPERTY()
-		bool Allow = true;
   UPROPERTY()
 		UCharacterMovementComponent* characterMovementComp;
 
@@ -161,9 +175,9 @@ protected:
 		float wallRunSpeed = 500.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
 		float wallRunGravity = 0.3f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpUpwardsVelocity = 500.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Run Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wall Jump Settings")
 		float wallJumpSidewaysVelocity = 500.0f;
 	UPROPERTY()
 		bool isWallRunning = false;
@@ -178,7 +192,7 @@ protected:
 	UPROPERTY()
 		int latestWallRunDir = 0;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool isWallJumping = false;
 	UPROPERTY()
 		bool hasWallJumped = false;
@@ -194,6 +208,8 @@ protected:
 		float wallJumpGroundedCheck = 400.0f;
 	UPROPERTY()
 		float currentWallJumpTime = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
+		TSubclassOf<AHealthAmmoDrop> AmmoDropBP;
 
 public:	
 	// Called every frame
@@ -217,6 +233,7 @@ public:
 	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
 	void RangedAttackEnd();
+	void EndingGrapple();
 
 	void HookShot();
 	void GrappleTo();
@@ -236,7 +253,9 @@ public:
 
 	void Dash();
 	void GroundPound();
-	bool isGrounded();
+
+	UFUNCTION(BlueprintCallable)
+		bool isGrounded();
 
 	void UpDownCheck(float amount);
 	void LeftRightCheck(float amount);
@@ -278,4 +297,15 @@ public:
 		void StopWallJump();
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartWallJump();
+
+	UFUNCTION(BlueprintCallable)
+		void DropExcessAmmo();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void GrappleEnd();
+
+	UFUNCTION(BlueprintCallable)
+		void SetPlayerVisability(bool ShouldHide);
+	UFUNCTION()
+		TArray<ARangedWeapon*> GetRangedWeapons();
 };

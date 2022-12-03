@@ -9,6 +9,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "FireBomb.h"
 #include "FlameThrower.generated.h"
 
 UCLASS()
@@ -34,12 +35,22 @@ protected:
 		float Timer = 0.0f;
 	UPROPERTY()
 		float TimerMax = 1.0f;
+	UPROPERTY(EditAnywhere)
+		float launchSpeed = 500.0f;
 	
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* NiagaraComp;
 	UPROPERTY(EditAnywhere)
 		UNiagaraSystem* NigaraSys;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AFireBomb> FireBomb;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float timeToThrow = 0.1f;
+	UPROPERTY()
+		float currentTimeToThrow = 0.0f;
+	UPROPERTY()
+		bool shoot = false;
 
 public:	
 	// Called every frame
@@ -55,5 +66,8 @@ public:
 
 	UFUNCTION()
 		void SecondaryAttack() override;
+
+	UFUNCTION()
+		void Fire();
 
 };

@@ -35,6 +35,8 @@ public:
 		float turretRange = 1000.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int turretAmmo = 12;
+	UPROPERTY()
+		int turretChargeUsage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float turretFireRate = 0.3f;
 	UPROPERTY()
