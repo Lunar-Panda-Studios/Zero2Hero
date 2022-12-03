@@ -1014,7 +1014,7 @@ void ABoss::SetNewDelay()
 	}
 	}
 
-	TimerToNext = 0;
+	AttackDelayTimer = 0;
 }
 
 void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
