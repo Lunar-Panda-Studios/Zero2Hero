@@ -61,6 +61,10 @@ protected:
 		bool DropAmmo = false;
 	UPROPERTY()
 		TSubclassOf<AActor> SpawnOnDeath;
+	UPROPERTY()
+		bool IsCrystal = false;
+	UPROPERTY()
+		bool isBoss = false;
 
 public:	
 	// Called every frame
@@ -76,6 +80,8 @@ public:
 		void SetBeingRevived(bool newRevive);
 	UFUNCTION()
 		void SetIsDead(bool newDead);
+	UFUNCTION()
+		void SetIsCrystal(bool NewIsCrystal);
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();

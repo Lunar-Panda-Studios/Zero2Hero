@@ -55,7 +55,11 @@ void ADamageable::Tick(float DeltaTime)
 
 					GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GetActorLocation(), GetActorRotation(), spawnParams);
 				}
-				Destroy();
+
+				if (!IsCrystal)
+				{
+					Destroy();
+				}
 			}
 		}
 	}
@@ -88,6 +92,11 @@ void ADamageable::SetIsDead(bool newDead)
 	isDead = newDead;
 }
 
+void ADamageable::SetIsCrystal(bool NewIsCrystal)
+{
+	IsCrystal = NewIsCrystal;
+}
+
 
 float ADamageable::GetHealth()
 {
@@ -108,7 +117,10 @@ void ADamageable::DecreaseHealth(int amount)
 {
 	if (!isDead)
 	{
-		Health -= amount;
+		if (!isBoss)
+		{
+			Health -= amount;
+		}
 		if (ActorHasTag("Enemy"))
 		{
 			EnemyDamaged();
