@@ -232,7 +232,8 @@ public:
 	void AddEnemyInRange(ADamageable* newEnemy);
 	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
-	void RangedAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void RangedAttackEnd();
 	void EndingGrapple();
 
 	void HookShot();
