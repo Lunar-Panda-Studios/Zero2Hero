@@ -9,6 +9,16 @@ void AChargeRifle::BeginPlay()
 	FireLocation = FindComponentByClass<USphereComponent>();
 	WeaponType = 3;
 	secondaryCurrentCooldown = secondaryFireRate;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetElectricAmmo();
+		}
+	}
 }
 
 void AChargeRifle::Tick(float DeltaTime)
@@ -42,7 +52,7 @@ void AChargeRifle::PrimaryAttack()
 		USphereComponent* sphereCol = succ->FindComponentByClass<USphereComponent>();
 		if (sphereCol && succ)
 		{
-			sphereCol->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);/*
+			sphereCol->AddImpulse(rotation.Vector() * secondaryLaunchSpeed);/*
 			meshComp->AddImpulse(GetActorForwardVector() * secondaryLaunchSpeed);*/
 		}
 		currentCooldown = 0.0f;

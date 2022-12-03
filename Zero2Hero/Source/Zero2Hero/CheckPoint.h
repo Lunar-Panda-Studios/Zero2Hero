@@ -34,7 +34,7 @@ protected:
 		UStaticMeshComponent* Mesh;
 	UPROPERTY()
 		APlayerCharacter* Player;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		TSubclassOf<USaveSystem> SaveClass;
 
 public:	

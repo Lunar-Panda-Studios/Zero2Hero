@@ -25,11 +25,17 @@ protected:
 		UStaticMeshComponent* MainBody;
 	UPROPERTY()
 		bool HookAttached;
+	UPROPERTY()
+		FVector HookPointLocation;
+	UPROPERTY()
+		float PreviousMag;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+		void SetHookPointLocation(FVector NewHookPointLocation);
 	UFUNCTION()
 		UProjectileMovementComponent* GetMoveComp();
 	UFUNCTION()
