@@ -221,6 +221,22 @@ void APlayerCharacter::Tick(float DeltaTime)
 		GrapplingHook->GetInUseHook()->SetHookAttached(true);
 	}
 
+	if (!GrapplingHook->GetCanGrapple())
+	{
+		GrappleTimer += DeltaTime;
+		
+		if (GrappleTimer >= GrappleMaxLength)
+		{
+			GrapplingHook->SetEndGrapple(true);
+			GrapplingHook->GetInUseHook()->SetHookAttached(true);
+			GrappleTimer = 0;
+		}
+	}
+	else
+	{
+		GrappleTimer = 0;
+	}
+
 	
 	if (isDead)
 	{
