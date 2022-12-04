@@ -48,13 +48,18 @@ void AGrapplingHook::Tick(float DeltaTime)
 		{
 			if (!canGrapple)
 			{
-				EndGrapple = true;
-				canGrapple = false;
+				Detach();
 			}
 		}
 
 		PreviousMag = CurrentMag;
 	}
+}
+
+void AGrapplingHook::Detach()
+{
+	EndGrapple = true;
+	canGrapple = true;
 }
 
 bool AGrapplingHook::Fire()
@@ -202,5 +207,10 @@ bool AGrapplingHook::GetEndGrapple()
 void AGrapplingHook::SetEndGrapple(bool newGrapple)
 {
 	EndGrapple = newGrapple;
+}
+
+bool AGrapplingHook::GetCanGrapple()
+{
+	return canGrapple;
 }
 

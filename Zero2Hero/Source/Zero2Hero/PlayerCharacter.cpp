@@ -179,9 +179,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (GrapplingHook->GetEndGrapple())
 	{
+		characterMovementComp->Velocity = FVector(0, 0, 0);
 		GrapplingHook->SetEndGrapple(false);
 		EndingGrapple();
-		characterMovementComp->Velocity = FVector(0, 0, 0);
 	}
 
 	if (DialogueSystem != nullptr)
@@ -213,6 +213,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	else
 	{
 		SetPlayerVisability(true);
+	}
+
+	if (isDashing && !GrapplingHook->GetCanGrapple())
+	{
+		GrapplingHook->SetEndGrapple(true);
+		GrapplingHook->GetInUseHook()->SetHookAttached(true);
 	}
 
 	
@@ -822,9 +828,11 @@ void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
 
 void APlayerCharacter::GrappleTo()
 {
-	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
-
-	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+	if (!GrapplingHook->GetEndGrapple())
+	{
+		DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+		LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+	}
 }
 
 void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
