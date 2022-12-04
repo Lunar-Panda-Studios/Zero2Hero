@@ -105,18 +105,29 @@ void AAutoMakit::Attack()
 	UWorld* World = GEngine->GameViewport->GetWorld();
 	AActor* Player = World->GetFirstPlayerController()->GetPawn();
 
-	if (Player != nullptr)
+	FVector EndPoint = Player->GetActorLocation();
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.AddIgnoredActor(Player);
+	FHitResult Hit;
+
+	GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), EndPoint, ECollisionChannel::ECC_Visibility, TraceParams, FCollisionResponseParams());
+
+	if (!Hit.IsValidBlockingHit())
 	{
-		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation());
-		AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileBP, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-		if (Projectile != nullptr)
+		if (Player != nullptr)
 		{
-			Projectile->Damage = Damage;
+			FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation());
+			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileBP, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+			if (Projectile != nullptr)
+			{
+				Projectile->Damage = Damage;
+			}
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player is Null"));
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player is Null"));
+		}
 	}
 }
 

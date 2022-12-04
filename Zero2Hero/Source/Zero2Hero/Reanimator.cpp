@@ -63,6 +63,7 @@ void AReanimator::OnDeath()
 	if (ToRevive != nullptr)
 	{
 		ToRevive->SetBeingRevived(false);
+		ToRevive->GetMesh()->SetAnimation(nullptr);
 	}
 }
 
@@ -76,6 +77,7 @@ void AReanimator::ReanimateEnemy()
 	ToRevive->SetHealth(ToRevive->GetMaxHealth());
 	ToRevive->SetIsDead(false);
 	ToRevive->SetBeingRevived(false);
+	ToRevive->GetMesh()->SetAnimation(nullptr);
 
 	if (ReanimationVFX != nullptr)
 	{
@@ -113,6 +115,8 @@ void AReanimator::FindNewTarget()
 					ToRevive = enemy;
 					enemy->SetBeingRevived(true);
 					isReviving = true;
+
+					ToRevive->GetMesh()->SetAnimation(nullptr);
 
 					if (BBC != nullptr)
 					{
