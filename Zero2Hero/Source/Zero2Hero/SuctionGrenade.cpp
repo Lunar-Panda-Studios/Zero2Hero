@@ -17,6 +17,9 @@ void ASuctionGrenade::BeginPlay()
 {
 	Super::BeginPlay();
 	currentSuccTime = 0;
+
+	seekClass = AActor::StaticClass();
+	ignoreActors.Init(this, 1);
 }
 
 // Called every frame
@@ -42,15 +45,7 @@ void ASuctionGrenade::Tick(float DeltaTime)
 	if (isSucking)
 	{
 		currentSuccTime += DeltaTime;
-		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
-		TArray<AActor*> ignoreActors;
-		ignoreActors.Init(this, 1);
-		TArray<AActor*> actors;
-		UClass* seekClass = AActor::StaticClass();
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), succRadius, traceObjectTypes, seekClass, ignoreActors, actors);
-		DrawDebugSphere(GetWorld(), GetActorLocation(), succRadius, 12, FColor::Red, true, 1000.0f, ESceneDepthPriorityGroup::SDPG_Foreground, 5.0f);
-		ADamageable* DamageableTarget;
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 		for (AActor* a : actors)
 		{
 			if (Cast<AEnemy>(a))
@@ -62,7 +57,6 @@ void ASuctionGrenade::Tick(float DeltaTime)
 				dir = dir * succSpeed;
 				DamageableTarget = Cast<ADamageable>(a);
 				DamageableTarget->LaunchCharacter(dir, false, false);
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(currentSuccTime));
 				/*DamageableTarget = a->FindComponentByClass<UStaticMeshComponent>();
 				DamageableTarget->AddForce(dir);*/
 			}

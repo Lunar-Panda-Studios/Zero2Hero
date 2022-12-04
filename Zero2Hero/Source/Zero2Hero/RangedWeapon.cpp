@@ -20,7 +20,6 @@ void ARangedWeapon::BeginPlay()
 
 	Charge = MaxCharge;
 	CurrentAmmo = AmmoMax;
-	
 }
 
 // Called every frame
@@ -69,6 +68,10 @@ void ARangedWeapon::IncreaseCharge(int amount)
 
 bool ARangedWeapon::DecreaseCharge(int amount)
 {
+	if (!isEnabled)
+	{
+		return false;
+	}
 	if (Charge - amount < 0)
 	{
 		return false;
@@ -119,6 +122,7 @@ bool ARangedWeapon::Reload()
 			return false;
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Reload"));
+		Reloading();
 		return true;
 	}
 
@@ -138,5 +142,25 @@ void ARangedWeapon::SetTimerReload(float amount)
 float ARangedWeapon::GetTimeToReload()
 {
 	return TimeToReload;
+}
+
+ACamera* ARangedWeapon::GetCamera()
+{
+	return Camera;
+}
+
+void ARangedWeapon::SetCamera(ACamera* newCamera)
+{
+	Camera = newCamera;
+}
+
+FName ARangedWeapon::GetWeaponName()
+{
+	return WeaponTypeName;
+}
+
+void ARangedWeapon::SetAmmo(float ammo)
+{
+	CurrentAmmo = ammo;
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Damageable.h"
 #include "SuctionGrenade.generated.h"
 
 UCLASS()
@@ -38,5 +39,14 @@ public:
 		float explodeTime = 3.0f;
 	UPROPERTY()
 		float currentExplodeTime = 0.0f;
-
+	UPROPERTY()
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	UPROPERTY()
+		TArray<AActor*> ignoreActors;
+	UPROPERTY()
+		TArray<AActor*> actors;
+	UPROPERTY()
+		UClass* seekClass;
+	UPROPERTY()
+		ADamageable* DamageableTarget;
 };

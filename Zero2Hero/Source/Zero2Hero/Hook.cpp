@@ -27,6 +27,8 @@ void AHook::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Main Body (Static Mesh Component) missing"));
 	}
+
+	PreviousMag = (HookPointLocation - GetActorLocation()).Size();
 	
 }
 
@@ -35,6 +37,22 @@ void AHook::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float CurrentMag = (HookPointLocation - GetActorLocation()).Size();
+
+	if (CurrentMag > PreviousMag + 10)
+	{
+		HookAttached = true;
+		ProjectileMoveComp->Deactivate();
+		SetLifeSpan(10);
+	}
+
+	PreviousMag = CurrentMag;
+
+}
+
+void AHook::SetHookPointLocation(FVector NewHookPointLocation)
+{
+	HookPointLocation = NewHookPointLocation;
 }
 
 UProjectileMovementComponent* AHook::GetMoveComp()

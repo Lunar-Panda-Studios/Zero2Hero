@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.h"
 #include "Components/SphereComponent.h"
+#include "Camera.h"
+#include "GameManager.h"
 #include "RangedWeapon.generated.h"
 
 UCLASS()
@@ -20,6 +22,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY()
+		FName WeaponTypeName;
 	UPROPERTY(BlueprintReadWrite)
 		int WeaponType;
 	UPROPERTY(EditAnywhere, Category = "Ranged Stats", BlueprintReadWrite)
@@ -46,6 +50,18 @@ protected:
 		float TimeToReload = 0.0f;
 	UPROPERTY(BlueprintReadWrite)
 		float TimerReload = 0.0f;
+	UPROPERTY(BlueprintReadWrite)
+		ACamera* Camera;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CameraAimDifference = 15.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		float CameraAimDifferenceYaw = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranged Stats")
+		bool isEnabled = true;
+	UPROPERTY()
+		UGameManager* Manager;
+
 
 public:	
 	// Called every frame
@@ -80,5 +96,19 @@ public:
 		void SetTimerReload(float amount);
 	UFUNCTION()
 		float GetTimeToReload();
+	UFUNCTION()
+		ACamera* GetCamera();
+	UFUNCTION(BlueprintCallable)
+		void SetCamera(ACamera* newCamera);
+	UFUNCTION(BlueprintImplementableEvent)
+		void Reloading();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnFire();
+
+	UFUNCTION()
+		FName GetWeaponName();
+	UFUNCTION()
+		void SetAmmo(float ammo);
 
 };

@@ -8,10 +8,20 @@ AMachineGun::AMachineGun()
 void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
-
+	WeaponTypeName = "Nature";
 	FireLocation = FindComponentByClass<USphereComponent>();
 	currentSecondaryCooldown = secondaryCooldown;
 	WeaponType = 2;
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
+	if (Manager != nullptr)
+	{
+		if (Manager->GetLoadingSave())
+		{
+			CurrentAmmo = Manager->GetNatureAmmo();
+		}
+	}
 }
 
 void AMachineGun::Tick(float DeltaTime)
@@ -34,9 +44,16 @@ void AMachineGun::SecondaryAttack()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
-		FRotator rotation = GetActorRotation();
+		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+		rotation.Pitch += CameraAimDifference;
+		rotation.Yaw += CameraAimDifferenceYaw;
 		AActor* turretSeed = GetWorld()->SpawnActor<AActor>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+		ATurretSeed* seed = Cast<ATurretSeed>(turretSeed);
+		seed->ammo = Charge;
+		Charge = 0;
+		seed->chargeUsage = ChargeUsage;
 		currentSecondaryCooldown = 0;
+		AmmoCheck();
 	}
 }
 
@@ -49,22 +66,27 @@ void AMachineGun::Attack()
 {
 	if (shooting)
 	{
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
-		if (currentCooldown > fireRate)
+		if (Camera != nullptr)
 		{
-			if (DecreaseCharge(ChargeUsage))
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;
+			spawnParams.Instigator = GetInstigator();
+			if (currentCooldown > fireRate)
 			{
-				FRotator rotation = GetActorRotation();
-				AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
-				if (Bullet != nullptr)
+				if (DecreaseCharge(ChargeUsage))
 				{
-					Bullet->Damage = Damage;
+					FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
+
+					rotation.Pitch += CameraAimDifference;
+					AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+					if (Bullet != nullptr)
+					{
+						Bullet->Damage = Damage;
+					}
+					currentCooldown = 0.0f;
 				}
-				currentCooldown = 0.0f;
+
 			}
-			
 		}
 	}
 }

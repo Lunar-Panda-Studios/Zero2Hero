@@ -24,6 +24,8 @@
 *.la
 *.a
 *.lib
+!GameAnalytics.lib
+!Sqlite.lib
 
 # Executables
 *.exe

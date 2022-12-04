@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameManager.h"
 #include "Damageable.generated.h"
 
 UENUM()
@@ -38,9 +40,11 @@ protected:
 	UPROPERTY()
 		bool isDead = false;
 	UPROPERTY()
-		float AnimationTime;
+		bool beingRevived = false;
 	UPROPERTY(EditAnywhere, Category = "Character Stats")
-		float AnimationTimer = 1.0f;
+		float AnimationTime;
+	UPROPERTY()
+		float AnimationTimer = 0.0f;
 	UPROPERTY()
 		bool isShielded = false;
 	UPROPERTY()
@@ -49,6 +53,14 @@ protected:
 		bool ReflectorShield = false;
 	UPROPERTY()
 		ADamageable* PairedEnemy;
+	UPROPERTY()
+		UGameManager* Manager;
+	UPROPERTY()
+		bool Allow = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool DropAmmo = false;
+	UPROPERTY()
+		TSubclassOf<AActor> SpawnOnDeath;
 
 public:	
 	// Called every frame
@@ -56,6 +68,14 @@ public:
 
 	UFUNCTION()
 		int GetDamage();
+	UFUNCTION()
+		bool GetIsDead();
+	UFUNCTION()
+		bool GetBeingRevived();
+	UFUNCTION()
+		void SetBeingRevived(bool newRevive);
+	UFUNCTION()
+		void SetIsDead(bool newDead);
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();
@@ -65,6 +85,8 @@ public:
 		void IncreaseHealth(int amount);
 	UFUNCTION(BlueprintCallable)
 		void DecreaseHealth(int amount);
+	UFUNCTION()
+		void SetHealth(int amount);
 	UFUNCTION()
 		void CheckDeath();
 	UFUNCTION()
@@ -78,10 +100,24 @@ public:
 	UFUNCTION()
 		void SetEnemyPair(ADamageable* newPair);
 	UFUNCTION()
+		void SetShielded(bool shield);
+	UFUNCTION()
 		void UnPair();
 	UFUNCTION()
 		void SetShieldType(TEnumAsByte<ElementType> newElement);
 	UFUNCTION()
 		void SetisReflectorShield(bool isReflector);
+	UFUNCTION()
+		void SetSpawnOnDeath(TSubclassOf<AActor> newDropItem);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void EnemyDamaged();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EnemyDies();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerDamaged();
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayerDies();
 
 };

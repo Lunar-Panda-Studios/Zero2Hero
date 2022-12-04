@@ -53,41 +53,70 @@ void ACannonFodder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!CanExplode)
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
 	{
-		if (InRange && AttackSpeedTimer == 0)
-		{
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		}
-		else
-		{
-			MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-
-		if (InRange)
-		{
-			AttackSpeedTimer += DeltaTime;
-
-			if (AttackSpeedTimer >= AttackSpeed)
-			{
-				AttackSpeedTimer = 0;
-			}
-		}
+		return;
 	}
-	else
-	{
-		if (InRange)
-		{
-			Timer += DeltaTime;
 
-			if (Timer >= TimeToExplode)
-			{
-				Explode();
-			}
-		}
-		else
+	if (isDead)
+	{
+		return;
+	}
+
+	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
+	{
+
+		if (Health > 0)
 		{
-			Timer = 0;
+			if (!CanExplode)
+			{
+				if (InRange && AttackSpeedTimer == 0)
+				{
+					OnAttack();
+					MeleeCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				}
+				else
+				{
+					MeleeCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				}
+
+				if (InRange)
+				{
+					AttackSpeedTimer += DeltaTime;
+
+					if (AttackSpeedTimer >= AttackSpeed)
+					{
+						AttackSpeedTimer = 0;
+					}
+				}
+			}
+			else
+			{
+				if (InRange || shouldExplode)
+				{
+					shouldExplode = true;
+
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", true);
+					}
+
+					Timer += DeltaTime;
+
+					if (Timer >= TimeToExplode)
+					{
+						OnAttack();
+						Explode();
+					}
+				}
+				else
+				{
+					if (BBC != nullptr)
+					{
+						BBC->SetValueAsBool("Exploding", false);
+					}
+				}
+			}
 		}
 	}
 }
@@ -103,7 +132,7 @@ void ACannonFodder::Explode()
 {
 	BlastRadius->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//SetLifeSpan(AnimationTimer);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Knockback"));
 	Destroy();
 
 }
