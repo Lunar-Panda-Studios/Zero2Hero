@@ -128,19 +128,22 @@ void ADamageable::DecreaseHealth(int amount)
 {
 	if (!isDead)
 	{
-		if (!isBoss)
+		if (CanDamage)
 		{
-			Health -= amount;
+			if (!isBoss)
+			{
+				Health -= amount;
+			}
+			if (ActorHasTag("Enemy"))
+			{
+				EnemyDamaged();
+			}
+			else if (ActorHasTag("Player"))
+			{
+				PlayerDamaged();
+			}
+			CheckDeath();
 		}
-		if (ActorHasTag("Enemy"))
-		{
-			EnemyDamaged();
-		}
-		else if (ActorHasTag("Player"))
-		{
-			PlayerDamaged();
-		}
-		CheckDeath();
 	}
 }
 

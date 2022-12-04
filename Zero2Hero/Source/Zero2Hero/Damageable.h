@@ -65,6 +65,8 @@ protected:
 		bool IsCrystal = false;
 	UPROPERTY()
 		bool isBoss = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool CanDamage = true;
 
 public:	
 	// Called every frame
