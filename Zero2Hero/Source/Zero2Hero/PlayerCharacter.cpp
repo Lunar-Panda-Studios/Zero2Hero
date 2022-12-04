@@ -118,14 +118,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (CurrentRangedWeapon->GetCamera() == nullptr)
-	//{
-	//	for (int i = 0; i < allRangedWeapons.Num(); i++)
-	//	{
-	//		allRangedWeapons[i]->SetCamera(CameraFollowPoint);
-	//	}
-	//}
-
 	if (!hasWallJumped && !isWallJumping)
 	{
 		WalljumpCheck();
@@ -212,6 +204,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 				Allow = true;
 			}
 		}
+	}
+
+	if (InputEnabled())
+	{
+		SetPlayerVisability(false);
+	}
+	else
+	{
+		SetPlayerVisability(true);
 	}
 
 	

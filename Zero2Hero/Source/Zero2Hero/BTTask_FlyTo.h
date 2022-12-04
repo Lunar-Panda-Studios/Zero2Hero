@@ -19,6 +19,8 @@ class ZERO2HERO_API UBTTask_FlyTo : public UBTTask_BlackboardBase
 
 	UPROPERTY(EditAnywhere)
 		float AcceptableDistance;
+	UPROPERTY(EditAnywhere)
+		float ZOffsetFromGround = 400;
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
 };
