@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
-		int Phase = 2;
+		int Phase = 1;
 	UPROPERTY()
 		TEnumAsByte<BossAttacks> CurrentAttack = BossAttacks::Waiting;
 	//Will need changing to Skeletal Mesh later
@@ -84,7 +84,7 @@ protected:
 	UPROPERTY()
 		bool LeftHandAlive = true;
 	UPROPERTY()
-		bool RightHandAlive = false;
+		bool RightHandAlive = true;
 	UPROPERTY()
 		AShockWave* ShockWaveInstance;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
@@ -95,6 +95,22 @@ protected:
 		bool FirstAnimFinished = false;
 	UPROPERTY()
 		bool SecondAnimStarted = false;
+	UPROPERTY()
+		float AttackDelayTimer = 0;
+	UPROPERTY()
+		float CurrentAttackDelay = 0;
+	UPROPERTY()
+		bool ShouldShockwave = true;
+
+	//Phase 1 - Delays
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA1DelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA2aDelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA2bDelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float AOE1DelayTo;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
@@ -249,6 +265,8 @@ protected:
 		int RegProjectileDamage;
 
 public:
+	UFUNCTION()
+		void SetNewDelay();
 	UFUNCTION()
 		FVector CalculateSpawnLocation();
 	UFUNCTION()
