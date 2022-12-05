@@ -21,10 +21,10 @@ void UGameManager::OnStart()
 	PowerCore.PowerCoreColour = "Red";
 	PowerCoresRed = PowerCore;
 
-	//if (LoadingSave)
-	//{
-	//	LoadGame();
-	//}
+	if (LoadingSave)
+	{
+		LoadGame();
+	}
 }
 
 bool UGameManager::GetLoadingSave()
@@ -148,35 +148,50 @@ void UGameManager::addPowerCore(FName Colour, bool InInventory, bool Placed)
 	}
 }
 
+bool UGameManager::GetLoadingIn()
+{
+	return LoadingIn;
+}
+
 void UGameManager::Respawn(AActor* Player)
 {
 	Cast<ACharacter>(Player)->LaunchCharacter(FVector(0, 0, 0),true,true);
 	Player->SetActorLocation(CurrentCheckPoint);
 }
 
+void UGameManager::SetLoadingIn(bool newLoadingIn)
+{
+	LoadingIn = newLoadingIn;
+}
+
 void UGameManager::SaveGame(TSubclassOf<USaveSystem> Save)
 {
-	PowerCores.Empty();
+	if (!LoadingIn)
+	{
+		PowerCores.Empty();
 
-	PowerCores.Add(PowerCoresYellow);
-	PowerCores.Add(PowerCoresGreen);
-	PowerCores.Add(PowerCoresRed);
-	PowerCores.Add(PowerCoresBlue);
+		PowerCores.Add(PowerCoresYellow);
+		PowerCores.Add(PowerCoresGreen);
+		PowerCores.Add(PowerCoresRed);
+		PowerCores.Add(PowerCoresBlue);
 
-	USaveSystem* Saved = Cast<USaveSystem>(UGameplayStatics::CreateSaveGameObject(Save));
+		USaveSystem* Saved = Cast<USaveSystem>(UGameplayStatics::CreateSaveGameObject(Save));
 
-	Saved->SetCheckPointSpawn(CurrentCheckPoint);
-	Saved->SetBridgeComplete(BridgeStatus);
-	Saved->SetRangedWeapons(IceAmmo, FireAmmo, NatureAmmo, ElectricAmmo);
-	Saved->SetPowerCoreLocation(PowerCores);
+		Saved->SetCheckPointSpawn(CurrentCheckPoint);
+		Saved->SetBridgeComplete(BridgeStatus);
+		Saved->SetRangedWeapons(IceAmmo, FireAmmo, NatureAmmo, ElectricAmmo);
+		Saved->SetPowerCoreLocation(PowerCores);
 
-	//FString SaveFile = "EQUI&AcaData" + FDateTime::Now().ToString();
+		//FString SaveFile = "EQUI&AcaData" + FDateTime::Now().ToString();
 
-	UGameplayStatics::SaveGameToSlot(Saved, "EQUI&AcaData", 0);
+		UGameplayStatics::SaveGameToSlot(Saved, "EQUI&AcaData", 0);
+	}
 }
 
 bool UGameManager::LoadGame()
 {
+	LoadingIn = true;
+
 	USaveSystem* Save = Cast<USaveSystem>(UGameplayStatics::LoadGameFromSlot("EQUI&AcaData", 0));
 
 	if (Save == nullptr)

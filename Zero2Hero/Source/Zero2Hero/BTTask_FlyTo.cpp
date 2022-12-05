@@ -21,13 +21,13 @@ EBTNodeResult::Type UBTTask_FlyTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		return EBTNodeResult::Succeeded;
 	}
 
-	AActor* ActorLocation;
+	AActor* Actor;
 	FVector newLocation;
 	float Mag;
 
 	if (GetSelectedBlackboardKey() == "PlayerActor")
 	{
-		ActorLocation = Cast<AActor>(BBC->GetValueAsObject(GetSelectedBlackboardKey()));
+		Actor = Cast<AActor>(BBC->GetValueAsObject("PlayerActor"));
 
 		if (Self->GetZMoveToAtStart())
 		{
@@ -36,7 +36,7 @@ EBTNodeResult::Type UBTTask_FlyTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		}
 		else
 		{
-			newLocation = FVector(ActorLocation->GetActorLocation().X, ActorLocation->GetActorLocation().Y, Self->GetActorLocation().Z) - Self->GetActorLocation();
+			newLocation = FVector(Actor->GetActorLocation().X, Actor->GetActorLocation().Y, Actor->GetActorLocation().Z + ZOffsetFromGround) - FVector(Self->GetActorLocation().X, Self->GetActorLocation().Y, Self->GetActorLocation().Z);
 			Mag = newLocation.Size();
 		}
 

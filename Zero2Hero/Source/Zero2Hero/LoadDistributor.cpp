@@ -29,8 +29,8 @@ void ALoadDistributor::Tick(float DeltaTime)
 
 bool ALoadDistributor::DistributeLoad()
 {
-	DistributeAmmo();
 	DistributePlayerLocation();
+	DistributeAmmo();
 	return true;
 }
 
@@ -41,17 +41,17 @@ FPowerCoreLocation ALoadDistributor::DistributePowerCore(FName Colour)
 		Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
 	}
 
-		TArray<FPowerCoreLocation> PowerCores = Manager->GetPowerCores();
-		FPowerCoreLocation WantedPowerCore;
+	TArray<FPowerCoreLocation> PowerCores = Manager->GetPowerCores();
+	FPowerCoreLocation WantedPowerCore;
 
-		for (int i = 0; i < PowerCores.Num(); i++)
+	for (int i = 0; i < PowerCores.Num(); i++)
+	{
+		if (PowerCores[i].PowerCoreColour == Colour)
 		{
-			if (PowerCores[i].PowerCoreColour == Colour)
-			{
-				WantedPowerCore = PowerCores[i];
-				break;
-			}
+			WantedPowerCore = PowerCores[i];
+			break;
 		}
+	}
 
 	return WantedPowerCore;
 }

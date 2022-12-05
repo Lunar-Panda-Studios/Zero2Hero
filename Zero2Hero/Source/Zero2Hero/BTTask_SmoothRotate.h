@@ -5,22 +5,22 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "Enemy.h"
-#include "BTTask_FlyTo.generated.h"
+#include "BTTask_SmoothRotate.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZERO2HERO_API UBTTask_FlyTo : public UBTTask_BlackboardBase
+class ZERO2HERO_API UBTTask_SmoothRotate : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
 
-	UBTTask_FlyTo();
+	UBTTask_SmoothRotate();
+
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
+
+	FBlackboardKeySelector BBKS;
 
 	UPROPERTY(EditAnywhere)
-		float AcceptableDistance;
-	UPROPERTY(EditAnywhere)
-		float ZOffsetFromGround = 400;
-	
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
+		float RotationDelta = 1;
 };
