@@ -52,7 +52,7 @@ EBTNodeResult::Type UBTTask_GetRandomLocation::ExecuteTask(UBehaviorTreeComponen
 			Valid = true;
 		}
 
-	} while ((!Self->IsPositionReachable(newLocation) || repeated < MaxRepeated) && !Valid);
+	} while ((repeated < MaxRepeated) && !Valid);
 	
 	if (repeated != MaxRepeated)
 	{
