@@ -218,7 +218,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	if (isDead)
 	{
-		
+		RangedAttackEnd();
 		if (DropAmmo)
 		{
 			
@@ -573,7 +573,7 @@ void APlayerCharacter::RangedAttack()
 {
 	if (Allow)
 	{
-		if (CurrentRangedWeapon != nullptr)
+		if (CurrentRangedWeapon != nullptr && Health > 0)
 		{
 			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
 			SetActorRotation(Rotator);
