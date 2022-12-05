@@ -363,7 +363,10 @@ void ABuffer::OnEndOverlapTargetRange(UPrimitiveComponent* OverlappedComponent, 
 
 			if (PairedEnemy == ExitingEnemy)
 			{
-				PairedEnemy->UnshieldEnemy();
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->UnshieldEnemy();
+				}
 			}
 
 			TargetsInRange.Remove(ExitingEnemy);

@@ -177,11 +177,36 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (GrapplingHook->GetEndGrapple())
+	if (GrapplingHook != nullptr)
 	{
-		characterMovementComp->Velocity = FVector(0, 0, 0);
-		GrapplingHook->SetEndGrapple(false);
-		EndingGrapple();
+		if (GrapplingHook->GetEndGrapple())
+		{
+			characterMovementComp->Velocity = FVector(0, 0, 0);
+			GrapplingHook->SetEndGrapple(false);
+			EndingGrapple();
+		}
+
+		if (isDashing && !GrapplingHook->GetCanGrapple())
+		{
+			GrapplingHook->SetEndGrapple(true);
+			GrapplingHook->GetInUseHook()->SetHookAttached(true);
+		}
+
+		if (!GrapplingHook->GetCanGrapple())
+		{
+			GrappleTimer += DeltaTime;
+
+			if (GrappleTimer >= GrappleMaxLength)
+			{
+				GrapplingHook->SetEndGrapple(true);
+				GrapplingHook->GetInUseHook()->SetHookAttached(true);
+				GrappleTimer = 0;
+			}
+		}
+		else
+		{
+			GrappleTimer = 0;
+		}
 	}
 
 	if (DialogueSystem != nullptr)
@@ -214,29 +239,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		SetPlayerVisability(true);
 	}
-
-	if (isDashing && !GrapplingHook->GetCanGrapple())
-	{
-		GrapplingHook->SetEndGrapple(true);
-		GrapplingHook->GetInUseHook()->SetHookAttached(true);
-	}
-
-	if (!GrapplingHook->GetCanGrapple())
-	{
-		GrappleTimer += DeltaTime;
-		
-		if (GrappleTimer >= GrappleMaxLength)
-		{
-			GrapplingHook->SetEndGrapple(true);
-			GrapplingHook->GetInUseHook()->SetHookAttached(true);
-			GrappleTimer = 0;
-		}
-	}
-	else
-	{
-		GrappleTimer = 0;
-	}
-
 	
 	if (isDead)
 	{

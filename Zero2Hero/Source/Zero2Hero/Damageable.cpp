@@ -190,8 +190,11 @@ void ADamageable::CheckDeath()
 	void ADamageable::UnshieldEnemy()
 	{
 		isShielded = false;
-		PairedEnemy->SetEnemyPair(nullptr);
-		PairedEnemy = nullptr;
+		if (PairedEnemy != nullptr)
+		{
+			PairedEnemy->SetEnemyPair(nullptr);
+			PairedEnemy = nullptr;
+		}
 		CurrentShieldType = ElementType::None;
 	}
 
