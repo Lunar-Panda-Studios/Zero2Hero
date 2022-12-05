@@ -42,6 +42,8 @@ public:
 		UStaticMeshComponent* GetMainBody();
 	UFUNCTION()
 		bool GetHookAttached();
+	UFUNCTION()
+		void SetHookAttached(bool newAttached);
 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

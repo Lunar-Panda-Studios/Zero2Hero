@@ -48,10 +48,10 @@ void ABuffer::Tick(float DeltaTime)
 
 		TargetRange->SetSphereRadius(SphereRadius);
 
-		if (PairedEnemy != nullptr)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, PairedEnemy->GetFName().ToString());
-		}
+		//if (PairedEnemy != nullptr)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, PairedEnemy->GetFName().ToString());
+		//}
 
 		if (TimerForEachType >= TimeForEachType)
 		{
@@ -318,6 +318,11 @@ void ABuffer::RangedAttack()
 	}
 }
 
+void ABuffer::OnDeath()
+{
+	UnshieldEnemy();
+}
+
 void ABuffer::OnBeginOverlapTargetRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Overlap"));
@@ -334,7 +339,7 @@ void ABuffer::OnBeginOverlapTargetRange(UPrimitiveComponent* OverlappedComponent
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Enemy In Targetting Range"));
 			ADamageable* EnteringEnemy = Cast<ADamageable>(OtherActor);
 
-			if (EnteringEnemy != this && !TargetsInRange.Contains(EnteringEnemy) && EnteringEnemy->GetIsShielded())
+			if (EnteringEnemy != this && !EnteringEnemy->GetIsShielded() && !TargetsInRange.Contains(EnteringEnemy))
 			{
 				TargetsInRange.Add(EnteringEnemy);
 			}
@@ -358,7 +363,10 @@ void ABuffer::OnEndOverlapTargetRange(UPrimitiveComponent* OverlappedComponent, 
 
 			if (PairedEnemy == ExitingEnemy)
 			{
-				PairedEnemy->UnshieldEnemy();
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->UnshieldEnemy();
+				}
 			}
 
 			TargetsInRange.Remove(ExitingEnemy);

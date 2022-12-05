@@ -211,6 +211,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
 		TSubclassOf<AHealthAmmoDrop> AmmoDropBP;
 
+	UPROPERTY()
+		float GrappleTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Grappling Hook")
+		float GrappleMaxLength = 5;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

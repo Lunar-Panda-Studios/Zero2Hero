@@ -52,10 +52,16 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 		bool LoadingSave = false;
+	UPROPERTY()
+		bool LoadingIn = false;
 
 public:
 	UFUNCTION()
 		bool GetLoadingSave();
+	UFUNCTION()
+		bool GetLoadingIn();
+	UFUNCTION()
+		void SetLoadingIn(bool newLoadingIn);
 	UFUNCTION()
 		UDialogueBox* LoadDialogueBox(TSubclassOf<class UUserWidget> Asset);
 	UFUNCTION()
