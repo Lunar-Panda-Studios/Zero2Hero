@@ -179,9 +179,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if (GrapplingHook->GetEndGrapple())
 	{
+		characterMovementComp->Velocity = FVector(0, 0, 0);
 		GrapplingHook->SetEndGrapple(false);
 		EndingGrapple();
-		characterMovementComp->Velocity = FVector(0, 0, 0);
 	}
 
 	if (DialogueSystem != nullptr)
@@ -215,10 +215,32 @@ void APlayerCharacter::Tick(float DeltaTime)
 		SetPlayerVisability(true);
 	}
 
+	if (isDashing && !GrapplingHook->GetCanGrapple())
+	{
+		GrapplingHook->SetEndGrapple(true);
+		GrapplingHook->GetInUseHook()->SetHookAttached(true);
+	}
+
+	if (!GrapplingHook->GetCanGrapple())
+	{
+		GrappleTimer += DeltaTime;
+		
+		if (GrappleTimer >= GrappleMaxLength)
+		{
+			GrapplingHook->SetEndGrapple(true);
+			GrapplingHook->GetInUseHook()->SetHookAttached(true);
+			GrappleTimer = 0;
+		}
+	}
+	else
+	{
+		GrappleTimer = 0;
+	}
+
 	
 	if (isDead)
 	{
-		
+		RangedAttackEnd();
 		if (DropAmmo)
 		{
 			
@@ -573,7 +595,7 @@ void APlayerCharacter::RangedAttack()
 {
 	if (Allow)
 	{
-		if (CurrentRangedWeapon != nullptr)
+		if (CurrentRangedWeapon != nullptr && Health > 0)
 		{
 			FRotator Rotator = FRotator(GetActorRotation().Pitch, CameraFollowPoint->GetSpringArm()->GetComponentRotation().Yaw, GetActorRotation().Roll);
 			SetActorRotation(Rotator);
@@ -822,9 +844,11 @@ void APlayerCharacter::DeleteEnemyInRange(ADamageable* oldEnemy)
 
 void APlayerCharacter::GrappleTo()
 {
-	DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
-
-	LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+	if (!GrapplingHook->GetEndGrapple())
+	{
+		DirectionGrapple = (GrapplingHook->GetHit().GetActor()->GetActorLocation() - GetActorLocation());
+		LaunchCharacter(DirectionGrapple * GrapplingSpeed, true, true);
+	}
 }
 
 void APlayerCharacter::SetPlayerVisability(bool ShouldHide)
