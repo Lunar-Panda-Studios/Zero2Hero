@@ -25,7 +25,7 @@ protected:
 		USphereComponent* SpottingRange;
 	UPROPERTY()
 		bool InSight = false;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AGrapplingHook* GrapplingHook;
 
 public:	
@@ -36,6 +36,6 @@ public:
 		void OnOverlapRangeSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnOverlapRangeSphereEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SetGrapplingHook(AGrapplingHook* NewGrapple);
 };

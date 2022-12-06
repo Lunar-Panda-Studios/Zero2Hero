@@ -79,13 +79,16 @@ void AHook::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 {
 	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("GrapplePoint"))
+		if (OtherComp != nullptr)
 		{
-			if (OtherComp->ComponentHasTag(("MainBody")))
+			if (OtherActor->ActorHasTag("GrapplePoint"))
 			{
-				HookAttached = true;
-				ProjectileMoveComp->Deactivate();
-				SetLifeSpan(10);
+				if (OtherComp->ComponentHasTag(("MainBody")))
+				{
+					HookAttached = true;
+					ProjectileMoveComp->Deactivate();
+					SetLifeSpan(10);
+				}
 			}
 		}
 	}

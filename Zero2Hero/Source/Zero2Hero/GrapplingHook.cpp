@@ -143,17 +143,17 @@ void AGrapplingHook::SetCamera(UCameraComponent* Camera)
 
 void AGrapplingHook::SetGrapplePoint(AActor* NewPoint)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Set Grapple"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Set Grapple"));
 	GrapplePoint = NewPoint;
 
-	//if (GrapplePoint != nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not Null"));
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Null"));
-	//}
+	if (GrapplePoint != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not Null"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Null"));
+	}
 }
 
 AActor* AGrapplingHook::GetGrapplePoint()
