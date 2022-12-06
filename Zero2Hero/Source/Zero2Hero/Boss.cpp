@@ -823,7 +823,7 @@ void ABoss::ShouldEndPhase1()
 	if (HandsAlive() == 0)
 	{
 		CurrentAttack == BossAttacks::Waiting;
-
+		GetMesh()->SetAnimation(BossIdle);
 		ChangePhase();
 	}
 }

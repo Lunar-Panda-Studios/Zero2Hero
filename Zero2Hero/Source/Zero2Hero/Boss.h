@@ -192,6 +192,8 @@ protected:
 	//Phase2 General
 
 	//Phase 2 - Summoning General
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - General")
+		UAnimSequence* BossIdle;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMax;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
