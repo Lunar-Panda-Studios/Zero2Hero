@@ -279,6 +279,8 @@ public:
 		int HandsAlive();
 	UFUNCTION()
 		void ShouldEndPhase1();
+	UFUNCTION()
+		FVector RayTraceDown(FVector RandLocation);
 
 	UFUNCTION(BlueprintCallable)
 		void Melee1Right();

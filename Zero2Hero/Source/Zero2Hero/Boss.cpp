@@ -49,8 +49,15 @@ void ABoss::Tick(float DeltaTime)
 		return;
 	}
 
+	if (!isActiveMissile && !isActiveRegProjectile)
+	{
+		Destroy();
+	}
+
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		SetActorHiddenInGame(false);
+
 		if (BBC != nullptr)
 		{
 			BBC->SetValueAsInt("Phase", Phase);
@@ -203,6 +210,10 @@ void ABoss::Tick(float DeltaTime)
 		{
 			AttackDelayTimer += DeltaTime;
 		}
+	}
+	else
+	{
+		SetActorHiddenInGame(true);
 	}
 }
 
@@ -720,6 +731,8 @@ void ABoss::SummonType1()
 		RandLocation = CalculateSpawnLocation();
 		RandLocation.Z += ZSummonOffSet;
 
+		RandLocation = RayTraceDown(RandLocation);
+
 		//I'm about to tank the framerate lmao
 		//Very sad
 		//But if people don't know about it then I can't be asked to fix it
@@ -1079,5 +1092,31 @@ void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 			break;
 		}
 	}
+}
+
+FVector ABoss::RayTraceDown(FVector RandLocation)
+{
+	FHitResult Hit;
+
+	do
+	{
+		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+		FVector LineTraceEnd = FVector(RandLocation.X, RandLocation.Y, RandLocation.Z - DistanceTrace);
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(Player);
+
+
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, RandLocation, LineTraceEnd, ECollisionChannel::ECC_Camera, TraceParams, FCollisionResponseParams());
+		DrawDebugLine(GetWorld(), RandLocation, LineTraceEnd, FColor::Blue, false, 100, 0, 5);
+
+		if (Hit.IsValidBlockingHit())
+		{
+			RandLocation.Z = Hit.ImpactPoint.Z;
+		}
+
+	}while (!Hit.IsValidBlockingHit());
+
+	return RandLocation;
 }
 	
