@@ -677,6 +677,7 @@ int ABoss::HandsAlive()
 			LivingHands -= 1;
 			LeftHandAlive = false;
 			LeftHandCrystal->Destroy();
+			LeftWeaponDestroyed();
 		}
 	}
 
@@ -692,6 +693,7 @@ int ABoss::HandsAlive()
 			LivingHands -= 1;
 			RightHandAlive = false;
 			RightHandCrystal->Destroy();
+			RightWeaponDestroyed();
 		}
 	}
 

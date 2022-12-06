@@ -296,6 +296,10 @@ public:
 		void AoE1();
 
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void LeftWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void RightWeaponDestroyed();
 
 	UFUNCTION(BlueprintCallable)
 		void SummonType1();
