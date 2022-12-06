@@ -22,6 +22,9 @@ protected:
 	virtual void OnStart();
 
 	UPROPERTY(BlueprintReadWrite)
+		bool InBossFight = false;
+
+	UPROPERTY(BlueprintReadWrite)
 		FVector CurrentCheckPoint;
 	UPROPERTY()
 		int CheckPointNum = -1;
@@ -104,5 +107,9 @@ public:
 		void SaveGame(TSubclassOf<USaveSystem> Save);
 	UFUNCTION(BlueprintCallable)
 		bool LoadGame();
+	UFUNCTION()
+		FVector GetCurrentCheckPoint();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ReloadBossScene();
 	
 };

@@ -10,6 +10,7 @@
 #include "BossCrystalWeakness.h"
 #include "FallingItem.h"
 #include "ShockWave.h"
+#include "GameManager.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -302,6 +303,8 @@ public:
 		void LeftWeaponDestroyed();
 	UFUNCTION(BlueprintImplementableEvent)
 		void RightWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeFromPhase1ToPhase2();
 
 	UFUNCTION(BlueprintCallable)
 		void SummonType1();

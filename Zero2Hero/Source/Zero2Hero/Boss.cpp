@@ -839,6 +839,7 @@ void ABoss::ShouldEndPhase1()
 	{
 		CurrentAttack == BossAttacks::Waiting;
 		GetMesh()->SetAnimation(BossIdle);
+		ChangeFromPhase1ToPhase2();
 		ChangePhase();
 	}
 }
@@ -957,8 +958,6 @@ void ABoss::HarponSpawn()
 	}
 	else if (SummonedEnemies.Num() <= 0 && !SpawnSet)
 	{
-		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
-
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
@@ -967,7 +966,7 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				GetWorld()->SpawnActor<AActor>(HarponPiece1, Player->GetActorLocation(), GetActorRotation(), spawnParams);
+				GetWorld()->SpawnActor<AActor>(HarponPiece1, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
 			}
 		}
 		else
@@ -976,7 +975,7 @@ void ABoss::HarponSpawn()
 			{
 				if (CurrentSummon == 2)
 				{
-					GetWorld()->SpawnActor<AActor>(HarponPiece2, Player->GetActorLocation(), GetActorRotation(), spawnParams);
+					GetWorld()->SpawnActor<AActor>(HarponPiece2, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
 				}
 			}
 		}
