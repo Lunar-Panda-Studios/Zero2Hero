@@ -39,7 +39,7 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool beingRevived = false;
 	UPROPERTY(EditAnywhere, Category = "Character Stats")
 		float AnimationTime;
