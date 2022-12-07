@@ -17,14 +17,22 @@ ABoss::ABoss()
 
 	FireLocationRight = CreateDefaultSubobject<USphereComponent>(TEXT("FireLocationRight"));
 	FireLocationRight->SetupAttachment(GetRootComponent());
-
 }
 
 void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (FailSafeSpawnLocationBP != nullptr)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), FailSafeSpawnLocationBP, FoundActors);
+
+		FailSafeSpawnLocation = Cast<ABossFailSafeSpawn>(FoundActors[0])->GetFailSafeSphere();
+	}
+
 	isBoss = true;
+	CanDamage = false;
 
 	GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
 
@@ -37,6 +45,8 @@ void ABoss::BeginPlay()
 	{
 		BBC->SetValueAsInt("Phase", Phase);
 	}
+
+
 }
 
 // Called when the game starts or when spawned
@@ -51,6 +61,8 @@ void ABoss::Tick(float DeltaTime)
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		SetActorHiddenInGame(false);
+
 		if (BBC != nullptr)
 		{
 			BBC->SetValueAsInt("Phase", Phase);
@@ -72,26 +84,31 @@ void ABoss::Tick(float DeltaTime)
 			}
 			case 2:
 			{
-				if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
-				{
-					ReadyToSpawn = false;
-					if ((!Launcher1Fixed || !Launcher2Fixed) /*&& (Harpoon2Launched && Harpoon1Launched)*/ ||
-						((Launcher1Fixed && Harpoon1Launched) && !Launcher2Fixed) ||
-						(Launcher2Fixed && Harpoon2Launched) && !Launcher1Fixed)
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 1"));
-						CurrentAttack = BossAttacks::P2SummonV1;
-						SummonType1();
-					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 2"));
-						CurrentAttack = BossAttacks::P2SummonV2;
-						SummonType2();
-					}
-				}
-				Phase2AttackChoice();
-				HarponSpawn();
+				Harpoon1Launched = true;
+				Harpoon2Launched = true;
+
+				//CheckEnemyStatus();
+
+				//if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
+				//{
+				//	ReadyToSpawn = false;
+				//	if ((!Launcher1Fixed || !Launcher2Fixed) /*&& (Harpoon2Launched && Harpoon1Launched)*/ ||
+				//		((Launcher1Fixed && Harpoon1Launched) && !Launcher2Fixed) ||
+				//		(Launcher2Fixed && Harpoon2Launched) && !Launcher1Fixed)
+				//	{
+				//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 1"));
+				//		CurrentAttack = BossAttacks::P2SummonV1;
+				//		SummonType1();
+				//	}
+				//	else
+				//	{
+				//		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawn 2"));
+				//		CurrentAttack = BossAttacks::P2SummonV2;
+				//		SummonType2();
+				//	}
+				//}
+				//Phase2AttackChoice();
+				//HarponSpawn();
 				break;
 			}
 			default:
@@ -160,7 +177,7 @@ void ABoss::Tick(float DeltaTime)
 			}
 			case BossAttacks::P1AoE1:
 			{
-				AoE1TimerBetweenSpawns += DeltaTime;
+				//AoE1TimerBetweenSpawns += DeltaTime;
 				AoE1();
 				ShouldEndPhase1();
 				break;
@@ -204,10 +221,22 @@ void ABoss::Tick(float DeltaTime)
 			AttackDelayTimer += DeltaTime;
 		}
 	}
+	else
+	{
+		SetActorHiddenInGame(true);
+
+		//if (!isActiveMissile && !isActiveRegProjectile)
+		//{
+		//	Destroy();
+		//}
+	}
 }
 
 FVector ABoss::CalculateSpawnLocation()
 {
+	int FailSafeAmount = 0;
+	int FailSafeMaxAmount = 500;
+
 	FVector RandLocation;
 	float Distance;
 
@@ -225,8 +254,14 @@ FVector ABoss::CalculateSpawnLocation()
 
 		Distance = (CompareLocation - RandLocation).Size();
 
-	} while (Distance < MinRange || Distance > MaxRange);
+		FailSafeAmount++;
 
+	} while (Distance < MinRange || Distance > MaxRange || FailSafeAmount < FailSafeMaxAmount);
+
+	if (FailSafeAmount >= FailSafeMaxAmount)
+	{
+		return FVector(0, 0, 0);
+	}
 	return RandLocation;
 }
 
@@ -586,10 +621,10 @@ void ABoss::Melee2bLeft()
 
 void ABoss::AoE1()
 {
-	if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
-	{
-		if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
-		{
+	//if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
+	//{
+		//if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+		//{
 			AoE1TimerBetweenSpawns = 0;
 			if (HandsAlive() == 2)
 			{
@@ -632,33 +667,33 @@ void ABoss::AoE1()
 			}
 
 			SetNewDelay();
-		}
-	}
+		//}
+	//}
 
-	if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
-	{
-		if (BBC != nullptr)
-		{
-			BBC->SetValueAsBool("IsAttacking", true);
-		}
+	//if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+	//{
+	//	if (BBC != nullptr)
+	//	{
+	//		BBC->SetValueAsBool("IsAttacking", true);
+	//	}
 
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
+	//	FActorSpawnParameters spawnParams;
+	//	spawnParams.Owner = this;
+	//	spawnParams.Instigator = GetInstigator();
 
-		FVector SpawnLocation;
+	//	FVector SpawnLocation;
 
-		for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
-		{
-			SpawnLocation = CalculateSpawnLocation();
-			SpawnLocation.Z += AoE1ZOffset;
+	//	for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
+	//	{
+	//		SpawnLocation = CalculateSpawnLocation();
+	//		SpawnLocation.Z += AoE1ZOffset;
 
-			FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
-		}
+	//		FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
+	//	}
 
-		AoE1TimerBetweenSpawns = 0;
-		AoE1SpawnCounter = AoE1SpawnCounter + 1;
-	}
+	//	AoE1TimerBetweenSpawns = 0;
+	//	AoE1SpawnCounter = AoE1SpawnCounter + 1;
+	//}
 }
 
 int ABoss::HandsAlive()
@@ -677,6 +712,7 @@ int ABoss::HandsAlive()
 			LivingHands -= 1;
 			LeftHandAlive = false;
 			LeftHandCrystal->Destroy();
+			LeftWeaponDestroyed();
 		}
 	}
 
@@ -692,6 +728,7 @@ int ABoss::HandsAlive()
 			LivingHands -= 1;
 			RightHandAlive = false;
 			RightHandCrystal->Destroy();
+			RightWeaponDestroyed();
 		}
 	}
 
@@ -716,12 +753,25 @@ void ABoss::SummonType1()
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
 		RandLocation = CalculateSpawnLocation();
-		RandLocation.Z += ZSummonOffSet;
 
-		//I'm about to tank the framerate lmao
-		//Very sad
-		//But if people don't know about it then I can't be asked to fix it
-		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
+		if (FVector(0, 0, 0) == RandLocation)
+		{
+			RandLocation = FVector(FailSafeSpawnLocation->GetComponentLocation().X + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Y + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Z);
+		}
+		else
+		{
+			RandLocation.Z += ZSummonOffSet;
+			RandLocation = RayTraceDown(RandLocation);
+		}
+
+		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams);
+		if (Enemy != nullptr)
+		{
+			Enemy->SetIsCrystal(true);
+			SummonedEnemies.Add(Enemy);
+		}
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
@@ -751,12 +801,22 @@ void ABoss::SummonType2()
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
 		RandLocation = CalculateSpawnLocation();
-		RandLocation.Z += ZSummonOffSet;
 
-		//Ah shit here we go again
-		//Plz send help
-		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		if (FVector(0, 0, 0) == RandLocation)
+		{
+			RandLocation = FVector(FailSafeSpawnLocation->GetComponentLocation().X + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Y + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Z);
+		}
+		RandLocation.Z += ZSummonOffSet;
+		
+
+		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams);
+		if (Enemy != nullptr)
+		{
+			Enemy->SetIsCrystal(true);
+			SummonedEnemies.Add(Enemy);
+		}
 	}
 
 	if (BBC != nullptr)
@@ -823,7 +883,8 @@ void ABoss::ShouldEndPhase1()
 	if (HandsAlive() == 0)
 	{
 		CurrentAttack == BossAttacks::Waiting;
-
+		GetMesh()->SetAnimation(BossIdle);
+		ChangeFromPhase1ToPhase2();
 		ChangePhase();
 	}
 }
@@ -900,7 +961,7 @@ void ABoss::Phase2AttackChoice()
 
 void ABoss::HarponSpawn()
 {
-	if (SummonedEnemies.Num() != 0)
+/*	if (SummonedEnemies.Num() != 0)
 	{
 		for (AEnemy* enemy : SummonedEnemies)
 		{
@@ -922,7 +983,11 @@ void ABoss::HarponSpawn()
 			return;
 		}
 	}
-	else if (SummonedEnemies.Num() == 0 && SpawnSet)
+	else */
+	
+	CheckEnemyStatus();
+
+	if (SummonedEnemies.Num() == 0 && SpawnSet)
 	{
 		return;
 	}
@@ -942,8 +1007,6 @@ void ABoss::HarponSpawn()
 	}
 	else if (SummonedEnemies.Num() <= 0 && !SpawnSet)
 	{
-		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
-
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
@@ -952,7 +1015,8 @@ void ABoss::HarponSpawn()
 		{
 			if (HarponPiece1 != nullptr)
 			{
-				GetWorld()->SpawnActor<AActor>(HarponPiece1, Player->GetActorLocation(), GetActorRotation(), spawnParams);
+				GetWorld()->SpawnActor<AActor>(HarponPiece1, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
+				SpawnSet = true;
 			}
 		}
 		else
@@ -961,7 +1025,8 @@ void ABoss::HarponSpawn()
 			{
 				if (CurrentSummon == 2)
 				{
-					GetWorld()->SpawnActor<AActor>(HarponPiece2, Player->GetActorLocation(), GetActorRotation(), spawnParams);
+					GetWorld()->SpawnActor<AActor>(HarponPiece2, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
+					SpawnSet = true;
 				}
 			}
 		}
@@ -1077,5 +1142,43 @@ void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 			break;
 		}
 	}
+}
+
+void ABoss::CheckEnemyStatus()
+{
+	for (AEnemy* Enemy : SummonedEnemies)
+	{
+		if (Enemy->GetIsDead())
+		{
+			AEnemy* Temp = Enemy;
+			SummonedEnemies.Remove(Enemy);
+			Temp->Destroy();
+		}
+	}
+}
+
+FVector ABoss::RayTraceDown(FVector RandLocation)
+{
+	FHitResult Hit;
+
+	do
+	{
+		AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+		FVector LineTraceEnd = FVector(RandLocation.X, RandLocation.Y, RandLocation.Z - DistanceTrace);
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(Player);
+
+		GetWorld()->LineTraceSingleByChannel(OUT Hit, RandLocation, LineTraceEnd, ECollisionChannel::ECC_Camera, TraceParams, FCollisionResponseParams());
+		DrawDebugLine(GetWorld(), RandLocation, LineTraceEnd, FColor::Blue, false, 100, 0, 5);
+
+		if (Hit.IsValidBlockingHit())
+		{
+			RandLocation.Z = Hit.ImpactPoint.Z + 10;
+		}
+
+	}while (!Hit.IsValidBlockingHit());
+
+	return RandLocation;
 }
 	

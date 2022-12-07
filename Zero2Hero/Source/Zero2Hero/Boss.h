@@ -10,6 +10,8 @@
 #include "BossCrystalWeakness.h"
 #include "FallingItem.h"
 #include "ShockWave.h"
+#include "GameManager.h"
+#include "BossFailSafeSpawn.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -192,16 +194,22 @@ protected:
 	//Phase2 General
 
 	//Phase 2 - Summoning General
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - General")
+		UAnimSequence* BossIdle;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMax;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMin;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
+		TSubclassOf<ABossFailSafeSpawn> FailSafeSpawnLocationBP;
 	UPROPERTY()
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
 	UPROPERTY()
 		bool SpawnSet = false;
+	UPROPERTY(EditAnywhere)
+		USphereComponent* FailSafeSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher1Fixed = false;
@@ -266,6 +274,8 @@ protected:
 
 public:
 	UFUNCTION()
+		void CheckEnemyStatus();
+	UFUNCTION()
 		void SetNewDelay();
 	UFUNCTION()
 		FVector CalculateSpawnLocation();
@@ -277,6 +287,8 @@ public:
 		int HandsAlive();
 	UFUNCTION()
 		void ShouldEndPhase1();
+	UFUNCTION()
+		FVector RayTraceDown(FVector RandLocation);
 
 	UFUNCTION(BlueprintCallable)
 		void Melee1Right();
@@ -294,6 +306,12 @@ public:
 		void AoE1();
 
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void LeftWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void RightWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeFromPhase1ToPhase2();
 
 	UFUNCTION(BlueprintCallable)
 		void SummonType1();

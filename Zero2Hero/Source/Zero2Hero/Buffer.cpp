@@ -55,6 +55,21 @@ void ABuffer::Tick(float DeltaTime)
 
 		if (TimerForEachType >= TimeForEachType)
 		{
+			if (NiagaraComp == nullptr)
+			{
+				return;
+			}
+
+			if (PairedEnemy != nullptr)
+			{
+				if (Cast<AEnemy>(PairedEnemy)->GetNiagaraComp() == nullptr)
+				{
+					return;
+				}
+			}
+
+			TimerForEachType = 0;
+
 			switch (CurrentShieldType)
 			{
 			case 0:
@@ -147,8 +162,6 @@ void ABuffer::Tick(float DeltaTime)
 				break;
 			}
 			}
-
-			TimerForEachType = 0;
 		}
 
 		if (!isPaired)
@@ -195,6 +208,21 @@ bool ABuffer::SeekNewTarget()
 			CurrentShieldType = ElementType::Fire;
 			PairedEnemy->SetShieldType(ElementType::Fire);
 
+			if (ShieldVFX.Num() == 0)
+			{
+				return 0;
+			}
+
+			if (NiagaraComp == nullptr)
+			{
+				return false;
+			}
+
+			if (Cast<AEnemy>(PairedEnemy)->GetNiagaraComp() == nullptr)
+			{
+				return false;
+			}
+
 			switch (CurrentShieldType)
 			{
 			case ElementType::Ice:
@@ -204,6 +232,8 @@ bool ABuffer::SeekNewTarget()
 					NiagaraComp->SetAsset(ShieldVFX[ElementType::Ice]);
 					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Ice]);
 				}
+
+				break;
 			}
 			case ElementType::Fire:
 			{
@@ -212,6 +242,8 @@ bool ABuffer::SeekNewTarget()
 					NiagaraComp->SetAsset(ShieldVFX[ElementType::Fire]);
 					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Fire]);
 				}
+
+				break;
 			}
 			case ElementType::Electric:
 			{
@@ -220,6 +252,8 @@ bool ABuffer::SeekNewTarget()
 					NiagaraComp->SetAsset(ShieldVFX[ElementType::Electric]);
 					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Electric]);
 				}
+
+				break;
 			}
 			case ElementType::Nature:
 			{
@@ -228,6 +262,7 @@ bool ABuffer::SeekNewTarget()
 					NiagaraComp->SetAsset(ShieldVFX[ElementType::Nature]);
 					Cast<AEnemy>(PairedEnemy)->GetNiagaraComp()->SetAsset(ShieldVFX[ElementType::Nature]);
 				}
+				break;
 			}
 			default:
 			{
@@ -363,7 +398,10 @@ void ABuffer::OnEndOverlapTargetRange(UPrimitiveComponent* OverlappedComponent, 
 
 			if (PairedEnemy == ExitingEnemy)
 			{
-				PairedEnemy->UnshieldEnemy();
+				if (PairedEnemy != nullptr)
+				{
+					PairedEnemy->UnshieldEnemy();
+				}
 			}
 
 			TargetsInRange.Remove(ExitingEnemy);

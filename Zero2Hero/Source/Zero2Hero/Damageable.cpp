@@ -49,11 +49,34 @@ void ADamageable::Tick(float DeltaTime)
 			{
 				if (SpawnOnDeath != nullptr)
 				{
-					FActorSpawnParameters spawnParams;
-					spawnParams.Owner = this;
-					spawnParams.Instigator = GetInstigator();
+					if (!HasSpawned)
+					{
+						FHitResult Hit;
 
-					GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GetActorLocation(), GetActorRotation(), spawnParams);
+						FVector GroundLocation = GetActorLocation();
+
+						AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+						FVector LineTraceEnd = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 2000);
+						FCollisionQueryParams TraceParams;
+						TraceParams.AddIgnoredActor(Player);
+						TraceParams.AddIgnoredActor(this);
+
+						GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_Camera, TraceParams, FCollisionResponseParams());
+
+						if (Hit.IsValidBlockingHit())
+						{
+							GroundLocation.Z = Hit.ImpactPoint.Z;
+						}
+
+						FActorSpawnParameters spawnParams;
+						spawnParams.Owner = this;
+						spawnParams.Instigator = GetInstigator();
+
+						GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GroundLocation, GetActorRotation(), spawnParams);
+
+						HasSpawned = true;
+					}
 				}
 
 				if (!IsCrystal)
@@ -190,8 +213,11 @@ void ADamageable::CheckDeath()
 	void ADamageable::UnshieldEnemy()
 	{
 		isShielded = false;
-		PairedEnemy->SetEnemyPair(nullptr);
-		PairedEnemy = nullptr;
+		if (PairedEnemy != nullptr)
+		{
+			PairedEnemy->SetEnemyPair(nullptr);
+			PairedEnemy = nullptr;
+		}
 		CurrentShieldType = ElementType::None;
 	}
 
