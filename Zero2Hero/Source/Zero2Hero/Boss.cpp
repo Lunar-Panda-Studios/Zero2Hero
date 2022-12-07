@@ -32,6 +32,7 @@ void ABoss::BeginPlay()
 	}
 
 	isBoss = true;
+	CanDamage = false;
 
 	GetMesh()->OnComponentHit.AddDynamic(this, &ABoss::OnHitArms);
 
@@ -176,7 +177,7 @@ void ABoss::Tick(float DeltaTime)
 			}
 			case BossAttacks::P1AoE1:
 			{
-				AoE1TimerBetweenSpawns += DeltaTime;
+				//AoE1TimerBetweenSpawns += DeltaTime;
 				AoE1();
 				ShouldEndPhase1();
 				break;
@@ -620,10 +621,10 @@ void ABoss::Melee2bLeft()
 
 void ABoss::AoE1()
 {
-	if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
-	{
-		if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
-		{
+	//if (AoE1SpawnCounter >= AoE1AmountToSpawn.Num())
+	//{
+		//if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+		//{
 			AoE1TimerBetweenSpawns = 0;
 			if (HandsAlive() == 2)
 			{
@@ -666,33 +667,33 @@ void ABoss::AoE1()
 			}
 
 			SetNewDelay();
-		}
-	}
+		//}
+	//}
 
-	if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
-	{
-		if (BBC != nullptr)
-		{
-			BBC->SetValueAsBool("IsAttacking", true);
-		}
+	//if (AoE1DelayBetweenSpawns <= AoE1TimerBetweenSpawns)
+	//{
+	//	if (BBC != nullptr)
+	//	{
+	//		BBC->SetValueAsBool("IsAttacking", true);
+	//	}
 
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
+	//	FActorSpawnParameters spawnParams;
+	//	spawnParams.Owner = this;
+	//	spawnParams.Instigator = GetInstigator();
 
-		FVector SpawnLocation;
+	//	FVector SpawnLocation;
 
-		for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
-		{
-			SpawnLocation = CalculateSpawnLocation();
-			SpawnLocation.Z += AoE1ZOffset;
+	//	for (int i = 0; i < AoE1AmountToSpawn[AoE1SpawnCounter]; i++)
+	//	{
+	//		SpawnLocation = CalculateSpawnLocation();
+	//		SpawnLocation.Z += AoE1ZOffset;
 
-			FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
-		}
+	//		FallingItems.Add(GetWorld()->SpawnActor<AFallingItem>(FallingItemBP, SpawnLocation, GetActorRotation(), spawnParams));
+	//	}
 
-		AoE1TimerBetweenSpawns = 0;
-		AoE1SpawnCounter = AoE1SpawnCounter + 1;
-	}
+	//	AoE1TimerBetweenSpawns = 0;
+	//	AoE1SpawnCounter = AoE1SpawnCounter + 1;
+	//}
 }
 
 int ABoss::HandsAlive()
