@@ -11,6 +11,7 @@
 #include "FallingItem.h"
 #include "ShockWave.h"
 #include "GameManager.h"
+#include "BossFailSafeSpawn.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -199,12 +200,16 @@ protected:
 		USphereComponent* SummonRangeMax;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMin;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
+		TSubclassOf<ABossFailSafeSpawn> FailSafeSpawnLocationBP;
 	UPROPERTY()
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
 	UPROPERTY()
 		bool SpawnSet = false;
+	UPROPERTY(EditAnywhere)
+		USphereComponent* FailSafeSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher1Fixed = false;
@@ -268,6 +273,8 @@ protected:
 		int RegProjectileDamage;
 
 public:
+	UFUNCTION()
+		void CheckEnemyStatus();
 	UFUNCTION()
 		void SetNewDelay();
 	UFUNCTION()

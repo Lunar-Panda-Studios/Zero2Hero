@@ -17,12 +17,19 @@ ABoss::ABoss()
 
 	FireLocationRight = CreateDefaultSubobject<USphereComponent>(TEXT("FireLocationRight"));
 	FireLocationRight->SetupAttachment(GetRootComponent());
-
 }
 
 void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (FailSafeSpawnLocationBP != nullptr)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), FailSafeSpawnLocationBP, FoundActors);
+
+		FailSafeSpawnLocation = Cast<ABossFailSafeSpawn>(FoundActors[0])->GetFailSafeSphere();
+	}
 
 	isBoss = true;
 
@@ -37,6 +44,8 @@ void ABoss::BeginPlay()
 	{
 		BBC->SetValueAsInt("Phase", Phase);
 	}
+
+
 }
 
 // Called when the game starts or when spawned
@@ -47,11 +56,6 @@ void ABoss::Tick(float DeltaTime)
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0) == nullptr)
 	{
 		return;
-	}
-
-	if (!isActiveMissile && !isActiveRegProjectile)
-	{
-		Destroy();
 	}
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
@@ -79,6 +83,8 @@ void ABoss::Tick(float DeltaTime)
 			}
 			case 2:
 			{
+				CheckEnemyStatus();
+
 				if (SummonedEnemies.Num() == 0 && ReadyToSpawn)
 				{
 					ReadyToSpawn = false;
@@ -214,11 +220,19 @@ void ABoss::Tick(float DeltaTime)
 	else
 	{
 		SetActorHiddenInGame(true);
+
+		//if (!isActiveMissile && !isActiveRegProjectile)
+		//{
+		//	Destroy();
+		//}
 	}
 }
 
 FVector ABoss::CalculateSpawnLocation()
 {
+	int FailSafeAmount = 0;
+	int FailSafeMaxAmount = 500;
+
 	FVector RandLocation;
 	float Distance;
 
@@ -236,8 +250,14 @@ FVector ABoss::CalculateSpawnLocation()
 
 		Distance = (CompareLocation - RandLocation).Size();
 
-	} while (Distance < MinRange || Distance > MaxRange);
+		FailSafeAmount++;
 
+	} while (Distance < MinRange || Distance > MaxRange || FailSafeAmount < FailSafeMaxAmount);
+
+	if (FailSafeAmount >= FailSafeMaxAmount)
+	{
+		return FVector(0, 0, 0);
+	}
 	return RandLocation;
 }
 
@@ -729,14 +749,25 @@ void ABoss::SummonType1()
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
 		RandLocation = CalculateSpawnLocation();
-		RandLocation.Z += ZSummonOffSet;
 
-		RandLocation = RayTraceDown(RandLocation);
+		if (FVector(0, 0, 0) == RandLocation)
+		{
+			RandLocation = FVector(FailSafeSpawnLocation->GetComponentLocation().X + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Y + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Z);
+		}
+		else
+		{
+			RandLocation.Z += ZSummonOffSet;
+			RandLocation = RayTraceDown(RandLocation);
+		}
 
-		//I'm about to tank the framerate lmao
-		//Very sad
-		//But if people don't know about it then I can't be asked to fix it
-		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
+		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(Summon1EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams);
+		if (Enemy != nullptr)
+		{
+			Enemy->SetIsCrystal(true);
+			SummonedEnemies.Add(Enemy);
+		}
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
 	}
 
@@ -766,12 +797,22 @@ void ABoss::SummonType2()
 	for (int i = 0; i < AmountToSummonV1; i++)
 	{
 		RandLocation = CalculateSpawnLocation();
-		RandLocation.Z += ZSummonOffSet;
 
-		//Ah shit here we go again
-		//Plz send help
-		SummonedEnemies.Add(GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams));
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Spawned"));
+		if (FVector(0, 0, 0) == RandLocation)
+		{
+			RandLocation = FVector(FailSafeSpawnLocation->GetComponentLocation().X + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Y + FMath::RandRange(-FailSafeSpawnLocation->GetScaledSphereRadius(), FailSafeSpawnLocation->GetScaledSphereRadius()),
+				FailSafeSpawnLocation->GetComponentLocation().Z);
+		}
+		RandLocation.Z += ZSummonOffSet;
+		
+
+		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(Summon2EnemyTypeBP, RandLocation, GetActorRotation(), spawnParams);
+		if (Enemy != nullptr)
+		{
+			Enemy->SetIsCrystal(true);
+			SummonedEnemies.Add(Enemy);
+		}
 	}
 
 	if (BBC != nullptr)
@@ -916,7 +957,7 @@ void ABoss::Phase2AttackChoice()
 
 void ABoss::HarponSpawn()
 {
-	if (SummonedEnemies.Num() != 0)
+/*	if (SummonedEnemies.Num() != 0)
 	{
 		for (AEnemy* enemy : SummonedEnemies)
 		{
@@ -938,7 +979,11 @@ void ABoss::HarponSpawn()
 			return;
 		}
 	}
-	else if (SummonedEnemies.Num() == 0 && SpawnSet)
+	else */
+	
+	CheckEnemyStatus();
+
+	if (SummonedEnemies.Num() == 0 && SpawnSet)
 	{
 		return;
 	}
@@ -967,6 +1012,7 @@ void ABoss::HarponSpawn()
 			if (HarponPiece1 != nullptr)
 			{
 				GetWorld()->SpawnActor<AActor>(HarponPiece1, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
+				SpawnSet = true;
 			}
 		}
 		else
@@ -976,6 +1022,7 @@ void ABoss::HarponSpawn()
 				if (CurrentSummon == 2)
 				{
 					GetWorld()->SpawnActor<AActor>(HarponPiece2, Manager->GetCurrentCheckPoint(), GetActorRotation(), spawnParams);
+					SpawnSet = true;
 				}
 			}
 		}
@@ -1093,6 +1140,19 @@ void ABoss::OnHitArms(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	}
 }
 
+void ABoss::CheckEnemyStatus()
+{
+	for (AEnemy* Enemy : SummonedEnemies)
+	{
+		if (Enemy->GetIsDead())
+		{
+			AEnemy* Temp = Enemy;
+			SummonedEnemies.Remove(Enemy);
+			Temp->Destroy();
+		}
+	}
+}
+
 FVector ABoss::RayTraceDown(FVector RandLocation)
 {
 	FHitResult Hit;
@@ -1105,13 +1165,12 @@ FVector ABoss::RayTraceDown(FVector RandLocation)
 		FCollisionQueryParams TraceParams;
 		TraceParams.AddIgnoredActor(Player);
 
-
 		GetWorld()->LineTraceSingleByChannel(OUT Hit, RandLocation, LineTraceEnd, ECollisionChannel::ECC_Camera, TraceParams, FCollisionResponseParams());
 		DrawDebugLine(GetWorld(), RandLocation, LineTraceEnd, FColor::Blue, false, 100, 0, 5);
 
 		if (Hit.IsValidBlockingHit())
 		{
-			RandLocation.Z = Hit.ImpactPoint.Z;
+			RandLocation.Z = Hit.ImpactPoint.Z + 10;
 		}
 
 	}while (!Hit.IsValidBlockingHit());

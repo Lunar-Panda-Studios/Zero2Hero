@@ -67,6 +67,8 @@ protected:
 		bool isBoss = false;
 	UPROPERTY(BlueprintReadWrite)
 		bool CanDamage = true;
+	UPROPERTY()
+		bool HasSpawned = false;
 
 public:	
 	// Called every frame
