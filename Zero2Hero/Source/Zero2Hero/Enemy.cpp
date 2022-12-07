@@ -26,6 +26,8 @@ void AEnemy::BeginPlay()
 
 	//AIPC->ConfigureSense(*SightConfig);
 
+	NiagaraComp = FindComponentByClass<UNiagaraComponent>();
+
 	MainBody = FindComponentByClass<UBoxComponent>();
 	AIPC = FindComponentByClass<UAIPerceptionComponent>();
 

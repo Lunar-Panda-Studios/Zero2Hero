@@ -70,17 +70,25 @@ bool AHook::GetHookAttached()
 	return HookAttached;
 }
 
+void AHook::SetHookAttached(bool newAttached)
+{
+	HookAttached = newAttached;
+}
+
 void AHook::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr)
 	{
-		if (OtherActor->ActorHasTag("GrapplePoint"))
+		if (OtherComp != nullptr)
 		{
-			if (OtherComp->ComponentHasTag(("MainBody")))
+			if (OtherActor->ActorHasTag("GrapplePoint"))
 			{
-				HookAttached = true;
-				ProjectileMoveComp->Deactivate();
-				SetLifeSpan(10);
+				if (OtherComp->ComponentHasTag(("MainBody")))
+				{
+					HookAttached = true;
+					ProjectileMoveComp->Deactivate();
+					SetLifeSpan(10);
+				}
 			}
 		}
 	}

@@ -49,13 +49,40 @@ void ADamageable::Tick(float DeltaTime)
 			{
 				if (SpawnOnDeath != nullptr)
 				{
-					FActorSpawnParameters spawnParams;
-					spawnParams.Owner = this;
-					spawnParams.Instigator = GetInstigator();
+					if (!HasSpawned)
+					{
+						FHitResult Hit;
 
-					GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GetActorLocation(), GetActorRotation(), spawnParams);
+						FVector GroundLocation = GetActorLocation();
+
+						AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+						FVector LineTraceEnd = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 2000);
+						FCollisionQueryParams TraceParams;
+						TraceParams.AddIgnoredActor(Player);
+						TraceParams.AddIgnoredActor(this);
+
+						GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_Camera, TraceParams, FCollisionResponseParams());
+
+						if (Hit.IsValidBlockingHit())
+						{
+							GroundLocation.Z = Hit.ImpactPoint.Z;
+						}
+
+						FActorSpawnParameters spawnParams;
+						spawnParams.Owner = this;
+						spawnParams.Instigator = GetInstigator();
+
+						GetWorld()->SpawnActor<AActor>(SpawnOnDeath, GroundLocation, GetActorRotation(), spawnParams);
+
+						HasSpawned = true;
+					}
 				}
-				Destroy();
+
+				if (!IsCrystal)
+				{
+					Destroy();
+				}
 			}
 		}
 	}
@@ -81,11 +108,27 @@ bool ADamageable::GetBeingRevived()
 void ADamageable::SetBeingRevived(bool newRevive)
 {
 	beingRevived = newRevive;
+
+	if(!beingRevived)
+	{
+		AnimationTimer = 0;
+		EnemyDies();
+	}
 }
 
 void ADamageable::SetIsDead(bool newDead)
 {
 	isDead = newDead;
+}
+
+void ADamageable::SetIsCrystal(bool NewIsCrystal)
+{
+	IsCrystal = NewIsCrystal;
+}
+
+void ADamageable::OnDeath()
+{
+
 }
 
 
@@ -108,16 +151,22 @@ void ADamageable::DecreaseHealth(int amount)
 {
 	if (!isDead)
 	{
-		Health -= amount;
-		if (ActorHasTag("Enemy"))
+		if (CanDamage)
 		{
-			EnemyDamaged();
+			if (!isBoss)
+			{
+				Health -= amount;
+			}
+			if (ActorHasTag("Enemy"))
+			{
+				EnemyDamaged();
+			}
+			else if (ActorHasTag("Player"))
+			{
+				PlayerDamaged();
+			}
+			CheckDeath();
 		}
-		else if (ActorHasTag("Player"))
-		{
-			PlayerDamaged();
-		}
-		CheckDeath();
 	}
 }
 
@@ -130,6 +179,7 @@ void ADamageable::CheckDeath()
 {
 	if (Health <= 0 && !isDead)
 	{
+		OnDeath();
 		if (ActorHasTag("Enemy"))
 		{
 			EnemyDies();
@@ -142,8 +192,6 @@ void ADamageable::CheckDeath()
 		//SetLifeSpan(AnimationTimer);
 		AnimationTimer = 0;
 		Allow = false;
-
-
 	}
 }
 
@@ -165,8 +213,11 @@ void ADamageable::CheckDeath()
 	void ADamageable::UnshieldEnemy()
 	{
 		isShielded = false;
-		PairedEnemy->SetEnemyPair(nullptr);
-		PairedEnemy = nullptr;
+		if (PairedEnemy != nullptr)
+		{
+			PairedEnemy->SetEnemyPair(nullptr);
+			PairedEnemy = nullptr;
+		}
 		CurrentShieldType = ElementType::None;
 	}
 

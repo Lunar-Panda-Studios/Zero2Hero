@@ -211,6 +211,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
 		TSubclassOf<AHealthAmmoDrop> AmmoDropBP;
 
+	UPROPERTY()
+		float GrappleTimer = 0;
+	UPROPERTY(EditAnywhere, Category = "Grappling Hook")
+		float GrappleMaxLength = 5;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -232,7 +237,8 @@ public:
 	void AddEnemyInRange(ADamageable* newEnemy);
 	void DeleteEnemyInRange(ADamageable* oldEnemy);
 	void RangedAttack();
-	void RangedAttackEnd();
+	UFUNCTION(BlueprintCallable)
+		void RangedAttackEnd();
 	void EndingGrapple();
 
 	void HookShot();

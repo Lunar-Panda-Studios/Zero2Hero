@@ -50,6 +50,11 @@ void ASuctionGrenade::Tick(float DeltaTime)
 		{
 			if (Cast<AEnemy>(a))
 			{
+				if (Cast<AEnemy>(a)->ActorHasTag("Boss"))
+				{
+					continue;
+				}
+
 				//for some reason this sometimes doesnt work with the follow enemy. Sometimes it does, but when it does it doesnt work
 				// for the whole time. Dont get it. There are no (major) issues with my code. so confused
 				dir = GetActorLocation() - a->GetActorLocation();
