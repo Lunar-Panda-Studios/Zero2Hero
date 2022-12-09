@@ -98,6 +98,17 @@ void AEnemy::Tick(float DeltaTime)
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		if (Disenage)
+		{
+			DisenageTimer += DeltaTime;
+
+			if (DisenageTimer >= DisenageFor)
+			{
+				Disenage = false;
+				DisenageTimer = 0;
+			}
+		}
+
 		if (BBC != nullptr)
 		{
 			BBC->SetValueAsBool("isDead", isDead);
@@ -143,6 +154,11 @@ void AEnemy::Attack()
 {
 }
 
+bool AEnemy::GetDisenage()
+{
+	return Disenage;
+}
+
 bool AEnemy::GetCanSee()
 {
 	return CanSee;
@@ -152,7 +168,24 @@ void AEnemy::OnTargetDetected(AActor* actor, FAIStimulus stimulus)
 {
 	if (actor->ActorHasTag("Player"))
 	{
-		CanSee = stimulus.WasSuccessfullySensed();
+		if (!Disenage)
+		{
+			CanSee = stimulus.WasSuccessfullySensed();
+		}
+		else
+		{
+			CanSee = false;
+		}
+
+		if (CanSee && ShouldReset && !Disenage)
+		{
+			StartingAggroLocation = GetActorLocation();
+			ShouldReset = false;
+		}
+		else
+		{
+			ShouldReset = true;
+		}
 
 		if (BBC != nullptr)
 		{
