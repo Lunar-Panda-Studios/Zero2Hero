@@ -10,6 +10,8 @@
 #include "BossCrystalWeakness.h"
 #include "FallingItem.h"
 #include "ShockWave.h"
+#include "GameManager.h"
+#include "BossFailSafeSpawn.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -51,7 +53,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Misc")
 		USphereComponent* FireLocationRight;
 	UPROPERTY()
-		int Phase = 2;
+		int Phase = 1;
 	UPROPERTY()
 		TEnumAsByte<BossAttacks> CurrentAttack = BossAttacks::Waiting;
 	//Will need changing to Skeletal Mesh later
@@ -84,7 +86,7 @@ protected:
 	UPROPERTY()
 		bool LeftHandAlive = true;
 	UPROPERTY()
-		bool RightHandAlive = false;
+		bool RightHandAlive = true;
 	UPROPERTY()
 		AShockWave* ShockWaveInstance;
 	UPROPERTY(EditAnywhere, Category = "Phase 1 - General")
@@ -95,6 +97,22 @@ protected:
 		bool FirstAnimFinished = false;
 	UPROPERTY()
 		bool SecondAnimStarted = false;
+	UPROPERTY()
+		float AttackDelayTimer = 0;
+	UPROPERTY()
+		float CurrentAttackDelay = 0;
+	UPROPERTY()
+		bool ShouldShockwave = true;
+
+	//Phase 1 - Delays
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA1DelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA2aDelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float MA2bDelayTo;
+	UPROPERTY(EditAnywhere, Category = "Phase 1 - Delays")
+		float AOE1DelayTo;
 
 
 	//Phase 1 - Melee Attack 1 Right Arm
@@ -176,16 +194,22 @@ protected:
 	//Phase2 General
 
 	//Phase 2 - Summoning General
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - General")
+		UAnimSequence* BossIdle;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMax;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		USphereComponent* SummonRangeMin;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
+		TSubclassOf<ABossFailSafeSpawn> FailSafeSpawnLocationBP;
 	UPROPERTY()
 		TArray<AEnemy*> SummonedEnemies;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		float ZSummonOffSet = 10.0f;
 	UPROPERTY()
 		bool SpawnSet = false;
+	UPROPERTY(EditAnywhere)
+		USphereComponent* FailSafeSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher1Fixed = false;
@@ -250,6 +274,10 @@ protected:
 
 public:
 	UFUNCTION()
+		void CheckEnemyStatus();
+	UFUNCTION()
+		void SetNewDelay();
+	UFUNCTION()
 		FVector CalculateSpawnLocation();
 	UFUNCTION()
 		void CalculateHandLocation();
@@ -259,6 +287,8 @@ public:
 		int HandsAlive();
 	UFUNCTION()
 		void ShouldEndPhase1();
+	UFUNCTION()
+		FVector RayTraceDown(FVector RandLocation);
 
 	UFUNCTION(BlueprintCallable)
 		void Melee1Right();
@@ -276,6 +306,12 @@ public:
 		void AoE1();
 
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void LeftWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void RightWeaponDestroyed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeFromPhase1ToPhase2();
 
 	UFUNCTION(BlueprintCallable)
 		void SummonType1();

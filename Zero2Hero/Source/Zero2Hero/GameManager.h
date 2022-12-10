@@ -22,6 +22,9 @@ protected:
 	virtual void OnStart();
 
 	UPROPERTY(BlueprintReadWrite)
+		bool InBossFight = false;
+
+	UPROPERTY(BlueprintReadWrite)
 		FVector CurrentCheckPoint;
 	UPROPERTY()
 		int CheckPointNum = -1;
@@ -52,10 +55,16 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 		bool LoadingSave = false;
+	UPROPERTY()
+		bool LoadingIn = false;
 
 public:
 	UFUNCTION()
 		bool GetLoadingSave();
+	UFUNCTION()
+		bool GetLoadingIn();
+	UFUNCTION()
+		void SetLoadingIn(bool newLoadingIn);
 	UFUNCTION()
 		UDialogueBox* LoadDialogueBox(TSubclassOf<class UUserWidget> Asset);
 	UFUNCTION()
@@ -98,5 +107,9 @@ public:
 		void SaveGame(TSubclassOf<USaveSystem> Save);
 	UFUNCTION(BlueprintCallable)
 		bool LoadGame();
+	UFUNCTION()
+		FVector GetCurrentCheckPoint();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ReloadBossScene();
 	
 };

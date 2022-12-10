@@ -45,6 +45,12 @@ void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AAc
 			{
 				Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
 			}
+
+			if (Manager->GetLoadingSave() && Manager->GetLoadingIn())
+			{
+				Manager->SetLoadingIn(false);
+				return;
+			}
 			
 			Manager->SetCurrentCheckPoint(RespawnPoint->GetComponentLocation());
 
@@ -67,6 +73,7 @@ void ACheckPoint::ActiveCheckPoint(UPrimitiveComponent* OverlappedComponent, AAc
 					Manager->SetNatureAmmo(Weapon->GetAmmo());
 				}
 			}
+
 			Manager->SaveGame(SaveClass);
 		}
 	}
