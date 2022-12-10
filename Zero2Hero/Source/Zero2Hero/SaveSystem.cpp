@@ -26,6 +26,11 @@ void USaveSystem::SetRangedWeapons(float ice, float fire, float nature, float el
 	ElectricAmmo = electric;
 }
 
+void USaveSystem::SetTowerOpen(bool newOpen)
+{
+	TowerOpen = newOpen;
+}
+
 FVector USaveSystem::GetCPSpawn()
 {
 	return CheckPointSpawn;
@@ -64,4 +69,9 @@ float USaveSystem::GetNatureAmmo()
 float USaveSystem::GetElectricAmmo()
 {
 	return ElectricAmmo;
+}
+
+bool USaveSystem::GetTowerOpen()
+{
+	return TowerOpen;
 }
