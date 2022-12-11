@@ -133,9 +133,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void ReloadBossScene();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SaveOptions(TSubclassOf<USaveSystem> Save);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		bool LoadOptions();
 	
 };
