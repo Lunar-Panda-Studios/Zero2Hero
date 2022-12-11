@@ -37,8 +37,11 @@ void AHookPoint::OnOverlapRangeSphere(UPrimitiveComponent* OverlappedComponent, 
 	{
 		if (OtherComp->ComponentHasTag("PlayerView"))
 		{
-			InSight = true;
-			GrapplingHook->SetGrapplePoint(this);
+			if (GrapplingHook != nullptr)
+			{
+				InSight = true;
+				GrapplingHook->SetGrapplePoint(this);
+			}
 		}
 	}
 }
@@ -50,8 +53,11 @@ void AHookPoint::OnOverlapRangeSphereEnd(UPrimitiveComponent* OverlappedComponen
 	{
 		if (OtherComp->ComponentHasTag("PlayerView"))
 		{
-			InSight = false;
-			GrapplingHook->SetGrapplePoint(nullptr);
+			if (GrapplingHook != nullptr)
+			{
+				InSight = false;
+				GrapplingHook->SetGrapplePoint(nullptr);
+			}
 		}
 	}
 }

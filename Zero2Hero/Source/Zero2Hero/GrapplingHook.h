@@ -63,7 +63,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	UFUNCTION()
+		void Detach();
 	UFUNCTION()
 		bool Fire();
 	UFUNCTION()
@@ -91,6 +92,8 @@ public:
 		bool GetEndGrapple();
 	UFUNCTION()
 		void SetEndGrapple(bool newGrapple);
+	UFUNCTION()
+		bool GetCanGrapple();
 
 	UFUNCTION()
 		void OnHit(AActor* OverlappedActor, AActor* OtherActor);
