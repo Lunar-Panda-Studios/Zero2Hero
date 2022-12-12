@@ -49,7 +49,7 @@ void ADamageable::Tick(float DeltaTime)
 			{
 				if (SpawnOnDeath != nullptr)
 				{
-					if (!HasSpawned)
+					if (!HasSpawned && CanSpawn)
 					{
 						FHitResult Hit;
 
@@ -88,6 +88,11 @@ void ADamageable::Tick(float DeltaTime)
 	}
 
 	CheckDeath();
+}
+
+void ADamageable::SetCanSpawn(bool newSpawn)
+{
+	CanSpawn = newSpawn;
 }
 
 int ADamageable::GetDamage()
