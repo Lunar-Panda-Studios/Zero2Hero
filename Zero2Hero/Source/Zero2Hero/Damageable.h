@@ -39,7 +39,7 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool beingRevived = false;
 	UPROPERTY(EditAnywhere, Category = "Character Stats")
 		float AnimationTime;
@@ -67,6 +67,8 @@ protected:
 		bool isBoss = false;
 	UPROPERTY(BlueprintReadWrite)
 		bool CanDamage = true;
+	UPROPERTY()
+		bool HasSpawned = false;
 
 public:	
 	// Called every frame

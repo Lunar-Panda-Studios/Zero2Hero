@@ -58,6 +58,7 @@ void AGrapplingHook::Tick(float DeltaTime)
 
 void AGrapplingHook::Detach()
 {
+	isGrappling = false;
 	EndGrapple = true;
 	canGrapple = true;
 }

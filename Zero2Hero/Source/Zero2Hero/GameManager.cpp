@@ -114,6 +114,11 @@ void UGameManager::SetFireAmmo(float newAmmo)
 	FireAmmo = newAmmo;
 }
 
+FVector UGameManager::GetCurrentCheckPoint()
+{
+	return CurrentCheckPoint;
+}
+
 void UGameManager::SetNatureAmmo(float newAmmo)
 {
 	NatureAmmo = newAmmo;
@@ -156,7 +161,15 @@ bool UGameManager::GetLoadingIn()
 void UGameManager::Respawn(AActor* Player)
 {
 	Cast<ACharacter>(Player)->LaunchCharacter(FVector(0, 0, 0),true,true);
-	Player->SetActorLocation(CurrentCheckPoint);
+
+	if (!InBossFight)
+	{
+		Player->SetActorLocation(CurrentCheckPoint);
+	}
+	else
+	{
+		ReloadBossScene();
+	}
 }
 
 void UGameManager::SetLoadingIn(bool newLoadingIn)
