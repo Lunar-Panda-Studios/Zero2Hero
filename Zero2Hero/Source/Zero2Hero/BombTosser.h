@@ -24,6 +24,8 @@ protected:
 		TSubclassOf<AProjectile> ProjectileBP;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* FireLocation;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float RadiusCanFollow = 3000.0f;
 
 public:	
 	// Called every frame

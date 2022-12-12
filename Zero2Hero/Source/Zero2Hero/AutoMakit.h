@@ -21,6 +21,10 @@ public:
 		TSubclassOf<AProjectile> ProjectileBP;
 	UPROPERTY(EditAnywhere)
 		USphereComponent* FireLocation;
+	UPROPERTY(EditAnywhere, Category = "Flying Type")
+		float RadiusCanFollow = 4000;
+	UPROPERTY()
+		FVector StartLocation;
 
 protected:
 	// Called when the game starts or when spawned

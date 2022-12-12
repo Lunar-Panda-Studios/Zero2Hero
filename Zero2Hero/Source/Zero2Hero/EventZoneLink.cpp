@@ -15,6 +15,9 @@ AEventZoneLink::AEventZoneLink()
 void AEventZoneLink::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Manager = Cast<UGameManager>(GetWorld()->GetGameInstance());
+
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 	ignoreActors.Init(this, 1);
 	seekClass = UStaticMesh::StaticClass();
@@ -45,6 +48,34 @@ void AEventZoneLink::Tick(float DeltaTime)
 
 	if (enemies.Num() < 1)
 	{
+		AllEnemiesKilled();
+		Destroy();
+	}
+
+	if (Manager->GetLoadingSave())
+	{
+		if (Manager->GetTowerOpen())
+		{
+			AutoKill();
+		}
+	}
+}
+
+TArray<AEnemy*> AEventZoneLink::GetEnemies()
+{
+	return enemies;
+}
+
+void AEventZoneLink::AutoKill()
+{
+	if (ActorHasTag("ForTower"))
+	{
+		for (AEnemy* Enemy : GetEnemies())
+		{
+			Enemy->SetHealth(0);
+
+		}
+
 		AllEnemiesKilled();
 		Destroy();
 	}
