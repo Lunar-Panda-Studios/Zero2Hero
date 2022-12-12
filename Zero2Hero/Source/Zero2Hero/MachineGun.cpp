@@ -75,13 +75,28 @@ void AMachineGun::Attack()
 			{
 				if (DecreaseCharge(ChargeUsage))
 				{
+					FVector cameraRot = Camera->GetActorForwardVector();
+					FVector cameraPos = Camera->GetActorLocation();
+					FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+					FHitResult Hit;
 					FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-
 					rotation.Pitch += CameraAimDifference;
+
+					if (GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams())
+						|| GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_Pawn, TraceParams, FCollisionResponseParams()))
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("working"));
+						rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.Location);
+					}
 					AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+
 					if (Bullet != nullptr)
 					{
 						Bullet->Damage = Damage;
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("not working"));
 					}
 					currentCooldown = 0.0f;
 				}

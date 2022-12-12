@@ -62,6 +62,9 @@ protected:
 	UPROPERTY()
 		UGameManager* Manager;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float cameraRayRange = 100000.0f;
+
 
 public:	
 	// Called every frame
@@ -110,5 +113,8 @@ public:
 		FName GetWeaponName();
 	UFUNCTION()
 		void SetAmmo(float ammo);
+
+	UFUNCTION()
+		FRotator spawnRot();
 
 };

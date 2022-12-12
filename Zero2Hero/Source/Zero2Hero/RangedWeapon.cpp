@@ -2,6 +2,8 @@
 
 
 #include "RangedWeapon.h"
+#include "Kismet\KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ARangedWeapon::ARangedWeapon()
@@ -162,5 +164,22 @@ FName ARangedWeapon::GetWeaponName()
 void ARangedWeapon::SetAmmo(float ammo)
 {
 	CurrentAmmo = ammo;
+}
+
+FRotator ARangedWeapon::spawnRot()
+{
+	FVector cameraRot = Camera->GetActorForwardVector();
+	FVector cameraPos = Camera->GetActorLocation();
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	FHitResult Hit;
+
+	if (GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams())
+		|| GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_Pawn, TraceParams, FCollisionResponseParams()))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("working"));
+		return UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.Location);
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("not working"));
+	return FRotator();
 }
 

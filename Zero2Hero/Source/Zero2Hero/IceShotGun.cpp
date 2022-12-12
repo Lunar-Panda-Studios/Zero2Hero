@@ -51,6 +51,7 @@ void AIceShotGun::Tick(float DeltaTime)
 
 void AIceShotGun::PrimaryAttack()
 {
+	Super::PrimaryAttack();
 	if (CanShoot)
 	{
 		if (Camera != nullptr)
@@ -77,7 +78,15 @@ void AIceShotGun::PrimaryAttack()
 					for (int i = 0; i < IcicleNumber; i++)
 					{
 						Rotation = FRotator((Temp.Pitch - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Pitch, Max.Pitch), (Temp.Yaw - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Yaw, Max.Yaw), (Temp.Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
-						AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+						AProjectile* Icicle;
+						if (spawnRot() != FRotator::ZeroRotator)
+						{
+							Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), spawnRot(), spawnParams);
+						}
+						else
+						{
+							Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+						}
 						if (Icicle != nullptr)
 						{
 							Icicle->Damage = Damage;
