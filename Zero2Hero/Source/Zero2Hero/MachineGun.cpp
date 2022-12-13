@@ -68,6 +68,11 @@ void AMachineGun::Attack()
 	{
 		if (Camera != nullptr)
 		{
+			AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+			FRotator Rotation = FRotator(Player->GetActorRotation().Pitch, Camera->GetSpringArm()->GetComponentRotation().Yaw, Player->GetActorRotation().Roll);
+			Player->SetActorRotation(Rotation);
+
 			FActorSpawnParameters spawnParams;
 			spawnParams.Owner = this;
 			spawnParams.Instigator = GetInstigator();

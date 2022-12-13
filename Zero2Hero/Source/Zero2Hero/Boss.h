@@ -12,6 +12,7 @@
 #include "ShockWave.h"
 #include "GameManager.h"
 #include "BossFailSafeSpawn.h"
+#include "AllEnemiesDefeated.h"
 #include "Boss.generated.h"
 
 UENUM()
@@ -195,11 +196,11 @@ protected:
 
 	//Phase 2 - Summoning General
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - General")
+		TSubclassOf<AAllEnemiesDefeated> EnemiesDefeatedBP;
+	UPROPERTY()
+		AAllEnemiesDefeated* EnemiesDefeated;
+	UPROPERTY(EditAnywhere, Category = "Phase 2 - General")
 		UAnimSequence* BossIdle;
-	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
-		USphereComponent* SummonRangeMax;
-	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
-		USphereComponent* SummonRangeMin;
 	UPROPERTY(EditAnywhere, Category = "Phase 2 - Summoning General")
 		TSubclassOf<ABossFailSafeSpawn> FailSafeSpawnLocationBP;
 	UPROPERTY()
@@ -209,7 +210,7 @@ protected:
 	UPROPERTY()
 		bool SpawnSet = false;
 	UPROPERTY(EditAnywhere)
-		USphereComponent* FailSafeSpawnLocation;
+		TArray<USphereComponent*> FailSafeSpawnLocations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Launcher1Fixed = false;

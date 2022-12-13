@@ -25,6 +25,8 @@ class ZERO2HERO_API USaveSystem : public USaveGame
 	GENERATED_BODY()
 
 	UPROPERTY()
+		bool TowerOpen = false;
+	UPROPERTY()
 		FVector CheckPointSpawn;
 	UPROPERTY()
 		TArray<struct FPowerCoreLocation> PowerCores;
@@ -50,6 +52,8 @@ public:
 		void SetBridgeComplete(bool bridgeStatus);
 	UFUNCTION()
 		void SetRangedWeapons(float ice, float fire, float nature, float electric);
+	UFUNCTION()
+		void SetTowerOpen(bool newOpen);
 
 	UFUNCTION()
 		FVector GetCPSpawn();
@@ -68,4 +72,6 @@ public:
 		float GetNatureAmmo();
 	UFUNCTION()
 		float GetElectricAmmo();
+	UFUNCTION()
+		bool GetTowerOpen();
 };

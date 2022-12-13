@@ -69,10 +69,15 @@ protected:
 		bool CanDamage = true;
 	UPROPERTY()
 		bool HasSpawned = false;
+	UPROPERTY()
+		bool CanSpawn = false;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+		void SetCanSpawn(bool newSpawn);
 
 	UFUNCTION()
 		int GetDamage();

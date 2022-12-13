@@ -60,6 +60,23 @@ void ABombTosser::Tick(float DeltaTime)
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		if (HasSetStartLocation)
+		{
+			if (RadiusCanFollow != 0)
+			{
+				FVector Start = StartLocation;
+				Start.Z = 0;
+				FVector ActorLocation = GetActorLocation();
+				ActorLocation.Z = 0;
+
+				if ((Start - ActorLocation).Size() > RadiusCanFollow)
+				{
+					Disenage = true;
+					DisenageTimer = 0;
+				}
+			}
+		}
+
 		if (ZMoveAtStart)
 		{
 			if (BBC != nullptr)
@@ -74,7 +91,7 @@ void ABombTosser::Tick(float DeltaTime)
 		//	}
 		//}
 
-		if (InRange)
+		if (InRange && !Disenage)
 		{
 			AttackSpeedTimer += DeltaTime;
 

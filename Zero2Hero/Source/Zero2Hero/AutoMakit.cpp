@@ -59,6 +59,36 @@ void AAutoMakit::Tick(float DeltaTime)
 
 	if (UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->InputEnabled())
 	{
+		if (!HasSetStartLocation)
+		{
+			StartLocation = GetActorLocation();
+			HasSetStartLocation = true;
+		}
+		else
+		{
+			if (CanSee)
+			{
+				if (RadiusCanFollow != 0)
+				{
+					if (BBC != nullptr)
+					{
+						FVector PatrolLocation = BBC->GetValueAsVector("PatrolLocation");
+						PatrolLocation.Z = 0;
+						FVector ActorLocation = GetActorLocation();
+						ActorLocation.Z = 0;
+
+						Mag = ((PatrolLocation - ActorLocation).Size());
+
+						if (Mag > RadiusCanFollow)
+						{
+							Disenage = true;
+							DisenageTimer = 0;
+						}
+					}
+				}
+			}
+		}
+
 		if (ZMoveAtStart)
 		{
 			if (BBC != nullptr)
@@ -68,13 +98,7 @@ void AAutoMakit::Tick(float DeltaTime)
 
 		}
 
-		//	if (GetActorLocation().Z == DistanceFromGround)
-		//	{
-		//		ZMoveAtStart = false;
-		//	}
-		//}
-
-		if (InRange)
+		if (InRange && !Disenage)
 		{
 			AttackSpeedTimer += DeltaTime;
 
