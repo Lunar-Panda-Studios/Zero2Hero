@@ -75,12 +75,8 @@ void AMachineGun::Attack()
 			{
 				if (DecreaseCharge(ChargeUsage))
 				{
-					FRotator rotation;
-					if (spawnRot() != FRotator::ZeroRotator)
-					{
-						rotation = spawnRot();
-					}
-					else
+					FRotator rotation = spawnRot();
+					if (rotation == FRotator::ZeroRotator)
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fuck"));
 						rotation = Camera->GetSpringArm()->GetComponentRotation();
