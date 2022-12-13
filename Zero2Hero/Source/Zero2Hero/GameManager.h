@@ -88,6 +88,8 @@ public:
 		void SetCurrentCheckPoint(FVector newCPLocation);
 	UFUNCTION()
 		bool SetCurrentCheckPointNum(int newCPNum);
+	UFUNCTION()
+		bool GetIsInBossFight();
 
 	UFUNCTION()
 		FVector GetCurrentCP();

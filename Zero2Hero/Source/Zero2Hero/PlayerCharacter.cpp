@@ -28,7 +28,7 @@ void APlayerCharacter::BeginPlay()
 
 	if (Manager != nullptr)
 	{
-		if (Manager->GetLoadingSave())
+		if (Manager->GetLoadingSave() && !Manager->GetIsInBossFight())
 		{
 			Manager->Respawn(this);
 		}
