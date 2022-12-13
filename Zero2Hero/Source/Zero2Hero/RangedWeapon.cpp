@@ -172,7 +172,6 @@ FRotator ARangedWeapon::spawnRot()
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
 	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
 	AActor* p = GetWorld()->GetFirstPlayerController();
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Player->GetName());
 	TraceParams.AddIgnoredActor(this);
 	TraceParams.AddIgnoredActor(p);
 	TraceParams.AddIgnoredActor(Player);

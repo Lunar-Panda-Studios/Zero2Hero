@@ -66,14 +66,18 @@ void AIceShotGun::PrimaryAttack()
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire Location Set"));
 				FRotator Rotation;
 
-				FRotator Temp = Camera->GetSpringArm()->GetComponentRotation();
-				Temp.Pitch += CameraAimDifference;
-				Temp.Yaw += CameraAimDifferenceYaw;
+				FRotator Temp;
 
 				FRotator spawnRotation = spawnRot();
 				if (spawnRotation != FRotator::ZeroRotator)
 				{
 					Temp = spawnRotation;
+				}
+				else
+				{
+					Temp = Camera->GetSpringArm()->GetComponentRotation();
+					Temp.Pitch += CameraAimDifference;
+					Temp.Yaw += CameraAimDifferenceYaw;
 				}
 
 				
