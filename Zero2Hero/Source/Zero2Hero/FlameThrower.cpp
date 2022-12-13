@@ -121,7 +121,7 @@ void AFlameThrower::SecondaryAttack()
 void AFlameThrower::Fire()
 {
 	FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-	rotation.Pitch += CameraAimDifference;
+	rotation.Pitch += CameraAimDifference + zLaunchRot;
 	rotation.Yaw += CameraAimDifferenceYaw;
 
 	FActorSpawnParameters spawnParams;
