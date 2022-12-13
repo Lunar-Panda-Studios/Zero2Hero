@@ -68,6 +68,11 @@ void AMachineGun::Attack()
 	{
 		if (Camera != nullptr)
 		{
+			AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+			FRotator Rotation = FRotator(Player->GetActorRotation().Pitch, Camera->GetSpringArm()->GetComponentRotation().Yaw, Player->GetActorRotation().Roll);
+			Player->SetActorRotation(Rotation);
+
 			FActorSpawnParameters spawnParams;
 			spawnParams.Owner = this;
 			spawnParams.Instigator = GetInstigator();
@@ -75,13 +80,22 @@ void AMachineGun::Attack()
 			{
 				if (DecreaseCharge(ChargeUsage))
 				{
-					FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-
-					rotation.Pitch += CameraAimDifference;
+					FRotator rotation = spawnRot();
+					if (rotation == FRotator::ZeroRotator)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fuck"));
+						rotation = Camera->GetSpringArm()->GetComponentRotation();
+						rotation.Pitch += CameraAimDifference;
+					}
 					AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
+
 					if (Bullet != nullptr)
 					{
 						Bullet->Damage = Damage;
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("not working"));
 					}
 					currentCooldown = 0.0f;
 				}

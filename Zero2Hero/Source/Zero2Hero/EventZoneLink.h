@@ -32,11 +32,17 @@ protected:
 		TArray<AActor*> actors;
 	UPROPERTY()
 		UClass* seekClass;
+	UPROPERTY()
+		UGameManager* Manager;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void AllEnemiesKilled();
+	UFUNCTION()
+		TArray<AEnemy*> GetEnemies();
+	UFUNCTION(BlueprintCallable)
+		void AutoKill();
 
 };

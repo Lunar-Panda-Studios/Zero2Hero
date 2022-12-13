@@ -2,6 +2,9 @@
 
 
 #include "RangedWeapon.h"
+#include "Kismet\KismetSystemLibrary.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ARangedWeapon::ARangedWeapon()
@@ -162,5 +165,29 @@ FName ARangedWeapon::GetWeaponName()
 void ARangedWeapon::SetAmmo(float ammo)
 {
 	CurrentAmmo = ammo;
+}
+
+FRotator ARangedWeapon::spawnRot()
+{
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	AActor* p = GetWorld()->GetFirstPlayerController();
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Player->GetName());
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.AddIgnoredActor(p);
+	TraceParams.AddIgnoredActor(Player);
+	TArray<AActor*> outChildren;
+	GetWorld()->GetFirstPlayerController()->GetAttachedActors(outChildren);
+	TraceParams.AddIgnoredActors(outChildren);
+	TraceParams.AddIgnoredActor(Camera);
+	FHitResult Hit;
+	UCameraComponent* cameraComp = Camera->GetCameraComp();
+	FVector loc = cameraComp->GetComponentLocation();
+	FVector x = FVector(cameraComp->GetForwardVector() * cameraRayRange + loc);
+	if (GetWorld()->LineTraceSingleByChannel(OUT Hit, loc, x, ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams()))
+	{
+		return UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.ImpactPoint);
+	}
+	return FRotator(0, 0, 0);
 }
 
