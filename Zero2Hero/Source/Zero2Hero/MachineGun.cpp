@@ -75,18 +75,16 @@ void AMachineGun::Attack()
 			{
 				if (DecreaseCharge(ChargeUsage))
 				{
-					FVector cameraRot = Camera->GetActorForwardVector();
-					FVector cameraPos = Camera->GetActorLocation();
-					FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
-					FHitResult Hit;
-					FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-					rotation.Pitch += CameraAimDifference;
-
-					if (GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams())
-						|| GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_Pawn, TraceParams, FCollisionResponseParams()))
+					FRotator rotation;
+					if (spawnRot() != FRotator::ZeroRotator)
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("working"));
-						rotation = UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.Location);
+						rotation = spawnRot();
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fuck"));
+						rotation = Camera->GetSpringArm()->GetComponentRotation();
+						rotation.Pitch += CameraAimDifference;
 					}
 					AProjectile* Bullet = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), rotation, spawnParams);
 

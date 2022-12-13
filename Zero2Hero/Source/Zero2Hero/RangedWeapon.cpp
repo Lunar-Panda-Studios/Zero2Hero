@@ -168,18 +168,23 @@ void ARangedWeapon::SetAmmo(float ammo)
 
 FRotator ARangedWeapon::spawnRot()
 {
-	FVector cameraRot = Camera->GetActorForwardVector();
-	FVector cameraPos = Camera->GetActorLocation();
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	AActor* p = GetWorld()->GetFirstPlayerController();
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.AddIgnoredActor(p);
+	TraceParams.AddIgnoredActor(Player);
+	TArray<AActor*> outChildren;
+	GetWorld()->GetFirstPlayerController()->GetAttachedActors(outChildren);
+	TraceParams.AddIgnoredActors(outChildren);
+	TraceParams.AddIgnoredActor(Camera);
 	FHitResult Hit;
-
-	if (GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams())
-		|| GetWorld()->LineTraceSingleByChannel(OUT Hit, GetActorLocation(), cameraPos * (cameraRot * cameraRayRange), ECollisionChannel::ECC_Pawn, TraceParams, FCollisionResponseParams()))
+	FVector x = FVector(Camera->GetSpringArm()->GetForwardVector() * cameraRayRange + Camera->GetActorLocation());
+	if (GetWorld()->LineTraceSingleByChannel(OUT Hit, Camera->GetActorLocation(), x, ECollisionChannel::ECC_WorldStatic, TraceParams, FCollisionResponseParams()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("working"));
-		return UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.Location);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Hit.GetComponent()->GetName());
+		return UKismetMathLibrary::FindLookAtRotation(FireLocation->GetComponentLocation(), Hit.ImpactPoint);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("not working"));
-	return FRotator();
+	return FRotator(0, 0, 0);
 }
 

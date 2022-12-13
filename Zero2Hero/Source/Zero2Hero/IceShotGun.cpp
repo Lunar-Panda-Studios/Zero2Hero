@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Kismet/KismetMathLibrary.h"
 #include "IceShotGun.h"
 
 // Sets default values
@@ -67,26 +67,32 @@ void AIceShotGun::PrimaryAttack()
 				FRotator Rotation;
 
 				FRotator Temp = Camera->GetSpringArm()->GetComponentRotation();
+
+				FRotator spawnRotation = spawnRot();
+				if (spawnRotation != FRotator::ZeroRotator)
+				{
+					Temp = spawnRotation;
+				}
+
 				Temp.Pitch += CameraAimDifference;
 				Temp.Yaw += CameraAimDifferenceYaw;
 
 				FRotator Max = FRotator(Temp.Pitch + DegreesAroundCentre / 2, Temp.Roll + DegreesAroundCentre / 2, Temp.Roll);
 				FRotator Min = FRotator(Temp.Pitch - DegreesAroundCentre / 2, Temp.Roll - DegreesAroundCentre / 2, Temp.Roll);
 
+				
+
 				if (DecreaseCharge(ChargeUsage))
 				{
+					
+
 					for (int i = 0; i < IcicleNumber; i++)
 					{
 						Rotation = FRotator((Temp.Pitch - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Pitch, Max.Pitch), (Temp.Yaw - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Yaw, Max.Yaw), (Temp.Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
-						AProjectile* Icicle;
-						if (spawnRot() != FRotator::ZeroRotator)
-						{
-							Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), spawnRot(), spawnParams);
-						}
-						else
-						{
-							Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
-						}
+						
+						AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+						
+
 						if (Icicle != nullptr)
 						{
 							Icicle->Damage = Damage;

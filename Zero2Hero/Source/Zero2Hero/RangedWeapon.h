@@ -63,7 +63,7 @@ protected:
 		UGameManager* Manager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float cameraRayRange = 100000.0f;
+		float cameraRayRange = 10000.0f;
 
 
 public:	
