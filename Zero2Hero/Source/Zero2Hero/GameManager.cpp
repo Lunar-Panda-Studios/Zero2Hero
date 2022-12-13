@@ -114,6 +114,11 @@ void UGameManager::SetFireAmmo(float newAmmo)
 	FireAmmo = newAmmo;
 }
 
+bool UGameManager::GetIsInBossFight()
+{
+	return InBossFight;
+}
+
 bool UGameManager::GetTowerOpen()
 {
 	return TowerOpen;
@@ -247,12 +252,12 @@ void UGameManager::SaveGame(TSubclassOf<USaveSystem> Save)
 
 bool UGameManager::LoadGame()
 {
-	LoadingIn = true;
-
 	USaveSystem* Save = Cast<USaveSystem>(UGameplayStatics::LoadGameFromSlot("EQUI&AcaData", 0));
 
 	if (Save == nullptr)
 	{
+		LoadingIn = false;
+		LoadingSave = false;
 		return false;
 	}
 
@@ -265,5 +270,7 @@ bool UGameManager::LoadGame()
 	FireAmmo = Save->GetFireAmmo();
 	TowerOpen = Save->GetTowerOpen();
 
+	LoadingIn = true;
+	LoadingSave = true;
 	return true;
 }
