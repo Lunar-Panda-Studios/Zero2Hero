@@ -39,7 +39,7 @@ protected:
 		int Damage;
 	UPROPERTY()
 		bool isDead = false;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool beingRevived = false;
 	UPROPERTY(EditAnywhere, Category = "Character Stats")
 		float AnimationTime;
@@ -61,6 +61,14 @@ protected:
 		bool DropAmmo = false;
 	UPROPERTY()
 		TSubclassOf<AActor> SpawnOnDeath;
+	UPROPERTY()
+		bool IsCrystal = false;
+	UPROPERTY()
+		bool isBoss = false;
+	UPROPERTY(BlueprintReadWrite)
+		bool CanDamage = true;
+	UPROPERTY()
+		bool HasSpawned = false;
 
 public:	
 	// Called every frame
@@ -76,6 +84,10 @@ public:
 		void SetBeingRevived(bool newRevive);
 	UFUNCTION()
 		void SetIsDead(bool newDead);
+	UFUNCTION()
+		void SetIsCrystal(bool NewIsCrystal);
+	UFUNCTION()
+		virtual void OnDeath();
 
 	UFUNCTION(BlueprintCallable)
 		float GetHealth();

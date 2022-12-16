@@ -48,13 +48,19 @@ void AGrapplingHook::Tick(float DeltaTime)
 		{
 			if (!canGrapple)
 			{
-				EndGrapple = true;
-				canGrapple = false;
+				Detach();
 			}
 		}
 
 		PreviousMag = CurrentMag;
 	}
+}
+
+void AGrapplingHook::Detach()
+{
+	isGrappling = false;
+	EndGrapple = true;
+	canGrapple = true;
 }
 
 bool AGrapplingHook::Fire()
@@ -138,17 +144,17 @@ void AGrapplingHook::SetCamera(UCameraComponent* Camera)
 
 void AGrapplingHook::SetGrapplePoint(AActor* NewPoint)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Set Grapple"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Set Grapple"));
 	GrapplePoint = NewPoint;
 
-	//if (GrapplePoint != nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not Null"));
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Null"));
-	//}
+	if (GrapplePoint != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Not Null"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Null"));
+	}
 }
 
 AActor* AGrapplingHook::GetGrapplePoint()
@@ -202,5 +208,10 @@ bool AGrapplingHook::GetEndGrapple()
 void AGrapplingHook::SetEndGrapple(bool newGrapple)
 {
 	EndGrapple = newGrapple;
+}
+
+bool AGrapplingHook::GetCanGrapple()
+{
+	return canGrapple;
 }
 
