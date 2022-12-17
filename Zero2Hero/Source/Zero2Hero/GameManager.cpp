@@ -114,6 +114,54 @@ void UGameManager::SetFireAmmo(float newAmmo)
 	FireAmmo = newAmmo;
 }
 
+bool UGameManager::GetIsInBossFight()
+{
+	return InBossFight;
+}
+
+bool UGameManager::GetTowerOpen()
+{
+	return TowerOpen;
+}
+
+void UGameManager::SetTowerOpen(bool newOpen)
+{
+	TowerOpen = newOpen;
+}
+
+void UGameManager::SaveOptions(TSubclassOf<USaveSystem> Save)
+{
+	UOptionsSave* Saved = Cast<UOptionsSave>(UGameplayStatics::CreateSaveGameObject(Save));
+
+	Saved->SetMasterVol(AppliedMasterVol);
+	Saved->SetSFXVol(AppliedSFXVol);
+	Saved->SetMusicVol(AppliedMusicVol);
+	Saved->SetVoiceVol(AppliedVoiceVol);
+	Saved->SetSubTitles(AppliedSubtiles);
+	Saved->SetSensetivity(AppliedMouseSense);
+
+	UGameplayStatics::SaveGameToSlot(Saved, "EQUI&AcaOption", 0);
+}
+
+bool UGameManager::LoadOptions()
+{
+	UOptionsSave* Save = Cast<UOptionsSave>(UGameplayStatics::LoadGameFromSlot("EQUI&AcaOption", 0));
+
+	if (Save == nullptr)
+	{
+		return false;
+	}
+
+	AppliedMasterVol = Save->GetMasterVol();
+	AppliedSFXVol = Save->GetSFXVol();
+	AppliedMusicVol = Save->GetMusicVol();
+	AppliedVoiceVol = Save->GetVoiceVol();
+	AppliedSubtiles = Save->GetSubtitles();
+	AppliedMouseSense = Save->GetSensetivity();
+
+	return true;
+}
+
 FVector UGameManager::GetCurrentCheckPoint()
 {
 	return CurrentCheckPoint;
@@ -194,6 +242,7 @@ void UGameManager::SaveGame(TSubclassOf<USaveSystem> Save)
 		Saved->SetBridgeComplete(BridgeStatus);
 		Saved->SetRangedWeapons(IceAmmo, FireAmmo, NatureAmmo, ElectricAmmo);
 		Saved->SetPowerCoreLocation(PowerCores);
+		Saved->SetTowerOpen(TowerOpen);
 
 		//FString SaveFile = "EQUI&AcaData" + FDateTime::Now().ToString();
 
@@ -203,12 +252,12 @@ void UGameManager::SaveGame(TSubclassOf<USaveSystem> Save)
 
 bool UGameManager::LoadGame()
 {
-	LoadingIn = true;
-
 	USaveSystem* Save = Cast<USaveSystem>(UGameplayStatics::LoadGameFromSlot("EQUI&AcaData", 0));
 
 	if (Save == nullptr)
 	{
+		LoadingIn = false;
+		LoadingSave = false;
 		return false;
 	}
 
@@ -219,6 +268,9 @@ bool UGameManager::LoadGame()
 	ElectricAmmo = Save->GetElectricAmmo();
 	NatureAmmo = Save->GetNatureAmmo();
 	FireAmmo = Save->GetFireAmmo();
+	TowerOpen = Save->GetTowerOpen();
 
+	LoadingIn = true;
+	LoadingSave = true;
 	return true;
 }

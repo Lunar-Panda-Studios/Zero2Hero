@@ -23,6 +23,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -86,6 +87,19 @@ protected:
 	UPROPERTY()
 		bool ZMoveAtStart = false;
 
+	UPROPERTY()
+		bool ShouldReset = true;
+	UPROPERTY()
+		FVector StartingAggroLocation;
+	UPROPERTY()
+		bool Disenage = false;
+	UPROPERTY()
+		float DisenageFor = 5;
+	UPROPERTY()
+		float DisenageTimer = 0;
+	UPROPERTY()
+		float Mag = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBoxComponent* MainBody;
 	UPROPERTY(EditAnywhere)
@@ -112,6 +126,8 @@ public:
 
 	virtual void Attack();
 
+	UFUNCTION()
+		bool GetDisenage();
 	UFUNCTION()
 		bool GetCanSee();
 	UFUNCTION()

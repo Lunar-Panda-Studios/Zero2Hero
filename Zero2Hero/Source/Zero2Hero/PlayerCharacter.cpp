@@ -28,7 +28,7 @@ void APlayerCharacter::BeginPlay()
 
 	if (Manager != nullptr)
 	{
-		if (Manager->GetLoadingSave())
+		if (Manager->GetLoadingSave() && !Manager->GetIsInBossFight())
 		{
 			Manager->Respawn(this);
 		}
@@ -667,6 +667,7 @@ void APlayerCharacter::ChangeToWeapon1()
 {
 	if (currentWeapon != 0 && Allow)
 	{
+		allRangedWeapons[currentWeapon]->PrimaryAttackEnd();
 		currentWeapon = 0;
 		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 		SwitchWeapon();
@@ -678,6 +679,7 @@ void APlayerCharacter::ChangeToWeapon2()
 {
 	if (currentWeapon != 1 && Allow)
 	{
+		allRangedWeapons[currentWeapon]->PrimaryAttackEnd();
 		currentWeapon = 1;
 		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 		SwitchWeapon();
@@ -688,6 +690,7 @@ void APlayerCharacter::ChangeToWeapon3()
 {
 	if (currentWeapon != 2 && Allow)
 	{
+		allRangedWeapons[currentWeapon]->PrimaryAttackEnd();
 		currentWeapon = 2;
 		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 		SwitchWeapon();
@@ -698,6 +701,7 @@ void APlayerCharacter::ChangeToWeapon4()
 {
 	if (currentWeapon != 3 && Allow)
 	{
+		allRangedWeapons[currentWeapon]->PrimaryAttackEnd();
 		currentWeapon = 3;
 		CurrentRangedWeapon = allRangedWeapons[currentWeapon];
 		SwitchWeapon();

@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "SaveSystem.h"
+#include "OptionsSave.h"
 #include "GameManager.generated.h"
 
 /**
@@ -52,11 +53,27 @@ protected:
 		float NatureAmmo;
 	UPROPERTY()
 		float FireAmmo;
+	UPROPERTY(BlueprintReadWrite)
+		bool TowerOpen = false;
 
 	UPROPERTY(BlueprintReadWrite)
 		bool LoadingSave = false;
 	UPROPERTY()
 		bool LoadingIn = false;
+
+	//For Options Save 
+	UPROPERTY(BlueprintReadWrite)
+		float AppliedMasterVol = 0.5f;
+	UPROPERTY(BlueprintReadWrite)
+		float AppliedMusicVol = 0.5f;
+	UPROPERTY(BlueprintReadWrite)
+		float AppliedSFXVol = 0.5f;
+	UPROPERTY(BlueprintReadWrite)
+		float AppliedVoiceVol = 0.5f;
+	UPROPERTY(BlueprintReadWrite)
+		bool AppliedSubtiles = true;
+	UPROPERTY(BlueprintReadWrite)
+		float AppliedMouseSense = 2.0f;
 
 public:
 	UFUNCTION()
@@ -71,6 +88,8 @@ public:
 		void SetCurrentCheckPoint(FVector newCPLocation);
 	UFUNCTION()
 		bool SetCurrentCheckPointNum(int newCPNum);
+	UFUNCTION()
+		bool GetIsInBossFight();
 
 	UFUNCTION()
 		FVector GetCurrentCP();
@@ -97,6 +116,10 @@ public:
 		float GetElectricAmmo();
 	UFUNCTION()
 		void SetElectricAmmo(float newAmmo);
+	UFUNCTION()
+		bool GetTowerOpen();
+	UFUNCTION()
+		void SetTowerOpen(bool newOpen);
 
 	UFUNCTION(BlueprintCallable)
 		void addPowerCore(FName Colour, bool InInventory, bool Placed);
@@ -111,5 +134,10 @@ public:
 		FVector GetCurrentCheckPoint();
 	UFUNCTION(BlueprintImplementableEvent)
 		void ReloadBossScene();
+
+	UFUNCTION(BlueprintCallable)
+		void SaveOptions(TSubclassOf<USaveSystem> Save);
+	UFUNCTION(BlueprintCallable)
+		bool LoadOptions();
 	
 };

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "IceShotGun.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AIceShotGun::AIceShotGun()
@@ -51,6 +51,7 @@ void AIceShotGun::Tick(float DeltaTime)
 
 void AIceShotGun::PrimaryAttack()
 {
+	Super::PrimaryAttack();
 	if (CanShoot)
 	{
 		if (Camera != nullptr)
@@ -65,19 +66,37 @@ void AIceShotGun::PrimaryAttack()
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Fire Location Set"));
 				FRotator Rotation;
 
-				FRotator Temp = Camera->GetSpringArm()->GetComponentRotation();
-				Temp.Pitch += CameraAimDifference;
-				Temp.Yaw += CameraAimDifferenceYaw;
+				FRotator Temp;
 
-				FRotator Max = FRotator(Temp.Pitch + DegreesAroundCentre / 2, Temp.Roll + DegreesAroundCentre / 2, Temp.Roll);
-				FRotator Min = FRotator(Temp.Pitch - DegreesAroundCentre / 2, Temp.Roll - DegreesAroundCentre / 2, Temp.Roll);
+				FRotator spawnRotation = spawnRot();
+				if (spawnRotation != FRotator::ZeroRotator)
+				{
+					Temp = spawnRotation;
+				}
+				else
+				{
+					Temp = Camera->GetSpringArm()->GetComponentRotation();
+					Temp.Pitch += CameraAimDifference;
+					Temp.Yaw += CameraAimDifferenceYaw;
+				}
+
+				
+
+				FRotator Max = FRotator(DegreesAroundCentre, DegreesAroundCentre, DegreesAroundCentre);
+				FRotator Min = FRotator(-DegreesAroundCentre, -DegreesAroundCentre, -DegreesAroundCentre);
+
+				
 
 				if (DecreaseCharge(ChargeUsage))
 				{
 					for (int i = 0; i < IcicleNumber; i++)
 					{
-						Rotation = FRotator((Temp.Pitch - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Pitch, Max.Pitch), (Temp.Yaw - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Yaw, Max.Yaw), (Temp.Roll - DegreesAroundCentre / 4) + FMath::FRandRange(Min.Roll, Max.Roll));
+						
+						Rotation = FRotator((Temp.Pitch - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Pitch, Max.Pitch), (Temp.Yaw - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Yaw, Max.Yaw), (Temp.Roll - DegreesAroundCentre / IcicleNumber) + FMath::FRandRange(Min.Roll, Max.Roll));
+						
 						AProjectile* Icicle = GetWorld()->SpawnActor<AProjectile>(Projectile, FireLocation->GetComponentLocation(), Rotation, spawnParams);
+						
+
 						if (Icicle != nullptr)
 						{
 							Icicle->Damage = Damage;

@@ -44,7 +44,7 @@ void AChargeRifle::PrimaryAttack()
 		spawnParams.Instigator = GetInstigator();
 
 		FRotator rotation = Camera->GetSpringArm()->GetComponentRotation();
-		rotation.Pitch += CameraAimDifference;
+		rotation.Pitch += CameraAimDifference + zLaunchRot;
 		rotation.Yaw += CameraAimDifferenceYaw;
 
 		ASuctionGrenade* succ = GetWorld()->SpawnActor<ASuctionGrenade>(SecondaryProjectile, FireLocation->GetComponentLocation(), rotation, spawnParams);

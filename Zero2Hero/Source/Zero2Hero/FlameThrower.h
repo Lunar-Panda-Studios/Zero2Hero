@@ -51,7 +51,8 @@ protected:
 		float currentTimeToThrow = 0.0f;
 	UPROPERTY()
 		bool shoot = false;
-
+	UPROPERTY()
+		float zLaunchRot = 20.0f;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -54,7 +54,8 @@ public:
 
 	UPROPERTY()
 		bool hasFired = false;
-
+	UPROPERTY()
+		float zLaunchRot = 20.0f;
 	
 
 };
